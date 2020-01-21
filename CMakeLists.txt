@@ -147,6 +147,7 @@ add_subdirectory(source/MaterialXFormat)
 
 # Add shader generation subdirectories
 add_subdirectory(source/MaterialXGenShader)
+add_subdirectory(source/MaterialXGenMdl)
 add_subdirectory(source/MaterialXGenOsl)
 add_subdirectory(source/MaterialXGenGlsl)
 
