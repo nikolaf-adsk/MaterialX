@@ -16,7 +16,7 @@ def usage():
     print 'Usage:  genmdl.py <library search path> [<module name> <version>]'
     print '- A new directory called "library/stdlib/genmdl" will be created with two files added:'
     print '   - <module_name>.mdl: Module with signature stubs for each MaterialX nodedef'
-    print '   - stdlib_genmdl_impl.mtlx: MaterialX nodedef implementation mapping file'
+    print '   - <module_name>_genmdl_impl.mtlx: MaterialX nodedef implementation mapping file'
     print '- By default <module_name>="mymodule" and <version>="1.6"'
 
 def _getSubDirectories(libraryPath):
@@ -880,7 +880,7 @@ def main():
         file.close()
 
     # Save implementation reference file to disk
-    implFileName = LIBRARY + '_' + GENMDL + '_' + IMPLEMENTATION_STRING + '.mtlx'
+    implFileName = moduleName + '_' + GENMDL + '_' + IMPLEMENTATION_STRING + '.mtlx'
     implPath = os.path.join(outputPath, implFileName)
     print('Wrote implementation file: ' + implPath + '. ' + str(implementedCont) + '/' + str(totalCount) + '\n')
     mx.writeToXmlFile(implDoc, implPath)
