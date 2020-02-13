@@ -793,7 +793,8 @@ void ShaderGeneratorTester::validate(const mx::GenOptions& generateOptions, cons
                     }
                     else if (sourceCode.size())
                     {
-                        mx::FilePath path = mx::FilePath::getCurrentPath() / "generatedshaders";
+                        std::string sourceURI = doc->getActiveSourceUri();
+                        mx::FilePath path = mx::FilePath(sourceURI.substr(0, sourceURI.size() - 4)) / "generatedshaders";
                         if (!path.exists())
                         {
                             path.createDirectory();
