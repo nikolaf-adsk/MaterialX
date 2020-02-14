@@ -144,7 +144,7 @@ endfunction(assign_source_group)
 
 # Add core subdirectories
 
-if(MATERIALX_BUILD_VIEWER)
+if(MATERIALX_BUILD_WASM)
     add_subdirectory(source/MaterialXCore)
     add_subdirectory(source/MaterialXFormat)
 else()
