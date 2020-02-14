@@ -22,3 +22,6 @@ deploy
 # Ignore local editor settings
 .vscode/*
 
+# Ignore the build wasm folder
+wasm/*
+

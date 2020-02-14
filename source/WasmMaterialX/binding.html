@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <script>
+    var MaterialX;
+    var Module = {
+      onRuntimeInitialized: function () {
+        MaterialX = WasmUtil.generateWrappers(Module);
+        WasmUtil.test(MaterialX);
+      }
+    };
+  </script>
+
+  <!-- WasmUtil javascript wrapper -->
+  <script src="WasmMaterialXCore/WasmUtil.js"></script>
+
+  <!-- output from em++ -->
+  <script src="WasmMaterialXCore/MaterialXCore.js"></script>
+</html>
