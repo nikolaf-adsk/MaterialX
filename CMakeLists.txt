@@ -11,6 +11,7 @@ set(CMAKE_MACOSX_RPATH ON)
 enable_testing()
 
 option(MATERIALX_BUILD_PYTHON "Build the MaterialX Python package from C++ bindings. Requires Python 2.7 or greater." OFF)
+option(MATERIALX_BUILD_WASM "Build the MaterialX WASM package from C++ bindings." ON)
 option(MATERIALX_BUILD_VIEWER "Build the MaterialX Viewer." ON)
 option(MATERIALX_BUILD_RUNTIME "Build the MaterialX Runtime data model library." OFF)
 option(MATERIALX_BUILD_DOCS "Create HTML documentation using Doxygen. Requires that Doxygen be installed." OFF)
@@ -142,111 +143,117 @@ function(assign_source_group prefix)
 endfunction(assign_source_group)
 
 # Add core subdirectories
-add_subdirectory(source/MaterialXCore)
-add_subdirectory(source/MaterialXFormat)
 
-# Add shader generation subdirectories
-add_subdirectory(source/MaterialXGenShader)
-add_subdirectory(source/MaterialXGenOsl)
-add_subdirectory(source/MaterialXGenGlsl)
-
-if (MATERIALX_BUILD_CROSS)
-    add_definitions(-DMATERIALX_BUILD_CROSS)
-    add_subdirectory(source/MaterialXCross)
-endif()
-
-if (MATERIALX_BUILD_GEN_OGSXML)
-    add_definitions(-DMATERIALX_BUILD_GEN_OGSXML)
-    add_subdirectory(source/MaterialXGenOgsXml)
-endif()
-if (MATERIALX_BUILD_GEN_OGSFX)
-    add_definitions(-DMATERIALX_BUILD_GEN_OGSFX)
-    add_subdirectory(source/MaterialXGenOgsFx)
-endif()
-if (MATERIALX_BUILD_GEN_ARNOLD)
-    add_definitions(-DMATERIALX_BUILD_GEN_ARNOLD)
-    add_subdirectory(source/MaterialXGenArnold)
-endif()
-
-# Add render module subdirectories
-if(MATERIALX_BUILD_OIIO)
-    add_definitions(-DMATERIALX_BUILD_OIIO)
-    add_definitions(-DOPENIMAGEIO_ROOT_DIR=\"${OPENIMAGEIO_ROOT_DIR}\")
-endif()
-if (MATERIALX_DISABLE_BUILD_RENDER)
-    add_definitions(-DMATERIALX_DISABLE_BUILD_RENDER)    
-else()
-    add_subdirectory(source/MaterialXRender)
-    add_subdirectory(source/MaterialXRenderOsl)
-    add_subdirectory(source/MaterialXRenderHw)
-    add_subdirectory(source/MaterialXRenderGlsl)
-endif()
-
-if (MATERIALX_BUILD_CONTRIB)
-    add_definitions(-DMATERIALX_BUILD_CONTRIB)
-    add_subdirectory(source/MaterialXContrib)
-endif()
-
-if(MATERIALX_TEST_RENDER)
-    add_definitions(-DMATERIALX_TEST_RENDER)
-endif()
-
-# Add viewer subdirectory
 if(MATERIALX_BUILD_VIEWER)
-    add_subdirectory(source/MaterialXView)
-endif()
+    add_subdirectory(source/MaterialXCore)
+    add_subdirectory(source/MaterialXFormat)
+else()
+    add_subdirectory(source/MaterialXCore)
+    add_subdirectory(source/MaterialXFormat)
 
-# Add runtime subdirectory
-if(MATERIALX_BUILD_RUNTIME)
-    add_definitions(-DMATERIALX_BUILD_RUNTIME)
-    add_subdirectory(source/MaterialXRuntime)
-endif()
+    # Add shader generation subdirectories
+    add_subdirectory(source/MaterialXGenShader)
+    add_subdirectory(source/MaterialXGenOsl)
+    add_subdirectory(source/MaterialXGenGlsl)
 
-# Add test subdirectory
-if (NOT MATERIALX_DISABLE_BUILD_RENDER)
-    add_subdirectory(source/MaterialXTest)
-endif()
+    if (MATERIALX_BUILD_CROSS)
+        add_definitions(-DMATERIALX_BUILD_CROSS)
+        add_subdirectory(source/MaterialXCross)
+    endif()
 
-# Add resource and library subdirectories
-add_subdirectory(libraries)
-add_subdirectory(resources)
+    if (MATERIALX_BUILD_GEN_OGSXML)
+        add_definitions(-DMATERIALX_BUILD_GEN_OGSXML)
+        add_subdirectory(source/MaterialXGenOgsXml)
+    endif()
+    if (MATERIALX_BUILD_GEN_OGSFX)
+        add_definitions(-DMATERIALX_BUILD_GEN_OGSFX)
+        add_subdirectory(source/MaterialXGenOgsFx)
+    endif()
+    if (MATERIALX_BUILD_GEN_ARNOLD)
+        add_definitions(-DMATERIALX_BUILD_GEN_ARNOLD)
+        add_subdirectory(source/MaterialXGenArnold)
+    endif()
 
-if(MATERIALX_BUILD_PYTHON)
-    add_subdirectory(source/PyMaterialX)
-    add_subdirectory(python)
-endif()
-if(MATERIALX_BUILD_DOCS)
-    add_subdirectory(documents)
-endif()
-
-if(${CMAKE_VERSION} VERSION_GREATER "3.6.2")
-    if(MATERIALX_BUILD_VIEWER)
-        set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT MaterialXView)
+    # Add render module subdirectories
+    if(MATERIALX_BUILD_OIIO)
+        add_definitions(-DMATERIALX_BUILD_OIIO)
+        add_definitions(-DOPENIMAGEIO_ROOT_DIR=\"${OPENIMAGEIO_ROOT_DIR}\")
+    endif()
+    if (MATERIALX_DISABLE_BUILD_RENDER)
+        add_definitions(-DMATERIALX_DISABLE_BUILD_RENDER)    
     else()
-        if (NOT MATERIALX_DISABLE_BUILD_RENDER)
-            set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT MaterialXTest)
+        add_subdirectory(source/MaterialXRender)
+        add_subdirectory(source/MaterialXRenderOsl)
+        add_subdirectory(source/MaterialXRenderHw)
+        add_subdirectory(source/MaterialXRenderGlsl)
+    endif()
+
+    if (MATERIALX_BUILD_CONTRIB)
+        add_definitions(-DMATERIALX_BUILD_CONTRIB)
+        add_subdirectory(source/MaterialXContrib)
+    endif()
+
+    if(MATERIALX_TEST_RENDER)
+        add_definitions(-DMATERIALX_TEST_RENDER)
+    endif()
+
+    # Add viewer subdirectory
+    if(MATERIALX_BUILD_VIEWER)
+        add_subdirectory(source/MaterialXView)
+    endif()
+
+    # Add runtime subdirectory
+    if(MATERIALX_BUILD_RUNTIME)
+        add_definitions(-DMATERIALX_BUILD_RUNTIME)
+        add_subdirectory(source/MaterialXRuntime)
+    endif()
+
+    # Add test subdirectory
+    if (NOT MATERIALX_DISABLE_BUILD_RENDER)
+        add_subdirectory(source/MaterialXTest)
+    endif()
+
+    # Add resource and library subdirectories
+    add_subdirectory(libraries)
+    add_subdirectory(resources)
+
+    if(MATERIALX_BUILD_PYTHON)
+        add_subdirectory(source/PyMaterialX)
+        add_subdirectory(python)
+    endif()
+    if(MATERIALX_BUILD_DOCS)
+        add_subdirectory(documents)
+    endif()
+
+    if(${CMAKE_VERSION} VERSION_GREATER "3.6.2")
+        if(MATERIALX_BUILD_VIEWER)
+            set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT MaterialXView)
+        else()
+            if (NOT MATERIALX_DISABLE_BUILD_RENDER)
+                set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT MaterialXTest)
+            endif()
         endif()
     endif()
-endif()
 
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    ${CMAKE_BINARY_DIR}/cmake/MaterialXConfigVersion.cmake
-    VERSION ${CMAKE_VERSION}
-    COMPATIBILITY AnyNewerVersion
-)
-
-# Package for using the developer build
-export(
-    EXPORT MaterialX
-    FILE ${CMAKE_BINARY_DIR}/cmake/MaterialXConfig.cmake
+    include(CMakePackageConfigHelpers)
+    write_basic_package_version_file(
+        ${CMAKE_BINARY_DIR}/cmake/MaterialXConfigVersion.cmake
+        VERSION ${CMAKE_VERSION}
+        COMPATIBILITY AnyNewerVersion
     )
 
-# Package for using the installed build
-install(
-    EXPORT      MaterialX
-    DESTINATION cmake
-    FILE        MaterialXConfig.cmake)
-install(
-    FILES "${CMAKE_BINARY_DIR}/cmake/MaterialXConfigVersion.cmake"
-    DESTINATION cmake)
+    # Package for using the developer build
+    export(
+        EXPORT MaterialX
+        FILE ${CMAKE_BINARY_DIR}/cmake/MaterialXConfig.cmake
+        )
+
+    # Package for using the installed build
+    install(
+        EXPORT      MaterialX
+        DESTINATION cmake
+        FILE        MaterialXConfig.cmake)
+    install(
+        FILES "${CMAKE_BINARY_DIR}/cmake/MaterialXConfigVersion.cmake"
+        DESTINATION cmake)
+endif()
