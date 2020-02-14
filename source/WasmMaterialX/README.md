@@ -13,9 +13,38 @@ Make sure to clone the [emsdk repository](https://github.com/emscripten-core/ems
 ### Steps
 In the root of directory of this repository run the following:
 
-1. mkdir ./wasm
-2. cd ./wasm
-3. emcmake cmake .. -G "Unix Makefiles" -DMATERIALX_BUILD_WASM=1
-4. emmake make // This will generate a libMaterialX.a
-5. cd /mnt/c/GitHub/PUBLIC/autodesk-forks/MaterialXWin/MaterialX/source/WasmMaterialX/WasmMaterialXCore
-6. em++ --bind WasmUtil.cpp ../../../wasm/source/MaterialXCore/libMaterialX.a -I../../ -std=c++11 -s WASM=1 -o ../MaterialXCore.js
+1. Generate the wasm folder from the root
+
+```sh
+mkdir ./wasm
+```
+
+2. cd into the new folder
+
+```sh
+cd ./wasm
+```
+
+3. Generate a make file from the CMakeLists.txt 
+
+```sh
+emcmake cmake .. -G "Unix Makefiles" -DMATERIALX_BUILD_WASM=1
+```
+
+4. Generate the library is a binary. This command will generate a libMaterialX.a
+
+```sh
+emmake make
+```
+
+5. cd into the wasm source code
+
+```sh
+cd ../source/WasmMaterialX/WasmMaterialXCore
+```
+
+6. Generate the wasm and javascript files for the bindings.
+
+```sh
+em++ --bind WasmUtil.cpp ../../../wasm/source/MaterialXCore/libMaterialX.a -I../../ -std=c++11 -s WASM=1 -o ../MaterialXCore.js
+```
