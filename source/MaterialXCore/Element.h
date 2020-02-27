@@ -63,7 +63,11 @@ using ElementPredicate = std::function<bool(ConstElementPtr)>;
 /// number of child elements and attributes.
 class Element : public std::enable_shared_from_this<Element>
 {
+#ifdef EMSCRIPTEN
+  public:
+#else
   protected:
+#endif
     Element(ElementPtr parent, const string& category, const string& name) :
         _category(category),
         _name(name),

@@ -4,8 +4,7 @@ var WasmUtil = {
      * @param {*} Module - Wasm Module with the exported c++ functions
      * @returns {Object} - Object containing the wrapped javascript functions
      */
-    generateWrappers: function(Module) {
-        var api = {};
+    generateWrappers: function(Module, api) {
         api.getVersionString = Module.getVersionString;
         api.createValidName = function(str, char) {
             return Module.createValidName(str, char.charCodeAt(0));
@@ -35,8 +34,6 @@ var WasmUtil = {
         };
 
         api.replaceSubstrings = Module.replaceSubstrings;
-
-        return api;
     },
 
     /**

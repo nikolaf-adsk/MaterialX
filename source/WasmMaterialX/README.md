@@ -29,7 +29,7 @@ cd ./wasm
 3. Generate a makefile from the CMakeLists.txt. 
 
 ```sh
-emcmake cmake .. -G "Unix Makefiles" -DMATERIALX_BUILD_WASM=1
+emcmake cmake .. -G "Unix Makefiles" -DMATERIALX_BUILD_WASM=1 -DEMSCRIPTEN=1
 ```
 
 4. Generate the binary library. This command will generate a libMaterialX.a file.
@@ -47,5 +47,5 @@ cd ../source/WasmMaterialX/WasmMaterialXCore
 6. Generate the wasm and javascript files for the bindings.
 
 ```sh
-em++ --bind WasmUtil.cpp ../../../wasm/source/MaterialXCore/libMaterialX.a -I../../ -std=c++11 -s WASM=1 -o ../MaterialXCore.js
+em++ --bind WasmUtil.cpp WasmElement2.cpp ../../../wasm/source/MaterialXCore/libMaterialXCore.a -I../../ -std=c++11 -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -o ../MaterialXCore.js
 ```

@@ -1,18 +1,25 @@
 <!doctype html>
 <html>
-  <script>
-    var MaterialX;
-    var Module = {
-      onRuntimeInitialized: function () {
-        MaterialX = WasmUtil.generateWrappers(Module);
-        WasmUtil.test(MaterialX);
-      }
-    };
-  </script>
+<script>
+  var MaterialX = {};
+  var Module = {
+    onRuntimeInitialized: function () {
+      // Generate MaterialX api
+      WasmUtil.generateWrappers(Module, MaterialX);
+      WasmElement.generateWrappers(Module, MaterialX);
 
-  <!-- WasmUtil javascript wrapper -->
-  <script src="WasmMaterialXCore/WasmUtil.js"></script>
+      // Run "tests"
+      WasmUtil.test(MaterialX);
+      WasmElement.test(MaterialX);
+    }
+  };
+</script>
 
-  <!-- output from em++ -->
-  <script src="./MaterialXCore.js"></script>
+<!-- WasmUtil javascript wrapper -->
+<script src="WasmMaterialXCore/WasmUtil.js"></script>
+<script src="WasmMaterialXCore/WasmElement.js"></script>
+
+<!-- output from em++ -->
+<script src="./MaterialXCore.js"></script>
+
 </html>
