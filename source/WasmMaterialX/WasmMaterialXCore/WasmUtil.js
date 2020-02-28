@@ -15,13 +15,8 @@ var WasmUtil = {
         api.incrementName = Module.incrementName;
 
         api.getVersionIntegers = function() {
-            var vecStr = Module.getVersionIntegers();
-            var size = vecStr.size();
-            var result = [];
-            for (var i = 0; i < size; i++) {
-                result.push(vecStr.get(i));
-            }
-            return result;
+            var vec = Module.getVersionIntegers();
+            return vecToArray(vec);
         };
         api.splitString = function(str, spl) {
             var vecStr = Module.splitString(str, spl);
@@ -53,4 +48,4 @@ var WasmUtil = {
                 api.replaceSubstrings('This.is.a.test///', { '.': '_', '//': ')' })
         );
     }
-}
+};
