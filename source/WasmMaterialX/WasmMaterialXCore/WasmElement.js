@@ -33,6 +33,95 @@ var WasmElement = {
         api.Element.prototype.setInheritsFrom = function() {
             catchPtrError(_setInheritsFrom, this, arguments);
         };
+
+        var _hasInheritedBase = Module.Element.prototype.hasInheritedBase;
+        api.Element.prototype.hasInheritedBase = function() {
+            catchPtrError(_hasInheritedBase, this, arguments);
+        };
+
+        var _setFilePrefix = Module.Element.prototype.setFilePrefix;
+        api.Element.prototype.setFilePrefix = function() {
+            catchPtrError(_setFilePrefix, this, arguments);
+        };
+
+        var _setColorSpace = Module.Element.prototype.setColorSpace;
+        api.Element.prototype.setColorSpace = function() {
+            catchPtrError(_setColorSpace, this, arguments);
+        };
+
+        var _setGeomPrefix = Module.Element.prototype.setGeomPrefix;
+        api.Element.prototype.setGeomPrefix = function() {
+            catchPtrError(_setGeomPrefix, this, arguments);
+        };
+
+        var _setTarget = Module.Element.prototype.setTarget;
+        api.Element.prototype.setTarget = function() {
+            catchPtrError(_setTarget, this, arguments);
+        };
+
+        var _setInheritString = Module.Element.prototype.setInheritString;
+        api.Element.prototype.setInheritString = function() {
+            catchPtrError(_setInheritString, this, arguments);
+        };
+
+        var _setNamespace = Module.Element.prototype.setNamespace;
+        api.Element.prototype.setNamespace = function() {
+            catchPtrError(_setNamespace, this, arguments);
+        };
+
+        var _setVersionString = Module.Element.prototype.setVersionString;
+        api.Element.prototype.setVersionString = function() {
+            catchPtrError(_setVersionString, this, arguments);
+        };
+
+        var _setDefaultVersion = Module.Element.prototype.setDefaultVersion;
+        api.Element.prototype.setDefaultVersion = function() {
+            catchPtrError(_setDefaultVersion, this, arguments);
+        };
+
+        var _setDocString = Module.Element.prototype.setDocString;
+        api.Element.prototype.setDocString = function() {
+            catchPtrError(_setDocString, this, arguments);
+        };
+
+        var _addChildOfCategory = Module.Element.prototype.addChildOfCategory;
+        api.Element.prototype.addChildOfCategory = function() {
+            arguments[1] = arguments[1] || '';
+            arguments[2] = arguments[2] || true;
+            catchPtrError(_addChildOfCategory, this, arguments);
+        };
+
+        var _setAttribute = Module.Element.prototype.setAttribute;
+        api.Element.prototype.setAttribute = function() {
+            catchPtrError(_setAttribute, this, arguments);
+        };
+
+        var _getAttributeNames = Module.Element.prototype.getAttributeNames;
+        api.Element.prototype.getAttributeNames = function() {
+            var vec = _getAttributeNames.call(this);
+            return vecToArray(vec);
+        };
+
+        var _getRoot = Module.Element.prototype.getRoot;
+        api.Element.prototype.getRoot = function() {
+            catchPtrError(_getRoot, this, arguments);
+        };
+
+        var _validate = Module.Element.prototype.validate;
+        api.Element.prototype.validate = function() {
+            catchPtrError(_validate, this, arguments);
+        };
+
+        var _copyContentFrom = Module.Element.prototype.copyContentFrom;
+        api.Element.prototype.copyContentFrom = function() {
+            arguments[1] = arguments[1] === undefined ? null : arguments[1];
+            catchPtrError(_copyContentFrom, this, arguments);
+        };
+
+        var _clearContent = Module.Element.prototype.clearContent;
+        api.Element.prototype.clearContent = function() {
+            catchPtrError(_clearContent, this, arguments);
+        };
     },
 
     /**
@@ -59,6 +148,15 @@ var WasmElement = {
         // console.log('element.setFilePrefix("PREFIX"): ' + element.setFilePrefix("PREFIX"));
         console.log('element.hasFilePrefix(): ' + element.hasFilePrefix());
         console.log('element.getFilePrefix(): ' + element.getFilePrefix());
-    }
+    },
 
+    createElements: function() {
+        window.parent = new MaterialX.Element(null, 'Category', 'Parent');
+
+        try {
+            window.child = new MaterialX.Element(parent, 'Category', 'Child');
+        } catch (exception) {
+            console.error(`${Module.getExceptionMessage(exception)}`);
+        }
+    }
 };
