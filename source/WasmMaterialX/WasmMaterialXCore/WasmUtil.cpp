@@ -60,7 +60,6 @@ extern "C" {
             return replaceSubstrings(str, separatorMapper);
         }));
 
-        // NOTE: Need to create bindings for Element.cpp.
         function("prettyPrint", &prettyPrint);
 
         register_vector<string>("vector<string>");

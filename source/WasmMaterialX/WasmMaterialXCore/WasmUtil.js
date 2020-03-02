@@ -29,6 +29,7 @@ var WasmUtil = {
         };
 
         api.replaceSubstrings = Module.replaceSubstrings;
+        api.prettyPrint = Module.prettyPrint;
     },
 
     /**
@@ -36,16 +37,21 @@ var WasmUtil = {
      * @param {Object} api - Object containing the wrapped javascript functions
      */
     test: function(api) {
-        console.log('getVersionString(): ' + api.getVersionString());
-        console.log('createValidName("test.this.here", "_"): ' + api.createValidName('test.this.here', '_'));
-        console.log('makeVersionString(10, 1): ' + api.makeVersionString(10, 1));
-        console.log('isValidName("test.name"): ' + api.isValidName('test.name'));
-        console.log('incrementName("Blah"): ' + api.incrementName('Blah'));
-        console.log('getVersionIntegers(): ' + api.getVersionIntegers());
-        console.log('splitString("hello", "l"): ' + api.splitString('hello', 'l'));
-        console.log(
-            'replaceSubstrings("This.is.a.test///", {".": "_", "//": ")"}): ' +
-                api.replaceSubstrings('This.is.a.test///', { '.': '_', '//': ')' })
-        );
+        setupTest('WasmUtils.js', function() {
+            console.log('getVersionString(): ' + api.getVersionString());
+            console.log('createValidName("test.this.here", "_"): ' + api.createValidName('test.this.here', '_'));
+            console.log('makeVersionString(10, 1): ' + api.makeVersionString(10, 1));
+            console.log('isValidName("test.name"): ' + api.isValidName('test.name'));
+            console.log('incrementName("Blah"): ' + api.incrementName('Blah'));
+            console.log('getVersionIntegers(): ' + api.getVersionIntegers());
+            console.log('splitString("hello", "l"): ' + api.splitString('hello', 'l'));
+            console.log(
+                'replaceSubstrings("This.is.a.test///", {".": "_", "//": ")"}): ' +
+                    api.replaceSubstrings('This.is.a.test///', { '.': '_', '//': ')' })
+            );
+
+            var element = new api.Element(null, 'hello', 'world');
+            console.log('prettyPrint(element): ' + api.prettyPrint(element));
+        });
     }
 };

@@ -129,27 +129,30 @@ var WasmElement = {
      * @param {Object} api - Object containing the wrapped javascript functions
      */
     test: function(api) {
-        var copyOptions = new api.CopyOptions();
-        console.log('copyOptions.skipConflictingElements: ' + copyOptions.skipConflictingElements);
-        copyOptions.skipConflictingElements = true;
-        console.log('copyOptions.skipConflictingElements: ' + copyOptions.skipConflictingElements);
+        setupTest('WasmElement.js', function() {
+            var copyOptions = new api.CopyOptions();
+            console.log('copyOptions.skipConflictingElements: ' + copyOptions.skipConflictingElements);
+            copyOptions.skipConflictingElements = true;
+            console.log('copyOptions.skipConflictingElements: ' + copyOptions.skipConflictingElements);
 
-        var element = new api.Element(null, 'test', 'parent');
-        console.log('element.getCategory(): ' + element.getCategory());
-        console.log('element.setCategory("TEST"): ' + element.setCategory('TEST'));
-        console.log('element.getCategory(): ' + element.getCategory());
+            var element = new api.Element(null, 'test', 'parent');
+            console.log('element.getCategory(): ' + element.getCategory());
+            console.log('element.setCategory("TEST"): ' + element.setCategory('TEST'));
+            console.log('element.getCategory(): ' + element.getCategory());
 
-        console.log('element.getName(): ' + element.getName());
-        // This api does not yet work please see comments in WasmElement.cpp
-        console.log('element.setName("element"): ' + element.setName('element'));
-        console.log('element.getName(): ' + element.getName());
+            console.log('element.getName(): ' + element.getName());
+            // This api does not yet work please see comments in WasmElement.cpp
+            console.log('element.setName("element"): ' + element.setName('element'));
+            console.log('element.getName(): ' + element.getName());
 
-        // // This api does not yet work please see comments in WasmElement.cpp
-        // console.log('element.setFilePrefix("PREFIX"): ' + element.setFilePrefix("PREFIX"));
-        console.log('element.hasFilePrefix(): ' + element.hasFilePrefix());
-        console.log('element.getFilePrefix(): ' + element.getFilePrefix());
+            // // This api does not yet work please see comments in WasmElement.cpp
+            // console.log('element.setFilePrefix("PREFIX"): ' + element.setFilePrefix("PREFIX"));
+            console.log('element.hasFilePrefix(): ' + element.hasFilePrefix());
+            console.log('element.getFilePrefix(): ' + element.getFilePrefix());
+        });
     },
 
+    /** TODO: this should be removed. */
     createElements: function() {
         window.parent = new MaterialX.Element(null, 'Category', 'Parent');
 
