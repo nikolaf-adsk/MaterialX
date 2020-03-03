@@ -38,14 +38,27 @@ emcmake cmake .. -G "Unix Makefiles" -DMATERIALX_BUILD_WASM=1 -DEMSCRIPTEN=1
 emmake make
 ```
 
-5. cd into the wasm source code
+5. cd into the javascript source code
 
 ```sh
-cd ../source/WasmMaterialX/WasmMaterialXCore
+cd ../source/JsMaterialX/JsMaterialXCore
 ```
 
 6. Generate the wasm and javascript files for the bindings.
 
 ```sh
-em++ --bind WasmUtil.cpp WasmElement2.cpp ../../../wasm/source/MaterialXCore/libMaterialXCore.a -I../../ -std=c++17 -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -o ../MaterialXCore.js
+em++ --bind JsUtil.cpp JsElement.cpp ../../../wasm/source/MaterialXCore/libMaterialXCore.a -I../../ -std=c++17 -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -o ../MaterialXCore.js
 ```
+
+### Testing
+
+1. Start a server in the JsMaterialX directory
+
+```sh
+python -m http.server 9000
+```
+
+2. In your browser load: http://localhost:9000/binding.html
+
+There will be some console logs in the browser console. 
+

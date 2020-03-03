@@ -1,4 +1,4 @@
-var WasmUtil = {
+var JsUtil = {
     /**
      * Return wrappers for the exported functions.
      * @param {*} Module - Wasm Module with the exported c++ functions
@@ -37,7 +37,7 @@ var WasmUtil = {
      * @param {Object} api - Object containing the wrapped javascript functions
      */
     test: function(api) {
-        setupTest('WasmUtils.js', function() {
+        setupTest('JsUtils.js', function() {
             console.log('getVersionString(): ' + api.getVersionString());
             console.log('createValidName("test.this.here", "_"): ' + api.createValidName('test.this.here', '_'));
             console.log('makeVersionString(10, 1): ' + api.makeVersionString(10, 1));

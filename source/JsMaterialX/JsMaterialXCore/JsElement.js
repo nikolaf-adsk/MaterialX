@@ -1,4 +1,4 @@
-var WasmElement = {
+var JsElement = {
     /**
      * Return wrappers for the exported functions.
      * @param {*} Module - Wasm Module with the exported c++ functions
@@ -64,7 +64,7 @@ var WasmElement = {
      * @param {Object} api - Object containing the wrapped javascript functions
      */
     test: function(api) {
-        setupTest('WasmElement.js', function() {
+        setupTest('JsElement.js', function() {
             console.log(`------Checking CopyOptions`);
             var copyOptions = new api.CopyOptions();
             console.log('copyOptions.skipConflictingElements: ' + copyOptions.skipConflictingElements);
@@ -78,11 +78,11 @@ var WasmElement = {
             console.log('element.getCategory(): ' + element.getCategory());
 
             console.log('element.getName(): ' + element.getName());
-            // This api does not yet work please see comments in WasmElement.cpp
+            // This api does not yet work please see comments in JsElement.cpp
             console.log('element.setName("element"): ' + element.setName('element'));
             console.log('element.getName(): ' + element.getName());
 
-            // // This api does not yet work please see comments in WasmElement.cpp
+            // // This api does not yet work please see comments in JsElement.cpp
             // console.log('element.setFilePrefix("PREFIX"): ' + element.setFilePrefix("PREFIX"));
             console.log('element.hasFilePrefix(): ' + element.hasFilePrefix());
             console.log('element.getFilePrefix(): ' + element.getFilePrefix());

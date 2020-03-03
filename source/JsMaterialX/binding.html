@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<script>
+  var MaterialX = {};
+  var Module = {
+    onRuntimeInitialized: function () {
+      // Generate MaterialX api
+      JsUtil.generateWrappers(Module, MaterialX);
+      JsElement.generateWrappers(Module, MaterialX);
+
+      // Run "tests"
+      JsUtil.test(MaterialX);
+      JsElement.test(MaterialX);
+    }
+  };
+</script>
+
+<!-- WasmUtil javascript wrapper -->
+<script src="JsMaterialXCore/jsUtils.js"></script>
+<script src="JsMaterialXCore/JsUtil.js"></script>
+<script src="JsMaterialXCore/JsElement.js"></script>
+
+<!-- output from em++ -->
+<script src="./MaterialXCore.js"></script>
+
+</html>
