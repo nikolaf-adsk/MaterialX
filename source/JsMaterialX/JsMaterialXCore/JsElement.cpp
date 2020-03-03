@@ -1,3 +1,4 @@
+#include "helpers.h"
 #include <MaterialXCore/Element.h>
 
 #include <emscripten.h>
@@ -9,26 +10,11 @@ namespace mx = MaterialX;
 
 using namespace mx;
 
-namespace foo
-{
-std::string getExceptionMessage(int exceptionPtr)
-{
-    return std::string(reinterpret_cast<std::exception *>(exceptionPtr)->what());
-}
-} // namespace foo
-
-template <class myClass>
-vector<myClass> arrayToVec(myClass *arr, int size)
-{
-    std::vector<myClass> dest(arr, arr + size);
-    return dest;
-}
 
 extern "C"
 {
     EMSCRIPTEN_BINDINGS(element)
     {
-        emscripten::function("getExceptionMessage", &foo::getExceptionMessage);
         class_<CopyOptions>("CopyOptions")
             .constructor<>()
             .property("skipConflictingElements", &CopyOptions::skipConflictingElements);

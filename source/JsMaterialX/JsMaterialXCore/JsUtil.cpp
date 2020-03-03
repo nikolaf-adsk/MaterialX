@@ -1,4 +1,4 @@
-
+#include "helpers.h"
 #include <MaterialXCore/Node.h>
 #include <MaterialXCore/Util.h>
 
@@ -16,12 +16,6 @@ using namespace emscripten;
 namespace mx = MaterialX;
 
 using namespace mx;
-
-template <class myClass> 
-vector <myClass> arrayToVec(myClass* arr, int size) {
-    std::vector<myClass> dest(arr, arr + size);
-    return dest;
-}
 
 // For reference.
 // EM_JS(void, call_something, (string a), {
