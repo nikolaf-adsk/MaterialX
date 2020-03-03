@@ -47,5 +47,5 @@ cd ../source/WasmMaterialX/WasmMaterialXCore
 6. Generate the wasm and javascript files for the bindings.
 
 ```sh
-em++ --bind WasmUtil.cpp WasmElement2.cpp ../../../wasm/source/MaterialXCore/libMaterialXCore.a -I../../ -std=c++11 -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -o ../MaterialXCore.js
+em++ --bind WasmUtil.cpp WasmElement2.cpp ../../../wasm/source/MaterialXCore/libMaterialXCore.a -I../../ -std=c++17 -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -o ../MaterialXCore.js
 ```
