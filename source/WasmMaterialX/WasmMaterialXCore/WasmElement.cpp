@@ -147,6 +147,105 @@ extern "C"
             .function("createValidChildName", &Element::createValidChildName)
             .function("createStringResolver", &Element::createStringResolver) /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX14StringResolverEEE, NSt3__210shared_ptrIKN9MaterialX8MaterialEEE */
             .function("asString", &Element::asString)
-            .function("__str__", &Element::asString);
+            .function("__str__", &Element::asString)
+            .class_property("NAME_ATTRIBUTE", &Element::NAME_ATTRIBUTE)
+            .class_property("FILE_PREFIX_ATTRIBUTE", &Element::FILE_PREFIX_ATTRIBUTE)
+            .class_property("GEOM_PREFIX_ATTRIBUTE", &Element::GEOM_PREFIX_ATTRIBUTE)
+            .class_property("COLOR_SPACE_ATTRIBUTE", &Element::COLOR_SPACE_ATTRIBUTE)
+            .class_property("TARGET_ATTRIBUTE", &Element::TARGET_ATTRIBUTE)
+            .class_property("VERSION_ATTRIBUTE", &Element::VERSION_ATTRIBUTE)
+            .class_property("DEFAULT_VERSION_ATTRIBUTE", &Element::DEFAULT_VERSION_ATTRIBUTE)
+            .class_property("INHERIT_ATTRIBUTE", &Element::INHERIT_ATTRIBUTE)
+            .class_property("NAMESPACE_ATTRIBUTE", &Element::NAMESPACE_ATTRIBUTE)
+            .class_property("DOC_ATTRIBUTE", &Element::DOC_ATTRIBUTE);
+
+        class_<TypedElement, base<Element>>("TypedElement")
+            .constructor<ElementPtr, const string &, const string &>()
+            .function("setType", &TypedElement::setType)
+            .function("hasType", &TypedElement::hasType)
+            .function("getType", &TypedElement::getType)
+            .function("isMultiOutputType", &TypedElement::isMultiOutputType)
+            .function("getTypeDef", &TypedElement::getTypeDef)
+            .class_property("TYPE_ATTRIBUTE", &TypedElement::TYPE_ATTRIBUTE);
+
+        class_<ValueElement, base<TypedElement>>("ValueElement")
+            .constructor<ElementPtr, const string &, const string &>()
+            .function("setValueString", &ValueElement::setValueString)
+            .function("hasValueString", &ValueElement::hasValueString)
+            .function("getValueString", &ValueElement::getValueString)
+            .function("getResolvedValueString", &ValueElement::getResolvedValueString)
+            .function("setInterfaceName", &ValueElement::setInterfaceName)
+            .function("hasInterfaceName", &ValueElement::hasInterfaceName)
+            .function("getInterfaceName", &ValueElement::getInterfaceName)
+            .function("setImplementationName", &ValueElement::setImplementationName)
+            .function("hasImplementationName", &ValueElement::hasImplementationName)
+            .function("getImplementationName", &ValueElement::getImplementationName)
+            .function("getValue", &ValueElement::getValue)
+            .function("getBoundValue", &ValueElement::getBoundValue)
+            .function("getDefaultValue", &ValueElement::getDefaultValue)
+            .function("setUnit", &ValueElement::setUnit)
+            .function("hasUnit", &ValueElement::hasUnit)
+            .function("getUnit", &ValueElement::getUnit)
+            .function("getActiveUnit", &ValueElement::getActiveUnit)
+            .function("setUnitType", &ValueElement::setUnitType)
+            .function("hasUnitType", &ValueElement::hasUnitType)
+            .function("getUnitType", &ValueElement::getUnitType)
+            .class_property("VALUE_ATTRIBUTE", &ValueElement::VALUE_ATTRIBUTE)
+            .class_property("INTERFACE_NAME_ATTRIBUTE", &ValueElement::INTERFACE_NAME_ATTRIBUTE)
+            .class_property("IMPLEMENTATION_NAME_ATTRIBUTE", &ValueElement::IMPLEMENTATION_NAME_ATTRIBUTE)
+            .class_property("IMPLEMENTATION_TYPE_ATTRIBUTE", &ValueElement::IMPLEMENTATION_TYPE_ATTRIBUTE)
+            .class_property("ENUM_ATTRIBUTE", &ValueElement::ENUM_ATTRIBUTE)
+            .class_property("ENUM_VALUES_ATTRIBUTE", &ValueElement::ENUM_VALUES_ATTRIBUTE)
+            .class_property("UNIT_ATTRIBUTE", &ValueElement::UNIT_ATTRIBUTE)
+            .class_property("UI_NAME_ATTRIBUTE", &ValueElement::UI_NAME_ATTRIBUTE)
+            .class_property("UI_FOLDER_ATTRIBUTE", &ValueElement::UI_FOLDER_ATTRIBUTE)
+            .class_property("UI_MIN_ATTRIBUTE", &ValueElement::UI_MIN_ATTRIBUTE)
+            .class_property("UI_MAX_ATTRIBUTE", &ValueElement::UI_MAX_ATTRIBUTE)
+            .class_property("UI_SOFT_MIN_ATTRIBUTE", &ValueElement::UI_SOFT_MIN_ATTRIBUTE)
+            .class_property("UI_SOFT_MAX_ATTRIBUTE", &ValueElement::UI_SOFT_MAX_ATTRIBUTE)
+            .class_property("UI_STEP_ATTRIBUTE", &ValueElement::UI_STEP_ATTRIBUTE)
+            .class_property("UI_ADVANCED_ATTRIBUTE", &ValueElement::UI_ADVANCED_ATTRIBUTE);
+
+        class_<Token, base<ValueElement>>("Token")
+            .constructor<ElementPtr, const string &>()
+            .smart_ptr<std::shared_ptr<Token>>("Token")
+            .class_property("CATEGORY", &Token::CATEGORY);
+
+        class_<StringResolver>("StringResolver")
+            .smart_ptr<std::shared_ptr<StringResolver>>("StringResolver")
+            // .smart_ptr_constructor("StringResolver", &std::make_shared<StringResolver>) //<std::shared_ptr<StringResolver>>("StringResolver")
+            .class_function("create", &StringResolver::create) // Static function for creating a StringResolver instance
+            .function("setFilePrefix", &StringResolver::setFilePrefix)
+            .function("getFilePrefix", &StringResolver::getFilePrefix)
+            .function("setGeomPrefix", &StringResolver::setGeomPrefix)
+            .function("getGeomPrefix", &StringResolver::getGeomPrefix)
+            .function("setUdimString", &StringResolver::setUdimString)
+            .function("setUvTileString", &StringResolver::setUvTileString)
+            .function("setFilenameSubstitution", &StringResolver::setFilenameSubstitution)
+            // .function("getFilenameSubstitutions", &StringResolver::getFilenameSubstitutions)
+            .function("getFilenameSubstitutions", optional_override([](StringResolver &self) {
+                          std::unordered_map<string, string> res = self.StringResolver::getFilenameSubstitutions();
+                          val obj = val::object();
+                          for (const auto &[key, value] : res)
+                          {
+                              obj.set(key, value);
+                          }
+
+                          return obj;
+                      }))
+            .function("setGeomNameSubstitution", &StringResolver::setGeomNameSubstitution)
+            .function("getGeomNameSubstitutions", optional_override([](StringResolver &self) {
+                          std::unordered_map<string, string> res = self.StringResolver::getGeomNameSubstitutions();
+                          val obj = val::object();
+                          for (const auto &[key, value] : res)
+                          {
+                              obj.set(key, value);
+                          }
+
+                          return obj;
+                      }))
+            .function("resolve", &StringResolver::resolve);
+
+        class_<ElementPredicate>("ElementPredicate");
     }
 }

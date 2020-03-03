@@ -640,8 +640,8 @@ var wasmMemory;
 // In the wasm backend, we polyfill the WebAssembly object,
 // so this creates a (non-native-wasm) table for us.
 var wasmTable = new WebAssembly.Table({
-  'initial': 1644,
-  'maximum': 1644 + 0,
+  'initial': 1771,
+  'maximum': 1771 + 0,
   'element': 'anyfunc'
 });
 
@@ -1242,11 +1242,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5289152,
+    STACK_BASE = 5292080,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 46272,
-    DYNAMIC_BASE = 5289152,
-    DYNAMICTOP_PTR = 46096;
+    STACK_MAX = 49200,
+    DYNAMIC_BASE = 5292080,
+    DYNAMICTOP_PTR = 49024;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1770,7 +1770,7 @@ var ASM_CONSTS = {
 
 
 
-// STATICTOP = STATIC_BASE + 45248;
+// STATICTOP = STATIC_BASE + 48176;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -1920,7 +1920,7 @@ var ASM_CONSTS = {
   
       var pointer = ___cxa_is_pointer_type(throwntype);
       // can_catch receives a **, add indirection
-      var buffer = 46256;
+      var buffer = 49184;
       HEAP32[((buffer)>>2)]=thrown;
       thrown = buffer;
       // The different catch blocks are denoted by different types.
@@ -1957,7 +1957,7 @@ var ASM_CONSTS = {
   
       var pointer = ___cxa_is_pointer_type(throwntype);
       // can_catch receives a **, add indirection
-      var buffer = 46256;
+      var buffer = 49184;
       HEAP32[((buffer)>>2)]=thrown;
       thrown = buffer;
       // The different catch blocks are denoted by different types.
@@ -5480,71 +5480,6 @@ var ASM_CONSTS = {
     }
 
   
-  function heap32VectorToArray(count, firstElement) {
-      var array = [];
-      for (var i = 0; i < count; i++) {
-          array.push(HEAP32[(firstElement >> 2) + i]);
-      }
-      return array;
-    }
-  
-  function runDestructors(destructors) {
-      while (destructors.length) {
-          var ptr = destructors.pop();
-          var del = destructors.pop();
-          del(ptr);
-      }
-    }function __embind_register_class_constructor(
-      rawClassType,
-      argCount,
-      rawArgTypesAddr,
-      invokerSignature,
-      invoker,
-      rawConstructor
-    ) {
-      assert(argCount > 0);
-      var rawArgTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
-      invoker = embind__requireFunction(invokerSignature, invoker);
-      var args = [rawConstructor];
-      var destructors = [];
-  
-      whenDependentTypesAreResolved([], [rawClassType], function(classType) {
-          classType = classType[0];
-          var humanName = 'constructor ' + classType.name;
-  
-          if (undefined === classType.registeredClass.constructor_body) {
-              classType.registeredClass.constructor_body = [];
-          }
-          if (undefined !== classType.registeredClass.constructor_body[argCount - 1]) {
-              throw new BindingError("Cannot register multiple constructors with identical number of parameters (" + (argCount-1) + ") for class '" + classType.name + "'! Overload resolution is currently only performed using the parameter count, not actual type info!");
-          }
-          classType.registeredClass.constructor_body[argCount - 1] = function unboundTypeHandler() {
-              throwUnboundTypeError('Cannot construct ' + classType.name + ' due to unbound types', rawArgTypes);
-          };
-  
-          whenDependentTypesAreResolved([], rawArgTypes, function(argTypes) {
-              classType.registeredClass.constructor_body[argCount - 1] = function constructor_body() {
-                  if (arguments.length !== argCount - 1) {
-                      throwBindingError(humanName + ' called with ' + arguments.length + ' arguments, expected ' + (argCount-1));
-                  }
-                  destructors.length = 0;
-                  args.length = argCount;
-                  for (var i = 1; i < argCount; ++i) {
-                      args[i] = argTypes[i]['toWireType'](destructors, arguments[i - 1]);
-                  }
-  
-                  var ptr = invoker.apply(null, args);
-                  runDestructors(destructors);
-  
-                  return argTypes[0]['fromWireType'](ptr);
-              };
-              return [];
-          });
-          return [];
-      });
-    }
-
-  
   
   function new_(constructor, argumentList) {
       if (!(constructor instanceof Function)) {
@@ -5567,6 +5502,14 @@ var ASM_CONSTS = {
   
       var r = constructor.apply(obj, argumentList);
       return (r instanceof Object) ? r : obj;
+    }
+  
+  function runDestructors(destructors) {
+      while (destructors.length) {
+          var ptr = destructors.pop();
+          var del = destructors.pop();
+          del(ptr);
+      }
     }function craftInvokerFunction(humanName, argTypes, classType, cppInvokerFunc, cppTargetFunc) {
       // humanName: a human-readable string name for the function to be generated.
       // argTypes: An array that contains the embind type objects for all types in the function signature.
@@ -5669,7 +5612,191 @@ var ASM_CONSTS = {
   
       var invokerFunction = new_(Function, args1).apply(null, args2);
       return invokerFunction;
-    }function __embind_register_class_function(
+    }
+  
+  function heap32VectorToArray(count, firstElement) {
+      var array = [];
+      for (var i = 0; i < count; i++) {
+          array.push(HEAP32[(firstElement >> 2) + i]);
+      }
+      return array;
+    }function __embind_register_class_class_function(
+      rawClassType,
+      methodName,
+      argCount,
+      rawArgTypesAddr,
+      invokerSignature,
+      rawInvoker,
+      fn
+    ) {
+      var rawArgTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
+      methodName = readLatin1String(methodName);
+      rawInvoker = embind__requireFunction(invokerSignature, rawInvoker);
+      whenDependentTypesAreResolved([], [rawClassType], function(classType) {
+          classType = classType[0];
+          var humanName = classType.name + '.' + methodName;
+  
+          function unboundTypesHandler() {
+              throwUnboundTypeError('Cannot call ' + humanName + ' due to unbound types', rawArgTypes);
+          }
+  
+          var proto = classType.registeredClass.constructor;
+          if (undefined === proto[methodName]) {
+              // This is the first function to be registered with this name.
+              unboundTypesHandler.argCount = argCount-1;
+              proto[methodName] = unboundTypesHandler;
+          } else {
+              // There was an existing function with the same name registered. Set up a function overload routing table.
+              ensureOverloadTable(proto, methodName, humanName);
+              proto[methodName].overloadTable[argCount-1] = unboundTypesHandler;
+          }
+  
+          whenDependentTypesAreResolved([], rawArgTypes, function(argTypes) {
+              // Replace the initial unbound-types-handler stub with the proper function. If multiple overloads are registered,
+              // the function handlers go into an overload table.
+              var invokerArgsArray = [argTypes[0] /* return value */, null /* no class 'this'*/].concat(argTypes.slice(1) /* actual params */);
+              var func = craftInvokerFunction(humanName, invokerArgsArray, null /* no class 'this'*/, rawInvoker, fn);
+              if (undefined === proto[methodName].overloadTable) {
+                  func.argCount = argCount-1;
+                  proto[methodName] = func;
+              } else {
+                  proto[methodName].overloadTable[argCount-1] = func;
+              }
+              return [];
+          });
+          return [];
+      });
+    }
+
+  
+  function validateThis(this_, classType, humanName) {
+      if (!(this_ instanceof Object)) {
+          throwBindingError(humanName + ' with invalid "this": ' + this_);
+      }
+      if (!(this_ instanceof classType.registeredClass.constructor)) {
+          throwBindingError(humanName + ' incompatible with "this" of type ' + this_.constructor.name);
+      }
+      if (!this_.$$.ptr) {
+          throwBindingError('cannot call emscripten binding method ' + humanName + ' on deleted object');
+      }
+  
+      // todo: kill this
+      return upcastPointer(
+          this_.$$.ptr,
+          this_.$$.ptrType.registeredClass,
+          classType.registeredClass);
+    }function __embind_register_class_class_property(
+      rawClassType,
+      fieldName,
+      rawFieldType,
+      rawFieldPtr,
+      getterSignature,
+      getter,
+      setterSignature,
+      setter
+    ) {
+      fieldName = readLatin1String(fieldName);
+      getter = embind__requireFunction(getterSignature, getter);
+  
+      whenDependentTypesAreResolved([], [rawClassType], function(classType) {
+          classType = classType[0];
+          var humanName = classType.name + '.' + fieldName;
+          var desc = {
+              get: function() {
+                  throwUnboundTypeError('Cannot access ' + humanName + ' due to unbound types', [rawFieldType]);
+              },
+              enumerable: true,
+              configurable: true
+          };
+          if (setter) {
+              desc.set = function() {
+                  throwUnboundTypeError('Cannot access ' + humanName + ' due to unbound types', [rawFieldType]);
+              };
+          } else {
+              desc.set = function(v) {
+                  throwBindingError(humanName + ' is a read-only property');
+              };
+          }
+  
+          Object.defineProperty(classType.registeredClass.constructor, fieldName, desc);
+  
+          whenDependentTypesAreResolved([], [rawFieldType], function(fieldType) {
+              fieldType = fieldType[0];
+              var desc = {
+                  get: function() {
+                      return fieldType['fromWireType'](getter(rawFieldPtr));
+                  },
+                  enumerable: true
+              };
+  
+              if (setter) {
+                  setter = embind__requireFunction(setterSignature, setter);
+                  desc.set = function(v) {
+                      var destructors = [];
+                      setter(rawFieldPtr, fieldType['toWireType'](destructors, v));
+                      runDestructors(destructors);
+                  };
+              }
+  
+              Object.defineProperty(classType.registeredClass.constructor, fieldName, desc);
+              return [];
+          });
+  
+          return [];
+      });
+    }
+
+  function __embind_register_class_constructor(
+      rawClassType,
+      argCount,
+      rawArgTypesAddr,
+      invokerSignature,
+      invoker,
+      rawConstructor
+    ) {
+      assert(argCount > 0);
+      var rawArgTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
+      invoker = embind__requireFunction(invokerSignature, invoker);
+      var args = [rawConstructor];
+      var destructors = [];
+  
+      whenDependentTypesAreResolved([], [rawClassType], function(classType) {
+          classType = classType[0];
+          var humanName = 'constructor ' + classType.name;
+  
+          if (undefined === classType.registeredClass.constructor_body) {
+              classType.registeredClass.constructor_body = [];
+          }
+          if (undefined !== classType.registeredClass.constructor_body[argCount - 1]) {
+              throw new BindingError("Cannot register multiple constructors with identical number of parameters (" + (argCount-1) + ") for class '" + classType.name + "'! Overload resolution is currently only performed using the parameter count, not actual type info!");
+          }
+          classType.registeredClass.constructor_body[argCount - 1] = function unboundTypeHandler() {
+              throwUnboundTypeError('Cannot construct ' + classType.name + ' due to unbound types', rawArgTypes);
+          };
+  
+          whenDependentTypesAreResolved([], rawArgTypes, function(argTypes) {
+              classType.registeredClass.constructor_body[argCount - 1] = function constructor_body() {
+                  if (arguments.length !== argCount - 1) {
+                      throwBindingError(humanName + ' called with ' + arguments.length + ' arguments, expected ' + (argCount-1));
+                  }
+                  destructors.length = 0;
+                  args.length = argCount;
+                  for (var i = 1; i < argCount; ++i) {
+                      args[i] = argTypes[i]['toWireType'](destructors, arguments[i - 1]);
+                  }
+  
+                  var ptr = invoker.apply(null, args);
+                  runDestructors(destructors);
+  
+                  return argTypes[0]['fromWireType'](ptr);
+              };
+              return [];
+          });
+          return [];
+      });
+    }
+
+  function __embind_register_class_function(
       rawClassType,
       methodName,
       argCount,
@@ -5728,24 +5855,7 @@ var ASM_CONSTS = {
       });
     }
 
-  
-  function validateThis(this_, classType, humanName) {
-      if (!(this_ instanceof Object)) {
-          throwBindingError(humanName + ' with invalid "this": ' + this_);
-      }
-      if (!(this_ instanceof classType.registeredClass.constructor)) {
-          throwBindingError(humanName + ' incompatible with "this" of type ' + this_.constructor.name);
-      }
-      if (!this_.$$.ptr) {
-          throwBindingError('cannot call emscripten binding method ' + humanName + ' on deleted object');
-      }
-  
-      // todo: kill this
-      return upcastPointer(
-          this_.$$.ptr,
-          this_.$$.ptrType.registeredClass,
-          classType.registeredClass);
-    }function __embind_register_class_property(
+  function __embind_register_class_property(
       classType,
       fieldName,
       getterReturnType,
@@ -6400,10 +6510,21 @@ var ASM_CONSTS = {
       return __emval_register(getStringOrSymbol(v));
     }
 
+  function __emval_new_object() {
+      return __emval_register({});
+    }
+
   function __emval_run_destructors(handle) {
       var destructors = emval_handle_array[handle].value;
       runDestructors(destructors);
       __emval_decref(handle);
+    }
+
+  function __emval_set_property(handle, key, value) {
+      handle = requireHandle(handle);
+      key = requireHandle(key);
+      value = requireHandle(value);
+      handle[key] = value;
     }
 
   function __emval_take_value(type, argv) {
@@ -6421,7 +6542,7 @@ var ASM_CONSTS = {
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 46096;
+      return 49024;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {
@@ -7067,7 +7188,7 @@ function intArrayToString(array) {
 // ASM_LIBRARY EXTERN PRIMITIVES: Int8Array,Int32Array
 
 var asmGlobalArg = {};
-var asmLibraryArg = { "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_atexit": ___cxa_atexit, "__cxa_begin_catch": ___cxa_begin_catch, "__cxa_end_catch": ___cxa_end_catch, "__cxa_find_matching_catch_2": ___cxa_find_matching_catch_2, "__cxa_find_matching_catch_3": ___cxa_find_matching_catch_3, "__cxa_free_exception": ___cxa_free_exception, "__cxa_rethrow": ___cxa_rethrow, "__cxa_throw": ___cxa_throw, "__cxa_uncaught_exceptions": ___cxa_uncaught_exceptions, "__handle_stack_overflow": ___handle_stack_overflow, "__lock": ___lock, "__map_file": ___map_file, "__resumeException": ___resumeException, "__syscall91": ___syscall91, "__unlock": ___unlock, "_embind_register_bool": __embind_register_bool, "_embind_register_class": __embind_register_class, "_embind_register_class_constructor": __embind_register_class_constructor, "_embind_register_class_function": __embind_register_class_function, "_embind_register_class_property": __embind_register_class_property, "_embind_register_emval": __embind_register_emval, "_embind_register_float": __embind_register_float, "_embind_register_function": __embind_register_function, "_embind_register_integer": __embind_register_integer, "_embind_register_memory_view": __embind_register_memory_view, "_embind_register_smart_ptr": __embind_register_smart_ptr, "_embind_register_std_string": __embind_register_std_string, "_embind_register_std_wstring": __embind_register_std_wstring, "_embind_register_void": __embind_register_void, "_emval_as": __emval_as, "_emval_call": __emval_call, "_emval_call_method": __emval_call_method, "_emval_decref": __emval_decref, "_emval_get_global": __emval_get_global, "_emval_get_method_caller": __emval_get_method_caller, "_emval_get_property": __emval_get_property, "_emval_incref": __emval_incref, "_emval_new_cstring": __emval_new_cstring, "_emval_run_destructors": __emval_run_destructors, "_emval_take_value": __emval_take_value, "abort": _abort, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "environ_get": _environ_get, "environ_sizes_get": _environ_sizes_get, "fd_close": _fd_close, "fd_seek": _fd_seek, "fd_write": _fd_write, "getTempRet0": _getTempRet0, "invoke_diii": invoke_diii, "invoke_fiii": invoke_fiii, "invoke_i": invoke_i, "invoke_id": invoke_id, "invoke_ii": invoke_ii, "invoke_iii": invoke_iii, "invoke_iiii": invoke_iiii, "invoke_iiiii": invoke_iiiii, "invoke_iiiiid": invoke_iiiiid, "invoke_iiiiii": invoke_iiiiii, "invoke_iiiiiii": invoke_iiiiiii, "invoke_iiiiiiii": invoke_iiiiiiii, "invoke_iiiiiiiiiii": invoke_iiiiiiiiiii, "invoke_iiiiiiiiiiii": invoke_iiiiiiiiiiii, "invoke_iiiiiiiiiiiii": invoke_iiiiiiiiiiiii, "invoke_jiiii": invoke_jiiii, "invoke_v": invoke_v, "invoke_vi": invoke_vi, "invoke_vid": invoke_vid, "invoke_vii": invoke_vii, "invoke_viii": invoke_viii, "invoke_viiii": invoke_viiii, "invoke_viiiii": invoke_viiiii, "invoke_viiiiii": invoke_viiiiii, "invoke_viiiiiii": invoke_viiiiiii, "invoke_viiiiiiiiii": invoke_viiiiiiiiii, "invoke_viiiiiiiiiiiiiii": invoke_viiiiiiiiiiiiiii, "llvm_eh_typeid_for": _llvm_eh_typeid_for, "memory": wasmMemory, "setTempRet0": _setTempRet0, "strftime_l": _strftime_l, "table": wasmTable };
+var asmLibraryArg = { "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_atexit": ___cxa_atexit, "__cxa_begin_catch": ___cxa_begin_catch, "__cxa_end_catch": ___cxa_end_catch, "__cxa_find_matching_catch_2": ___cxa_find_matching_catch_2, "__cxa_find_matching_catch_3": ___cxa_find_matching_catch_3, "__cxa_free_exception": ___cxa_free_exception, "__cxa_rethrow": ___cxa_rethrow, "__cxa_throw": ___cxa_throw, "__cxa_uncaught_exceptions": ___cxa_uncaught_exceptions, "__handle_stack_overflow": ___handle_stack_overflow, "__lock": ___lock, "__map_file": ___map_file, "__resumeException": ___resumeException, "__syscall91": ___syscall91, "__unlock": ___unlock, "_embind_register_bool": __embind_register_bool, "_embind_register_class": __embind_register_class, "_embind_register_class_class_function": __embind_register_class_class_function, "_embind_register_class_class_property": __embind_register_class_class_property, "_embind_register_class_constructor": __embind_register_class_constructor, "_embind_register_class_function": __embind_register_class_function, "_embind_register_class_property": __embind_register_class_property, "_embind_register_emval": __embind_register_emval, "_embind_register_float": __embind_register_float, "_embind_register_function": __embind_register_function, "_embind_register_integer": __embind_register_integer, "_embind_register_memory_view": __embind_register_memory_view, "_embind_register_smart_ptr": __embind_register_smart_ptr, "_embind_register_std_string": __embind_register_std_string, "_embind_register_std_wstring": __embind_register_std_wstring, "_embind_register_void": __embind_register_void, "_emval_as": __emval_as, "_emval_call": __emval_call, "_emval_call_method": __emval_call_method, "_emval_decref": __emval_decref, "_emval_get_global": __emval_get_global, "_emval_get_method_caller": __emval_get_method_caller, "_emval_get_property": __emval_get_property, "_emval_incref": __emval_incref, "_emval_new_cstring": __emval_new_cstring, "_emval_new_object": __emval_new_object, "_emval_run_destructors": __emval_run_destructors, "_emval_set_property": __emval_set_property, "_emval_take_value": __emval_take_value, "abort": _abort, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "environ_get": _environ_get, "environ_sizes_get": _environ_sizes_get, "fd_close": _fd_close, "fd_seek": _fd_seek, "fd_write": _fd_write, "getTempRet0": _getTempRet0, "invoke_diii": invoke_diii, "invoke_fiii": invoke_fiii, "invoke_i": invoke_i, "invoke_id": invoke_id, "invoke_ii": invoke_ii, "invoke_iii": invoke_iii, "invoke_iiii": invoke_iiii, "invoke_iiiii": invoke_iiiii, "invoke_iiiiid": invoke_iiiiid, "invoke_iiiiii": invoke_iiiiii, "invoke_iiiiiii": invoke_iiiiiii, "invoke_iiiiiiii": invoke_iiiiiiii, "invoke_iiiiiiiiiii": invoke_iiiiiiiiiii, "invoke_iiiiiiiiiiii": invoke_iiiiiiiiiiii, "invoke_iiiiiiiiiiiii": invoke_iiiiiiiiiiiii, "invoke_jiiii": invoke_jiiii, "invoke_v": invoke_v, "invoke_vi": invoke_vi, "invoke_vid": invoke_vid, "invoke_vii": invoke_vii, "invoke_viii": invoke_viii, "invoke_viiii": invoke_viiii, "invoke_viiiii": invoke_viiiii, "invoke_viiiiii": invoke_viiiiii, "invoke_viiiiiii": invoke_viiiiiii, "invoke_viiiiiiiiii": invoke_viiiiiiiiii, "invoke_viiiiiiiiiiiiiii": invoke_viiiiiiiiiiiiiii, "llvm_eh_typeid_for": _llvm_eh_typeid_for, "memory": wasmMemory, "setTempRet0": _setTempRet0, "strftime_l": _strftime_l, "table": wasmTable };
 var asm = createWasm();
 Module["asm"] = asm;
 var ___wasm_call_ctors = Module["___wasm_call_ctors"] = function() {
