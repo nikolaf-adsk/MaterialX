@@ -26,27 +26,44 @@ extern "C"
             .function("getDownstreamPorts", &Node::getDownstreamPorts)
             .class_property("CATEGORY", &Node::CATEGORY);
 
-        // class_<GraphElement, base<InterfaceElement>>("GraphElement")
-        //     .smart_ptr_constructor("GraphElement", &std::make_shared<GraphElement, ElementPtr, const string &, const string &>)
+        class_<GraphElement, base<InterfaceElement>>("GraphElement")
+            .smart_ptr_constructor("GraphElement", &std::make_shared<GraphElement, ElementPtr, const string &, const string &>)
 
-        //     .function("_addNode", &GraphElement::addNode,
-        //               arg("category"), arg("name") = EMPTY_STRING, arg("type") = DEFAULT_TYPE_STRING)
-        //     .function("addNodeInstance", &GraphElement::addNodeInstance,
-        //               arg("nodeDef"), arg("name") = EMPTY_STRING)
-        //     // .function("getNode", &GraphElement::getNode)
-        //     // .function("getNodes", &GraphElement::getNodes,
-        //     //      arg("category") = EMPTY_STRING)
-        //     // .function("removeNode", &GraphElement::removeNode)
-        //     // .function("addBackdrop", &GraphElement::addBackdrop,
-        //     //      arg("name") = EMPTY_STRING)
-        //     // .function("getBackdrop", &GraphElement::getBackdrop)
-        //     // .function("getBackdrops", &GraphElement::getBackdrops)
-        //     // .function("removeBackdrop", &GraphElement::removeBackdrop)
-        //     // .function("flattenSubgraphs", &GraphElement::flattenSubgraphs,
-        //     //      arg("target") = EMPTY_STRING)
-        //     // .function("topologicalSort", &GraphElement::topologicalSort)
-        //     // .function("asStringDot", &GraphElement::asStringDot)
-        //     ;
+            .function("addNode", &GraphElement::addNode)
+            .function("addNodeInstance", &GraphElement::addNodeInstance) /** TODO: need to bind Definition.h */
+            .function("getNode", &GraphElement::getNode)
+            .function("getNodes", &GraphElement::getNodes)
+            .function("removeNode", &GraphElement::removeNode)
+            .function("addBackdrop", &GraphElement::addBackdrop)
+            .function("getBackdrop", &GraphElement::getBackdrop)
+            .function("getBackdrops", &GraphElement::getBackdrops)
+            .function("removeBackdrop", &GraphElement::removeBackdrop)
+            .function("flattenSubgraphs", &GraphElement::flattenSubgraphs)
+            .function("topologicalSort", &GraphElement::topologicalSort)
+            .function("asStringDot", &GraphElement::asStringDot);
+
+        class_<NodeGraph, base<GraphElement>>("NodeGraph")
+            .smart_ptr_constructor("NodeGraph", &std::make_shared<NodeGraph, ElementPtr, const string &>)
+            .function("setNodeDef", &NodeGraph::setNodeDef) /** TODO: need to bind Definition.h */
+            .function("getNodeDef", &NodeGraph::getNodeDef)
+            .class_property("CATEGORY", &NodeGraph::CATEGORY);
+
+        class_<Backdrop, base<Element>>("Backdrop")
+            .smart_ptr_constructor("Backdrop", &std::make_shared<Backdrop, ElementPtr, const string &>)
+            .function("getContains", &Backdrop::getContains)
+            .function("setContains", &Backdrop::setContains)
+            .function("getWidth", &Backdrop::getWidth)
+            .function("setWidth", &Backdrop::setWidth)
+            .function("getHeight", &Backdrop::getHeight)
+            .function("setHeight", &Backdrop::setHeight)
+            .class_property("CATEGORY", &Backdrop::CATEGORY)
+            .class_property("CONTAINS_ATTRIBUTE", &Backdrop::CONTAINS_ATTRIBUTE)
+            .class_property("WIDTH_ATTRIBUTE", &Backdrop::WIDTH_ATTRIBUTE)
+            .class_property("HEIGHT_ATTRIBUTE", &Backdrop::HEIGHT_ATTRIBUTE);
+
         register_vector<PortElementPtr>("vector<PortElementPtr>");
+        register_vector<NodePtr>("vector<NodePtr>");
+        register_vector<BackdropPtr>("vector<BackdropPtr>");
+        register_vector<ElementPtr>("vector<ElementPtr>");
     }
 }

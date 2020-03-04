@@ -161,7 +161,11 @@ class Node : public InterfaceElement
 /// The base class for graph elements such as NodeGraph and Document.
 class GraphElement : public InterfaceElement
 {
+#ifdef EMSCRIPTEN
+  public:
+#else
   protected:
+#endif
     GraphElement(ElementPtr parent, const string& category, const string& name) :
         InterfaceElement(parent, category, name)
     {
