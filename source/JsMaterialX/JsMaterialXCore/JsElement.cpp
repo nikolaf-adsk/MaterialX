@@ -155,7 +155,7 @@ extern "C"
             .class_property("TYPE_ATTRIBUTE", &TypedElement::TYPE_ATTRIBUTE);
 
         class_<ValueElement, base<TypedElement>>("ValueElement")
-            .constructor<ElementPtr, const string &, const string &>()
+            .smart_ptr_constructor("ValueElement", &std::make_shared<ValueElement, ElementPtr, const string &, const string &>)
             .function("setValueString", &ValueElement::setValueString)
             .function("hasValueString", &ValueElement::hasValueString)
             .function("getValueString", &ValueElement::getValueString)
@@ -193,8 +193,7 @@ extern "C"
             .class_property("UI_ADVANCED_ATTRIBUTE", &ValueElement::UI_ADVANCED_ATTRIBUTE);
 
         class_<Token, base<ValueElement>>("Token")
-            .constructor<ElementPtr, const string &>()
-            .smart_ptr<std::shared_ptr<Token>>("Token")
+            .smart_ptr_constructor("Token", &std::make_shared<Token, ElementPtr, const string &>)
             .class_property("CATEGORY", &Token::CATEGORY);
 
         class_<StringResolver>("StringResolver")
