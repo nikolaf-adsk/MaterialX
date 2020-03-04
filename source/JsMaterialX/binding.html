@@ -9,12 +9,14 @@
       JsUtil.generateWrappers(Module, MaterialX);
       JsElement.generateWrappers(Module, MaterialX);
       JsInterface.generateWrappers(Module, MaterialX);
+      JsNode.generateWrappers(Module, MaterialX);
 
       // Run "tests"
-      JsTypes.test(MaterialX);
-      JsUtil.test(MaterialX);
-      JsElement.test(MaterialX);
-      JsInterface.test(MaterialX);
+      JsTypes.test();
+      JsUtil.test();
+      JsElement.test();
+      JsInterface.test();
+      JsNode.test();
     }
   };
 </script>
@@ -25,6 +27,7 @@
 <script src="JsMaterialXCore/JsUtil.js"></script>
 <script src="JsMaterialXCore/JsElement.js"></script>
 <script src="JsMaterialXCore/JsInterface.js"></script>
+<script src="JsMaterialXCore/JsNode.js"></script>
 
 <!-- output from em++ -->
 <script src="./MaterialXCore.js"></script>

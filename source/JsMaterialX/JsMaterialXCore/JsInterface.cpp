@@ -24,8 +24,9 @@ extern "C"
             .class_property("CATEGORY", &Parameter::CATEGORY);
 
         class_<PortElement, base<ValueElement>>("PortElement")
-            .constructor<ElementPtr, const string &, const string &>()
-            .smart_ptr<std::shared_ptr<PortElement>>("PortElement")
+            .smart_ptr_constructor("PortElement", &std::make_shared<PortElement, ElementPtr, const string &, const string &>)
+            // .constructor<ElementPtr, const string &, const string &>()
+            // .smart_ptr<std::shared_ptr<PortElement>>("PortElement")
             .smart_ptr<std::shared_ptr<const PortElement>>("PortElement")
             .function("setNodeName", &PortElement::setNodeName)
             .function("getNodeName", &PortElement::getNodeName)
@@ -85,7 +86,7 @@ extern "C"
             .function("removeOutput", &InterfaceElement::removeOutput)
             .function("getActiveOutput", &InterfaceElement::getActiveOutput)
             .function("getActiveOutputs", &InterfaceElement::getActiveOutputs)
-    
+
             .function("addToken", &InterfaceElement::addToken)
             .function("getToken", &InterfaceElement::getToken)
             .function("getTokens", &InterfaceElement::getTokens)
@@ -96,8 +97,8 @@ extern "C"
             .function("getActiveValueElement", &InterfaceElement::getActiveValueElement)
             .function("getActiveValueElements", &InterfaceElement::getActiveValueElements)
             .function("getParameterValue", &InterfaceElement::getParameterValue) /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX5ValueEEE" */
-            .function("getInputValue", &InterfaceElement::getInputValue) /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX5ValueEEE" */
-            
+            .function("getInputValue", &InterfaceElement::getInputValue)         /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX5ValueEEE" */
+
             .function("setTokenValue", &InterfaceElement::setTokenValue)
             .function("getTokenValue", &InterfaceElement::getTokenValue)
             .function("getDeclaration", &InterfaceElement::getDeclaration) /** TODO: unbound types: NSt3__210shared_ptrIKN9MaterialX7NodeDefEEE" */
@@ -105,10 +106,10 @@ extern "C"
 
             .class_property("NODE_DEF_ATTRIBUTE", &InterfaceElement::NODE_DEF_ATTRIBUTE);
 
-            register_vector<ParameterPtr>("vector<ParameterPtr>");
-            register_vector<InputPtr>("vector<InputPtr>");
-            register_vector<OutputPtr>("vector<OutputPtr>");
-            register_vector<TokenPtr>("vector<TokenPtr>");
-            register_vector<ValueElementPtr>("vector<ValueElementPtr>");
+        register_vector<ParameterPtr>("vector<ParameterPtr>");
+        register_vector<InputPtr>("vector<InputPtr>");
+        register_vector<OutputPtr>("vector<OutputPtr>");
+        register_vector<TokenPtr>("vector<TokenPtr>");
+        register_vector<ValueElementPtr>("vector<ValueElementPtr>");
     }
 }

@@ -24,25 +24,26 @@ var JsTypes = {
 
     /**
      * Console log the returned values for the the api functions.
-     * @param {Object} api - Object containing the wrapped javascript functions
      */
-    test: function(api) {
-        setupTest('JsTypes.js', function() {
-            console.log('DEFAULT_TYPE_STRING: ' + api.DEFAULT_TYPE_STRING);
-            console.log('FILENAME_TYPE_STRING: ' + api.FILENAME_TYPE_STRING);
-            console.log('GEOMNAME_TYPE_STRING: ' + api.GEOMNAME_TYPE_STRING);
-            console.log('SURFACE_SHADER_TYPE_STRING: ' + api.SURFACE_SHADER_TYPE_STRING);
-            console.log('DISPLACEMENT_SHADER_TYPE_STRING: ' + api.DISPLACEMENT_SHADER_TYPE_STRING);
-            console.log('VOLUME_SHADER_TYPE_STRING: ' + api.VOLUME_SHADER_TYPE_STRING);
-            console.log('LIGHT_SHADER_TYPE_STRING: ' + api.LIGHT_SHADER_TYPE_STRING);
-            console.log('MULTI_OUTPUT_TYPE_STRING: ' + api.MULTI_OUTPUT_TYPE_STRING);
-            console.log('NONE_TYPE_STRING: ' + api.NONE_TYPE_STRING);
-            console.log('VALUE_STRING_TRUE: ' + api.VALUE_STRING_TRUE);
-            console.log('VALUE_STRING_FALSE: ' + api.VALUE_STRING_FALSE);
-            console.log('NAME_PREFIX_SEPARATOR: ' + api.NAME_PREFIX_SEPARATOR);
-            console.log('NAME_PATH_SEPARATOR: ' + api.NAME_PATH_SEPARATOR);
-            console.log('ARRAY_VALID_SEPARATORS: ' + api.ARRAY_VALID_SEPARATORS);
-            console.log('ARRAY_PREFERRED_SEPARATOR: ' + api.ARRAY_PREFERRED_SEPARATOR);
+    test: function() {
+        var validator = new Validator('JsTypes.js');
+        validator.classValidatorCb('Types', null, function() {
+            MaterialX.DEFAULT_TYPE_STRING;
+            MaterialX.FILENAME_TYPE_STRING;
+            MaterialX.GEOMNAME_TYPE_STRING;
+            MaterialX.SURFACE_SHADER_TYPE_STRING;
+            MaterialX.DISPLACEMENT_SHADER_TYPE_STRING;
+            MaterialX.VOLUME_SHADER_TYPE_STRING;
+            MaterialX.LIGHT_SHADER_TYPE_STRING;
+            MaterialX.MULTI_OUTPUT_TYPE_STRING;
+            MaterialX.NONE_TYPE_STRING;
+            MaterialX.VALUE_STRING_TRUE;
+            MaterialX.VALUE_STRING_FALSE;
+            MaterialX.NAME_PREFIX_SEPARATOR;
+            MaterialX.NAME_PATH_SEPARATOR;
+            MaterialX.ARRAY_VALID_SEPARATORS;
+            MaterialX.ARRAY_PREFERRED_SEPARATOR;
         });
+        validator.validate();
     }
 };

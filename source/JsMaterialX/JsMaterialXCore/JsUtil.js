@@ -34,24 +34,22 @@ var JsUtil = {
 
     /**
      * Console log the returned values for the the api functions.
-     * @param {Object} api - Object containing the wrapped javascript functions
      */
-    test: function(api) {
-        setupTest('JsUtils.js', function() {
-            console.log('getVersionString(): ' + api.getVersionString());
-            console.log('createValidName("test.this.here", "_"): ' + api.createValidName('test.this.here', '_'));
-            console.log('makeVersionString(10, 1): ' + api.makeVersionString(10, 1));
-            console.log('isValidName("test.name"): ' + api.isValidName('test.name'));
-            console.log('incrementName("Blah"): ' + api.incrementName('Blah'));
-            console.log('getVersionIntegers(): ' + api.getVersionIntegers());
-            console.log('splitString("hello", "l"): ' + api.splitString('hello', 'l'));
-            console.log(
-                'replaceSubstrings("This.is.a.test///", {".": "_", "//": ")"}): ' +
-                    api.replaceSubstrings('This.is.a.test///', { '.': '_', '//': ')' })
-            );
+    test: function() {
+        var validator = new Validator('JsUtils.js');
+        validator.classValidatorCb('Utils', function() {
+            MaterialX.getVersionString();
+            MaterialX.createValidName('test.this.here', '_');
+            MaterialX.makeVersionString(10, 1);
+            MaterialX.isValidName('test.name');
+            MaterialX.incrementName('Blah');
+            MaterialX.getVersionIntegers();
+            MaterialX.splitString('hello', 'l');
+            MaterialX.replaceSubstrings('This.is.a.test///', { '.': '_', '//': ')' });
 
-            var element = new api.Element(null, 'hello', 'world');
-            console.log('prettyPrint(element): ' + api.prettyPrint(element));
+            var element = new MaterialX.Element(null, 'hello', 'world');
+            console.log('prettyPrint(element): ' + MaterialX.prettyPrint(element));
         });
+        validator.validate();
     }
 };

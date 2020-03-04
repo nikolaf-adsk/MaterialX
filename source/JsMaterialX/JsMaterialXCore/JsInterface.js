@@ -37,148 +37,158 @@ var JsInterface = {
 
         var _addOutput = Module.InterfaceElement.prototype.addOutput;
         api.InterfaceElement.prototype.addOutput = function() {
-            var arg1 = arguments[0] || "";
+            var arg1 = arguments[0] || '';
             var arg2 = arguments[1] || api.DEFAULT_TYPE_STRING;
             return _addOutput.call(this, arg1, arg2);
         };
 
         var _addToken = Module.InterfaceElement.prototype.addToken;
         api.InterfaceElement.prototype.addToken = function() {
-            var arg1 = arguments[0] || "";
+            var arg1 = arguments[0] || '';
             return _addToken.call(this, arg1);
         };
 
         var _getParameterValue = Module.InterfaceElement.prototype.getParameterValue;
         api.InterfaceElement.prototype.getParameterValue = function() {
             var arg1 = arguments[0];
-            var arg2 = arguments[1] || "";
+            var arg2 = arguments[1] || '';
             return _getParameterValue.call(this, arg1, arg2);
         };
 
         var _getInputValue = Module.InterfaceElement.prototype.getInputValue;
         api.InterfaceElement.prototype.getInputValue = function() {
             var arg1 = arguments[0];
-            var arg2 = arguments[1] || "";
+            var arg2 = arguments[1] || '';
             return _getInputValue.call(this, arg1, arg2);
         };
 
         var _getDeclaration = Module.InterfaceElement.prototype.getDeclaration;
         api.InterfaceElement.prototype.getDeclaration = function() {
-            var arg1 = arguments[0] || "";
+            var arg1 = arguments[0] || '';
             return _getDeclaration.call(this, arg1);
         };
     },
 
     /**
      * Console log the returned values for the the api functions.
-     * @param {Object} api - Object containing the wrapped javascript functions
      */
-    test: function(api) {
-        setupTest('JsInterface.js', function() {
-            console.log(`------Checking Parameter`);
-            var parameter = new api.Parameter(null, 'tttt');
+    test: function() {
+        var validator = new Validator('JsInterface.js');
+
+        validator.classValidatorCb(
+            'Parameter',
+            function() {
+                var parameter = new MaterialX.Parameter(null, 'tttt');
+                // Make sure that a method defined in Element is callable.
+                // This is checks that inheritance works.
+                parameter.getVersionIntegers();
+            },
+            function() {
+                MaterialX.Parameter.CATEGORY;
+            }
+        );
+
+        validator.classValidatorCb('PortElement', function() {
+            var portElement = new MaterialX.PortElement(null, 'category', 'tttt');
             // Make sure that a method defined in Element is callable.
             // This is checks that inheritance works.
-            console.log('parameter.getVersionIntegers(): ' + parameter.getVersionIntegers());
-            console.log(`------Checking Parameter constants`);
-            console.log(`Parameter.CATEGORY: ` + api.Parameter.CATEGORY);
-
-            console.log(`------Checking PortElement`);
-            var portElement = new api.PortElement(null, 'category', 'tttt');
-            // Make sure that a method defined in Element is callable.
-            // This is checks that inheritance works.
-            console.log('portElement.getVersionIntegers(): ' + portElement.getVersionIntegers());
-            console.log('portElement.setNodeName("node"): ' + portElement.setNodeName('node'));
-            console.log('portElement.getNodeName(): ' + portElement.getNodeName());
-            console.log('portElement.setChannels("channels"): ' + portElement.setChannels('channels'));
-            console.log('portElement.getChannels(): ' + portElement.getChannels());
-            // console.log(
-            //     'portElement.setConnectedNode("connectedNode"): ' + portElement.setConnectedNode('connectedNode')
-            // );
-            // console.log('portElement.getConnectedNode(): ' + portElement.getConnectedNode());
-
-            console.log(`------Checking Input`);
-            var input = new api.Input(null, 'tttt');
-            // Make sure that a method defined in Element is callable.
-            // This is checks that inheritance works.
-            console.log('input.getVersionIntegers(): ' + input.getVersionIntegers());
-
-            console.log('input.setDefaultGeomPropString("geomProp"): ' + input.setDefaultGeomPropString('geomProp'));
-            console.log('input.hasDefaultGeomPropString(): ' + input.hasDefaultGeomPropString());
-            console.log('input.getDefaultGeomPropString(): ' + input.getDefaultGeomPropString());
-            // console.log('input.getDefaultGeomProp(): ' + input.getDefaultGeomProp());
-
-            console.log(`------Checking Input constants`);
-            console.log(`Input.CATEGORY: ` + api.Input.CATEGORY);
-
-            console.log(`------Checking Output`);
-            var output = new api.Output(null, 'tttt');
-            // Make sure that a method defined in Element is callable.
-            // This is checks that inheritance works.
-            console.log('output.getVersionIntegers(): ' + output.getVersionIntegers());
-            console.log('output.hasUpstreamCycle(): ' + output.hasUpstreamCycle());
-
-            console.log(`------Checking Output constants`);
-            console.log(`Output.CATEGORY: ` + api.Output.CATEGORY);
-            console.log(`Output.DEFAULT_INPUT_ATTRIBUTE: ` + api.Output.DEFAULT_INPUT_ATTRIBUTE);
-
-            console.log(`------Checking InterfaceElement`);
-            var interfaceElement = new api.InterfaceElement(null, 'category', 'name');
-            // Make sure that a method defined in Element is callable.
-            // This is checks that inheritance works.
-            console.log('interfaceElement.getVersionIntegers(): ' + interfaceElement.getVersionIntegers());
-            console.log(
-                'interfaceElement.setNodeDefString("nodeDefString"): ' +
-                    interfaceElement.setNodeDefString('nodeDefString')
-            );
-            console.log('interfaceElement.hasNodeDefString(): ' + interfaceElement.hasNodeDefString());
-            console.log('interfaceElement.getNodeDefString(): ' + interfaceElement.getNodeDefString());
-            console.log('interfaceElement.addParameter(): ' + interfaceElement.addParameter());
-            console.log('interfaceElement.getParameter("color3"): ' + interfaceElement.getParameter('color3'));
-            console.log('interfaceElement.getParameters(): ' + JSON.stringify(interfaceElement.getParameters()));
-            console.log('interfaceElement.getParameterCount(): ' + interfaceElement.getParameterCount());
-            console.log('interfaceElement.removeParameter("color3"): ' + interfaceElement.removeParameter('color3'));
-            console.log(
-                'interfaceElement.getActiveParameter("color3"): ' + interfaceElement.getActiveParameter('color3')
-            );
-            console.log('interfaceElement.getActiveParameters(): ' + interfaceElement.getActiveParameters());
-            console.log('interfaceElement.addInput(): ' + interfaceElement.addInput());
-            console.log('interfaceElement.getInput("color3"): ' + interfaceElement.getInput('color3'));
-            console.log('interfaceElement.getInputs(): ' + interfaceElement.getInputs());
-            console.log('interfaceElement.getInputCount(): ' + interfaceElement.getInputCount());
-            console.log('interfaceElement.removeInput("color3"): ' + interfaceElement.removeInput('color3'));
-            console.log('interfaceElement.getActiveInput("color3"): ' + interfaceElement.getActiveInput('color3'));
-            console.log('interfaceElement.getActiveInputs(): ' + interfaceElement.getActiveInputs());
-            
-            console.log('interfaceElement.addOutput("test", "this"): ' + interfaceElement.addOutput("test", "this"));
-            console.log('interfaceElement.getOutput("test"): ' + interfaceElement.getOutput("test"));
-            console.log('interfaceElement.getOutputs(): ' + interfaceElement.getOutputs());
-            console.log('interfaceElement.getOutputCount(): ' + interfaceElement.getOutputCount());
-            console.log('interfaceElement.removeOutput("test"): ' + interfaceElement.removeOutput("test"));
-            console.log('interfaceElement.getActiveOutput("test"): ' + interfaceElement.getActiveOutput("test"));
-            console.log('interfaceElement.getActiveOutputs(): ' + interfaceElement.getActiveOutputs());
-
-            console.log('interfaceElement.addToken("thisToken"): ' + interfaceElement.addToken("thisToken"));
-            console.log('interfaceElement.getToken("thisToken"): ' + interfaceElement.getToken("thisToken"));
-            console.log('interfaceElement.getTokens(): ' + interfaceElement.getTokens());
-            console.log('interfaceElement.removeToken("thisToken"): ' + interfaceElement.removeToken("thisToken"));
-            console.log('interfaceElement.getActiveToken("thisToken"): ' + interfaceElement.getActiveToken("thisToken"));
-            console.log('interfaceElement.getActiveTokens(): ' + interfaceElement.getActiveTokens());
-
-            console.log('interfaceElement.getActiveValueElement("ValueElement"): ' + interfaceElement.getActiveValueElement("ValueElement"));
-            console.log('interfaceElement.getActiveValueElements(): ' + interfaceElement.getActiveValueElements());
-
-            // console.log('interfaceElement.getParameterValue("ParameterValue", "target"): ' + interfaceElement.getParameterValue("ParameterValue", "target"));
-            // console.log('interfaceElement.getInputValue("name", "target"): ' + interfaceElement.getInputValue("name", "target"));
-            
-            console.log('interfaceElement.setTokenValue("name", "value"): ' + interfaceElement.setTokenValue("name", "value"));
-            console.log('interfaceElement.getTokenValue("name"): ' + interfaceElement.getTokenValue("name"));
-            
-            // console.log('interfaceElement.getDeclaration("value"): ' + interfaceElement.getDeclaration("value"));
-            // console.log('interfaceElement.isTypeCompatible(): ' + interfaceElement.isTypeCompatible());
-
-            console.log(`------Checking InterfaceElement constants`);
-            console.log(`InterfaceElement.NODE_DEF_ATTRIBUTE: ` + api.InterfaceElement.NODE_DEF_ATTRIBUTE);
+            portElement.getVersionIntegers();
+            portElement.setNodeName('node');
+            portElement.getNodeName();
+            portElement.setChannels('channels');
+            portElement.getChannels();
+            // portElement.setConnectedNode('connectedNode');
+            // portElement.getConnectedNode();
         });
+
+        validator.classValidatorCb(
+            'Input',
+            function() {
+                var input = new MaterialX.Input(null, 'tttt');
+                input.getVersionIntegers();
+                input.setDefaultGeomPropString('geomProp');
+                input.hasDefaultGeomPropString();
+                input.getDefaultGeomPropString();
+                // input.getDefaultGeomProp();
+            },
+            function() {
+                MaterialX.Input.CATEGORY;
+            }
+        );
+
+        validator.classValidatorCb(
+            'Output',
+            function() {
+                var output = new MaterialX.Output(null, 'tttt');
+                // Make sure that a method defined in Element is callable.
+                // This is checks that inheritance works.
+                output.getVersionIntegers();
+                output.hasUpstreamCycle();
+            },
+            function() {
+                MaterialX.Output.CATEGORY;
+                MaterialX.Output.DEFAULT_INPUT_ATTRIBUTE;
+            }
+        );
+
+        validator.classValidatorCb(
+            'InterfaceElement',
+            function() {
+                var interfaceElement = new MaterialX.InterfaceElement(null, 'category', 'name');
+                // Make sure that a method defined in Element is callable.
+                // This is checks that inheritance works.
+                interfaceElement.getVersionIntegers();
+                interfaceElement.setNodeDefString('nodeDefString');
+
+                interfaceElement.hasNodeDefString();
+                interfaceElement.getNodeDefString();
+                interfaceElement.addParameter();
+                interfaceElement.getParameter('color3');
+                JSON.stringify(interfaceElement.getParameters());
+                interfaceElement.getParameterCount();
+                interfaceElement.removeParameter('color3');
+                interfaceElement.getActiveParameter('color3');
+                interfaceElement.getActiveParameters();
+                interfaceElement.addInput();
+                interfaceElement.getInput('color3');
+                interfaceElement.getInputs();
+                interfaceElement.getInputCount();
+                interfaceElement.removeInput('color3');
+                interfaceElement.getActiveInput('color3');
+                interfaceElement.getActiveInputs();
+
+                interfaceElement.addOutput('test', 'this');
+                interfaceElement.getOutput('test');
+                interfaceElement.getOutputs();
+                interfaceElement.getOutputCount();
+                interfaceElement.removeOutput('test');
+                interfaceElement.getActiveOutput('test');
+                interfaceElement.getActiveOutputs();
+
+                interfaceElement.addToken('thisToken');
+                interfaceElement.getToken('thisToken');
+                interfaceElement.getTokens();
+                interfaceElement.removeToken('thisToken');
+                interfaceElement.getActiveToken('thisToken');
+                interfaceElement.getActiveTokens();
+
+                interfaceElement.getActiveValueElement('ValueElement');
+                interfaceElement.getActiveValueElements();
+
+                // interfaceElement.getParameterValue("ParameterValue", "target");
+                // interfaceElement.getInputValue("name", "target");
+
+                interfaceElement.setTokenValue('name', 'value');
+                interfaceElement.getTokenValue('name');
+
+                // interfaceElement.getDeclaration("value");
+                // interfaceElement.isTypeCompatible();
+            },
+            function() {
+                MaterialX.InterfaceElement.NODE_DEF_ATTRIBUTE;
+            }
+        );
+
+        validator.validate();
     }
 };

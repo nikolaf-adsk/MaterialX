@@ -10,7 +10,6 @@ namespace mx = MaterialX;
 
 using namespace mx;
 
-
 extern "C"
 {
     EMSCRIPTEN_BINDINGS(element)

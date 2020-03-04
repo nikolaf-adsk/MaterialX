@@ -61,144 +61,142 @@ var JsElement = {
 
     /**
      * Console log the returned values for the the api functions.
-     * @param {Object} api - Object containing the wrapped javascript functions
      */
-    test: function(api) {
-        setupTest('JsElement.js', function() {
-            console.log(`------Checking CopyOptions`);
-            var copyOptions = new api.CopyOptions();
-            console.log('copyOptions.skipConflictingElements: ' + copyOptions.skipConflictingElements);
+    test: function() {
+        var validator = new Validator('JsElement.js');
+        validator.classValidatorCb('CopyOptions', function() {
+            var copyOptions = new MaterialX.CopyOptions();
+            copyOptions.skipConflictingElements;
             copyOptions.skipConflictingElements = true;
-            console.log('copyOptions.skipConflictingElements: ' + copyOptions.skipConflictingElements);
-
-            console.log(`------Checking Element`);
-            var element = new api.Element(null, 'test', 'parent');
-            console.log('element.getCategory(): ' + element.getCategory());
-            console.log('element.setCategory("TEST"): ' + element.setCategory('TEST'));
-            console.log('element.getCategory(): ' + element.getCategory());
-
-            console.log('element.getName(): ' + element.getName());
-            // This api does not yet work please see comments in JsElement.cpp
-            console.log('element.setName("element"): ' + element.setName('element'));
-            console.log('element.getName(): ' + element.getName());
-
-            // // This api does not yet work please see comments in JsElement.cpp
-            // console.log('element.setFilePrefix("PREFIX"): ' + element.setFilePrefix("PREFIX"));
-            console.log('element.hasFilePrefix(): ' + element.hasFilePrefix());
-            console.log('element.getFilePrefix(): ' + element.getFilePrefix());
-
-            console.log('element.getVersionIntegers(): ' + element.getVersionIntegers());
-
-            console.log(`------Checking Element constants`);
-            // Output constant variables
-            console.log('Element.NAME_ATTRIBUTE: ' + api.Element.NAME_ATTRIBUTE);
-            console.log('Element.FILE_PREFIX_ATTRIBUTE: ' + api.Element.FILE_PREFIX_ATTRIBUTE);
-            console.log('Element.GEOM_PREFIX_ATTRIBUTE: ' + api.Element.GEOM_PREFIX_ATTRIBUTE);
-            console.log('Element.COLOR_SPACE_ATTRIBUTE: ' + api.Element.COLOR_SPACE_ATTRIBUTE);
-            console.log('Element.TARGET_ATTRIBUTE: ' + api.Element.TARGET_ATTRIBUTE);
-            console.log('Element.VERSION_ATTRIBUTE: ' + api.Element.VERSION_ATTRIBUTE);
-            console.log('Element.DEFAULT_VERSION_ATTRIBUTE: ' + api.Element.DEFAULT_VERSION_ATTRIBUTE);
-            console.log('Element.INHERIT_ATTRIBUTE: ' + api.Element.INHERIT_ATTRIBUTE);
-            console.log('Element.NAMESPACE_ATTRIBUTE: ' + api.Element.NAMESPACE_ATTRIBUTE);
-            console.log('Element.DOC_ATTRIBUTE: ' + api.Element.DOC_ATTRIBUTE);
-
-            console.log(`------Checking TypedElement`);
-            var typedElement = new api.TypedElement(null, 'hello', 'world');
-            console.log('typedElement.setType("newType"): ' + typedElement.setType('newType'));
-            console.log('typedElement.hasType(): ' + typedElement.hasType());
-            console.log('typedElement.getType(): ' + typedElement.getType());
-            console.log('typedElement.isMultiOutputType(): ' + typedElement.isMultiOutputType());
-            // console.log('typedElement.getTypeDef(): ' + typedElement.getTypeDef());
-
-            console.log(`------Checking TypedElement constants`);
-            console.log('TypedElement.TYPE_ATTRIBUTE: ' + api.TypedElement.TYPE_ATTRIBUTE);
-
-            console.log(`------Checking ValueElement`);
-            var valueElement = new api.ValueElement(null, 'hello', 'world');
-            // Make sure that a method defined in Element is callable.
-            // This is checks that inheritance works.
-            console.log('valueElement.getVersionIntegers(): ' + valueElement.getVersionIntegers());
-            console.log('valueElement.setValueString("newValue"): ' + valueElement.setValueString('newValue'));
-            console.log('valueElement.hasValueString(): ' + valueElement.hasValueString());
-            console.log('valueElement.getValueString(): ' + valueElement.getValueString());
-            // console.log('valueElement.getResolvedValueString(): ' + valueElement.getResolvedValueString());
-            console.log(
-                'valueElement.setInterfaceName("InterfaceName"): ' + valueElement.setInterfaceName('InterfaceName')
-            );
-            console.log('valueElement.hasInterfaceName(): ' + valueElement.hasInterfaceName());
-            console.log('valueElement.getInterfaceName(): ' + valueElement.getInterfaceName());
-            console.log('valueElement.setImplementationName("test"): ' + valueElement.setImplementationName('test'));
-            console.log('valueElement.hasImplementationName(): ' + valueElement.hasImplementationName());
-            console.log('valueElement.getImplementationName(): ' + valueElement.getImplementationName());
-            // console.log('valueElement.getValue(): ' + valueElement.getValue());
-            // console.log('valueElement.getBoundValue(): ' + valueElement.getBoundValue());
-            // console.log('valueElement.getDefaultValue(): ' + valueElement.getDefaultValue()); // Value.h needs to binded for this to work.
-            console.log('valueElement.setUnit("mm"): ' + valueElement.setUnit('mm'));
-            console.log('valueElement.hasUnit(): ' + valueElement.hasUnit());
-            console.log('valueElement.getUnit(): ' + valueElement.getUnit());
-            console.log('valueElement.getActiveUnit(): ' + valueElement.getActiveUnit());
-            console.log('valueElement.setUnitType("meters"): ' + valueElement.setUnitType('meters'));
-            console.log('valueElement.hasUnitType(): ' + valueElement.hasUnitType());
-            console.log('valueElement.getUnitType(): ' + valueElement.getUnitType());
-
-            console.log(`------Checking ValueElement constants`);
-            console.log('ValueElement.VALUE_ATTRIBUTE: ' + api.ValueElement.VALUE_ATTRIBUTE);
-            console.log('ValueElement.INTERFACE_NAME_ATTRIBUTE: ' + api.ValueElement.INTERFACE_NAME_ATTRIBUTE);
-            console.log(
-                'ValueElement.IMPLEMENTATION_NAME_ATTRIBUTE: ' + api.ValueElement.IMPLEMENTATION_NAME_ATTRIBUTE
-            );
-            console.log(
-                'ValueElement.IMPLEMENTATION_TYPE_ATTRIBUTE: ' + api.ValueElement.IMPLEMENTATION_TYPE_ATTRIBUTE
-            );
-            console.log('ValueElement.ENUM_ATTRIBUTE: ' + api.ValueElement.ENUM_ATTRIBUTE);
-            console.log('ValueElement.ENUM_VALUES_ATTRIBUTE: ' + api.ValueElement.ENUM_VALUES_ATTRIBUTE);
-            console.log('ValueElement.UNIT_ATTRIBUTE: ' + api.ValueElement.UNIT_ATTRIBUTE);
-            console.log('ValueElement.UI_NAME_ATTRIBUTE: ' + api.ValueElement.UI_NAME_ATTRIBUTE);
-            console.log('ValueElement.UI_FOLDER_ATTRIBUTE: ' + api.ValueElement.UI_FOLDER_ATTRIBUTE);
-            console.log('ValueElement.UI_MIN_ATTRIBUTE: ' + api.ValueElement.UI_MIN_ATTRIBUTE);
-            console.log('ValueElement.UI_MAX_ATTRIBUTE: ' + api.ValueElement.UI_MAX_ATTRIBUTE);
-            console.log('ValueElement.UI_SOFT_MIN_ATTRIBUTE: ' + api.ValueElement.UI_SOFT_MIN_ATTRIBUTE);
-            console.log('ValueElement.UI_SOFT_MAX_ATTRIBUTE: ' + api.ValueElement.UI_SOFT_MAX_ATTRIBUTE);
-            console.log('ValueElement.UI_STEP_ATTRIBUTE: ' + api.ValueElement.UI_STEP_ATTRIBUTE);
-            console.log('ValueElement.UI_ADVANCED_ATTRIBUTE: ' + api.ValueElement.UI_ADVANCED_ATTRIBUTE);
-
-            console.log(`------Checking Token`);
-            var token = new api.Token(null, 'tttt');
-            // Make sure that a method defined in Element is callable.
-            // This is checks that inheritance works.
-            console.log('token.getVersionIntegers(): ' + token.getVersionIntegers());
-            console.log(`------Checking Token constants`);
-            console.log(`Token.CATEGORY: ` + api.Token.CATEGORY);
-
-            console.log(`------Checking StringResolver`);
-            // Make sure that a method defined in Element is callable.
-            // This is checks that inheritance works.
-            console.log('StringResolver.create(): ' + api.StringResolver.create());
-            var sr = api.StringResolver.create();
-            console.log('sr.setFilePrefix("test"): ' + sr.setFilePrefix('test'));
-            console.log('sr.getFilePrefix(): ' + sr.getFilePrefix());
-            console.log('sr.setGeomPrefix("geom"): ' + sr.setGeomPrefix('geom'));
-            console.log('sr.getGeomPrefix(): ' + sr.getGeomPrefix());
-            console.log('sr.setUdimString("u"): ' + sr.setUdimString('u'));
-            console.log('sr.setUvTileString("uv"): ' + sr.setUvTileString('uv'));
-            console.log('sr.setFilenameSubstitution("hello", "world"): ' + sr.setFilenameSubstitution('hello', "world"));
-            console.log('sr.getFilenameSubstitutions(): ' + JSON.stringify(sr.getFilenameSubstitutions()));
-            console.log('sr.setGeomNameSubstitution("geomNameSub", "blah"): ' + sr.setGeomNameSubstitution('geomNameSub', 'blah'));
-            console.log('sr.getGeomNameSubstitutions(): ' + JSON.stringify(sr.getGeomNameSubstitutions()));
-            console.log('sr.resolve("The is a uv u test//", "blah"): ' + sr.resolve('The is a uv u test//', 'blah'));
-            console.log(`------Checking StringResolver constants`);
-            console.log(`Token.CATEGORY: ` + api.Token.CATEGORY);
+            copyOptions.skipConflictingElements;
         });
-    },
 
-    /** TODO: this should be removed. */
-    createElements: function() {
-        window.parent = new MaterialX.Element(null, 'Category', 'Parent');
+        validator.classValidatorCb(
+            'Element',
+            function() {
+                var element = new MaterialX.Element(null, 'test', 'parent');
+                element.getCategory();
+                element.setCategory('TEST');
+                element.getCategory();
 
-        try {
-            window.child = new MaterialX.Element(parent, 'Category', 'Child');
-        } catch (exception) {
-            console.error(`${Module.getExceptionMessage(exception)}`);
-        }
+                element.getName();
+                // This MaterialX does not yet work please see comments in JsElement.cpp
+                element.setName('element');
+                element.getName();
+
+                // This MaterialX does not yet work please see comments in JsElement.cpp
+                // element.setFilePrefix("PREFIX");
+                element.hasFilePrefix();
+                element.getFilePrefix();
+
+                element.getVersionIntegers();
+            },
+            function() {
+                MaterialX.Element.NAME_ATTRIBUTE;
+                MaterialX.Element.FILE_PREFIX_ATTRIBUTE;
+                MaterialX.Element.GEOM_PREFIX_ATTRIBUTE;
+                MaterialX.Element.COLOR_SPACE_ATTRIBUTE;
+                MaterialX.Element.TARGET_ATTRIBUTE;
+                MaterialX.Element.VERSION_ATTRIBUTE;
+                MaterialX.Element.DEFAULT_VERSION_ATTRIBUTE;
+                MaterialX.Element.INHERIT_ATTRIBUTE;
+                MaterialX.Element.NAMESPACE_ATTRIBUTE;
+                MaterialX.Element.DOC_ATTRIBUTE;
+            }
+        );
+
+        validator.classValidatorCb(
+            'TypedElement',
+            function() {
+                var typedElement = new MaterialX.TypedElement(null, 'hello', 'world');
+                typedElement.setType('newType');
+                typedElement.hasType();
+                typedElement.getType();
+                typedElement.isMultiOutputType();
+                // typedElement.getTypeDef();
+            },
+            function() {
+                MaterialX.TypedElement.TYPE_ATTRIBUTE;
+            }
+        );
+
+        validator.classValidatorCb(
+            'ValueElement',
+            function() {
+                var valueElement = new MaterialX.ValueElement(null, 'hello', 'world');
+                // Make sure that a method defined in Element is callable.
+                // This is checks that inheritance works.
+                valueElement.getVersionIntegers();
+                valueElement.setValueString('newValue');
+                valueElement.hasValueString();
+                valueElement.getValueString();
+                // valueElement.getResolvedValueString();
+                valueElement.setInterfaceName('InterfaceName');
+                valueElement.hasInterfaceName();
+                valueElement.getInterfaceName();
+                valueElement.setImplementationName('test');
+                valueElement.hasImplementationName();
+                valueElement.getImplementationName();
+                // valueElement.getValue();
+                // valueElement.getBoundValue();
+                // valueElement.getDefaultValue(); // Value.h needs to binded for this to work.
+                valueElement.setUnit('mm');
+                valueElement.hasUnit();
+                valueElement.getUnit();
+                valueElement.getActiveUnit();
+                valueElement.setUnitType('meters');
+                valueElement.hasUnitType();
+                valueElement.getUnitType();
+            },
+            function() {
+                MaterialX.ValueElement.VALUE_ATTRIBUTE;
+                MaterialX.ValueElement.INTERFACE_NAME_ATTRIBUTE;
+                MaterialX.ValueElement.IMPLEMENTATION_NAME_ATTRIBUTE;
+                MaterialX.ValueElement.IMPLEMENTATION_TYPE_ATTRIBUTE;
+                MaterialX.ValueElement.ENUM_ATTRIBUTE;
+                MaterialX.ValueElement.ENUM_VALUES_ATTRIBUTE;
+                MaterialX.ValueElement.UNIT_ATTRIBUTE;
+                MaterialX.ValueElement.UI_NAME_ATTRIBUTE;
+                MaterialX.ValueElement.UI_FOLDER_ATTRIBUTE;
+                MaterialX.ValueElement.UI_MIN_ATTRIBUTE;
+                MaterialX.ValueElement.UI_MAX_ATTRIBUTE;
+                MaterialX.ValueElement.UI_SOFT_MIN_ATTRIBUTE;
+                MaterialX.ValueElement.UI_SOFT_MAX_ATTRIBUTE;
+                MaterialX.ValueElement.UI_STEP_ATTRIBUTE;
+                MaterialX.ValueElement.UI_ADVANCED_ATTRIBUTE;
+            }
+        );
+
+        validator.classValidatorCb(
+            'Token',
+            function() {
+                var token = new MaterialX.Token(null, 'tttt');
+                // Make sure that a method defined in Element is callable.
+                // This is checks that inheritance works.
+                token.getVersionIntegers();
+            },
+            function() {
+                MaterialX.Token.CATEGORY;
+            }
+        );
+
+        validator.classValidatorCb('StringResolver', function() {
+            // Make sure that a method defined in Element is callable.
+            // This is checks that inheritance works.
+            MaterialX.StringResolver.create();
+            var sr = MaterialX.StringResolver.create();
+            sr.setFilePrefix('test');
+            sr.getFilePrefix();
+            sr.setGeomPrefix('geom');
+            sr.getGeomPrefix();
+            sr.setUdimString('u');
+            sr.setUvTileString('uv');
+            sr.setFilenameSubstitution('hello', 'world');
+            JSON.stringify(sr.getFilenameSubstitutions());
+            sr.setGeomNameSubstitution('geomNameSub', 'blah');
+            JSON.stringify(sr.getGeomNameSubstitutions());
+            sr.resolve('The is a uv u test//', 'blah');
+        });
+        validator.validate();
     }
 };

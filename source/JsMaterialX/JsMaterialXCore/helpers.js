@@ -23,7 +23,7 @@ function catchPtrError(func, handle, args) {
 
 /**
  * Wraps the class prototype functions to catch ptr errors.
- * @param {*} klass 
+ * @param {*} klass
  */
 function wrapperFactory(klass) {
     var proto = klass.prototype;
@@ -33,16 +33,56 @@ function wrapperFactory(klass) {
         apiFunc = proto[funcName];
         function wrap(func) {
             return function() {
-                return catchPtrError(func, this, arguments)
-            }
+                return catchPtrError(func, this, arguments);
+            };
         }
         proto[funcName] = wrap(apiFunc);
     }
     return klass;
 }
 
-function setupTest(fileName, callback) {
-    console.log(`**************${fileName}**************`);
-    callback && callback();
-    console.log(`**************${'*'.repeat(fileName.length)}**************\n\n`);
+class Validator {
+    constructor(fileName) {
+        this.fileName = fileName;
+        this.validators = [];
+    }
+
+    validate() {
+        console.log(`**************${this.fileName}**************`);
+        for (var i = 0; i < this.validators.length; i++) {
+            var validator = this.validators[i];
+            if (validator) {
+                validator();
+            }
+        }
+        console.log(`**************${'*'.repeat(this.fileName.length)}**************\n\n`);
+    }
+
+    output(callback) {
+        if (!callback) return;
+        var callStr = callback.toString();
+        callStr = callStr.split('function() {')[1];
+        callStr = callStr.substring(0, callStr.length - 1);
+        callStr = callStr.trim();
+        var commands = callStr.split(';');
+        for (var i = 0; i < commands.length - 1; i++) {
+            var command = commands[i].trim();
+            var geval = eval;
+            var output =
+                command.indexOf('//') === 0
+                    ? `/**Commented out*/ ${command};`
+                    : `${command}; // returned: ${geval(command)}`;
+            console.log(`   ${output}`);
+        }
+    }
+
+    classValidatorCb(className, validateInstanceCb, validateConstantsCb) {
+        var func = function() {
+            console.log(`------Validating ${className} instance`);
+            this.output(validateInstanceCb);
+            console.log(`------Validating ${className} Constants`);
+            this.output(validateConstantsCb);
+        }.bind(this, className, validateInstanceCb, validateConstantsCb);
+        this.validators.push(func);
+    }
 }
