@@ -21,6 +21,12 @@ function catchPtrError(func, handle, args) {
     }
 }
 
+function wrapperFunction(func) {
+    return function() {
+        return catchPtrError(func, this, arguments);
+    };
+}
+
 /**
  * Wraps the class prototype functions to catch ptr errors.
  * @param {*} klass
