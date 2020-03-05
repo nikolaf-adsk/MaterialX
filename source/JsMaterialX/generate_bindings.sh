@@ -9,7 +9,7 @@ em++ --bind \
     JsInterface.cpp \
     JsNode.cpp \
     JsDocument.cpp \
-    ../../../wasm/source/MaterialXCore/libMaterialXCore.a \
+    ../../../wasm/_build/source/MaterialXCore/libMaterialXCore.a \
     -I../../ \
     -std=c++17 \
     -s WASM=1 \

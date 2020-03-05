@@ -23,5 +23,5 @@ deploy
 .vscode/*
 
 # Ignore the build wasm folder
-wasm/*
+wasm/_build/*
 

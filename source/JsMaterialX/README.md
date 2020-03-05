@@ -14,37 +14,25 @@ For more information follow the steps described in the [emscripten documentation
 ### Steps
 In the root of directory of this repository run the following:
 
-1. Generate the wasm folder from the root.
-
-```sh
-mkdir ./wasm
-```
-
-2. cd into the new folder.
+1. cd into the new folder.
 
 ```sh
 cd ./wasm
 ```
 
-3. Generate a makefile from the CMakeLists.txt. 
+2. Generate the MaterialX libraries that will be used for the js bindings. 
 
 ```sh
-emcmake cmake .. -G "Unix Makefiles" -DMATERIALX_BUILD_WASM=1 -DEMSCRIPTEN=1
+./generate_lib.sh
 ```
 
-4. Generate the binary library. This command will generate a libMaterialX.a file.
-
-```sh
-emmake make
-```
-
-5. cd into the javascript source code
+3. cd into the javascript bindings directory. 
 
 ```sh
 cd ../source/JsMaterialX
 ```
 
-6. Generate the wasm and javascript files for the bindings.
+4. Generate the wasm and javascript files for the bindings.
 
 ```sh
 ./generate_bindings.sh
