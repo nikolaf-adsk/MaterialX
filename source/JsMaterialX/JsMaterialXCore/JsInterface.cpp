@@ -18,15 +18,11 @@ extern "C"
 
         class_<Parameter, base<ValueElement>>("Parameter")
             .smart_ptr_constructor("Parameter", &std::make_shared<Parameter, ElementPtr, const string &>)
-            // .constructor<ElementPtr, const string &>()
-            // .smart_ptr<std::shared_ptr<Parameter>>("Parameter")
             .smart_ptr<std::shared_ptr<const Parameter>>("Parameter")
             .class_property("CATEGORY", &Parameter::CATEGORY);
 
         class_<PortElement, base<ValueElement>>("PortElement")
             .smart_ptr_constructor("PortElement", &std::make_shared<PortElement, ElementPtr, const string &, const string &>)
-            // .constructor<ElementPtr, const string &, const string &>()
-            // .smart_ptr<std::shared_ptr<PortElement>>("PortElement")
             .smart_ptr<std::shared_ptr<const PortElement>>("PortElement")
             .function("setNodeName", &PortElement::setNodeName)
             .function("getNodeName", &PortElement::getNodeName)
@@ -37,9 +33,6 @@ extern "C"
 
         class_<Input, base<PortElement>>("Input")
             .smart_ptr_constructor("Input", &std::make_shared<Input, ElementPtr, const string &>)
-
-            // .constructor<ElementPtr, const string &>()
-            // .smart_ptr<std::shared_ptr<Input>>("Input")
             .smart_ptr<std::shared_ptr<const Input>>("Input")
             .function("setDefaultGeomPropString", &Input::setDefaultGeomPropString)
             .function("hasDefaultGeomPropString", &Input::hasDefaultGeomPropString)

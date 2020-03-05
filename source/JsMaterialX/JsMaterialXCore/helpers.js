@@ -76,10 +76,22 @@ class Validator {
             var geval = eval;
             var output;
             var tab = ' '.repeat(4);
+            var variable = null;
+
+            var tokenizedVar = command.split('var ');
+            if (tokenizedVar.length > 1) {
+                var tokenizedEqual = tokenizedVar[tokenizedVar.length - 1].split(" =");
+                variable = tokenizedEqual.length > 1 ? tokenizedEqual[0]: variable;
+            }
+
+
             if (command.indexOf('//') === 0) {
                 output = `/**Commented out*/ ${command};`;
             } else {
                 var ret = geval(command);
+                if (variable !== null) {
+                    ret = geval(variable);
+                }
                 ret = ret !== null && typeof ret === "object" ? `${ret.constructor.name} ${JSON.stringify(ret)}` : ret;
                 output = `${command};\n${tab.repeat(2)}// ---> ${ret}`;
             }
