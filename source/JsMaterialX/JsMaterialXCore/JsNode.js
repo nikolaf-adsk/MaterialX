@@ -92,14 +92,14 @@ var JsNode = {
             graphElement.addNode("category", "name", "type");
             // graphElement.addNodeInstance(constNodeDefPtr, "name");
             graphElement.getNode("name");
-            JSON.stringify(graphElement.getNodes("category"));
+            graphElement.getNodes("category");
             graphElement.removeNode("name");
             graphElement.addBackdrop("name");
             graphElement.getBackdrop("name");
-            JSON.stringify(graphElement.getBackdrops());
+            graphElement.getBackdrops();
             graphElement.removeBackdrop("name");
             graphElement.flattenSubgraphs("something");
-            JSON.stringify(graphElement.topologicalSort());
+            graphElement.topologicalSort();
             graphElement.asStringDot();
 
         });

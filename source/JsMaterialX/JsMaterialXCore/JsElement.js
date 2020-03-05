@@ -192,9 +192,9 @@ var JsElement = {
             sr.setUdimString('u');
             sr.setUvTileString('uv');
             sr.setFilenameSubstitution('hello', 'world');
-            JSON.stringify(sr.getFilenameSubstitutions());
+            sr.getFilenameSubstitutions();
             sr.setGeomNameSubstitution('geomNameSub', 'blah');
-            JSON.stringify(sr.getGeomNameSubstitutions());
+            sr.getGeomNameSubstitutions();
             sr.resolve('The is a uv u test//', 'blah');
         });
         validator.validate();

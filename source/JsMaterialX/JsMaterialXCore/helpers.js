@@ -74,11 +74,16 @@ class Validator {
         for (var i = 0; i < commands.length - 1; i++) {
             var command = commands[i].trim();
             var geval = eval;
-            var output =
-                command.indexOf('//') === 0
-                    ? `/**Commented out*/ ${command};`
-                    : `${command}; // returned: ${geval(command)}`;
-            console.log(`   ${output}`);
+            var output;
+            var tab = ' '.repeat(4);
+            if (command.indexOf('//') === 0) {
+                output = `/**Commented out*/ ${command};`;
+            } else {
+                var ret = geval(command);
+                ret = ret !== null && typeof ret === "object" ? `${ret.constructor.name} ${JSON.stringify(ret)}` : ret;
+                output = `${command};\n${tab.repeat(2)}// ---> ${ret}`;
+            }
+            console.log(`${tab}${output}`);
         }
     }
 

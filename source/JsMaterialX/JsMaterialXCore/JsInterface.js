@@ -144,7 +144,7 @@ var JsInterface = {
                 interfaceElement.getNodeDefString();
                 interfaceElement.addParameter();
                 interfaceElement.getParameter('color3');
-                JSON.stringify(interfaceElement.getParameters());
+                interfaceElement.getParameters();
                 interfaceElement.getParameterCount();
                 interfaceElement.removeParameter('color3');
                 interfaceElement.getActiveParameter('color3');
