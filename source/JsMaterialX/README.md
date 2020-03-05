@@ -41,16 +41,16 @@ emmake make
 5. cd into the javascript source code
 
 ```sh
-cd ../source/JsMaterialX/JsMaterialXCore
+cd ../source/JsMaterialX
 ```
 
 6. Generate the wasm and javascript files for the bindings.
 
 ```sh
-em++ --bind JsTypes.cpp JsExceptions.cpp JsUtil.cpp JsElement.cpp JsInterface.cpp JsNode.cpp JsDocument.cpp ../../../wasm/source/MaterialXCore/libMaterialXCore.a -I../../ -std=c++17 -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -o ../MaterialXCore.js
+./generate_bindings.sh
 ```
 
-To debug the em++ command append `EMCC_DEBUG=1` to the shell command above.
+To debug the em++ command append `EMCC_DEBUG=1` to the shell command in `generate_bindings.sh`.
 
 ```sh
 EMCC_DEBUG=1 em++ --bind ...
@@ -65,7 +65,7 @@ EMCC_DEBUG=1 em++ --bind ...
 python -m http.server 9000
 ```
 
-2. In your browser load: http://localhost:9000/binding.html
+2. In your browser load: http://localhost:9000/JsMaterialXCore/index.html
 
 There will be some console logs in the browser console. 
 
