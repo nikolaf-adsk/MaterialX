@@ -11,6 +11,8 @@
       JsInterface.generateWrappers(Module, MaterialX);
       JsNode.generateWrappers(Module, MaterialX);
       JsDocument.generateWrappers(Module, MaterialX);
+      JsDefinition.generateWrappers(Module, MaterialX);
+
 
       // Run "tests"
       JsTypes.test();
@@ -19,6 +21,7 @@
       JsInterface.test();
       JsNode.test();
       JsDocument.test();
+      JsDefinition.test();
     }
   };
 </script>
@@ -31,6 +34,7 @@
 <script src="JsInterface.js"></script>
 <script src="JsNode.js"></script>
 <script src="JsDocument.js"></script>
+<script src="JsDefinition.js"></script>
 
 <!-- output from em++ -->
 <script src="./MaterialXCore.js"></script>

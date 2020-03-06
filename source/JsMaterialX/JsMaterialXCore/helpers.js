@@ -101,10 +101,10 @@ class Validator {
 
     classValidatorCb(className, validateInstanceCb, validateConstantsCb) {
         var func = function() {
-            console.log(`------Validating ${className} instance`);
-            this.output(validateInstanceCb);
-            console.log(`------Validating ${className} Constants`);
+            console.log(`------Validating ${className} Constants------`);
             this.output(validateConstantsCb);
+            console.log(`------Validating ${className} instance------`);
+            this.output(validateInstanceCb);
         }.bind(this, className, validateInstanceCb, validateConstantsCb);
         this.validators.push(func);
     }

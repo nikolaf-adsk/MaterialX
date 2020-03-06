@@ -26,7 +26,7 @@ var JsDocument = {
 
         var _addNodeGraph = Module.Document.prototype.addNodeGraph;
         api.Document.prototype.addNodeGraph = function() {
-            var arg1 = arguments[1] || "";
+            var arg1 = arguments[0] || "";
             return _addNodeGraph.call(this, arg1);
         };
 

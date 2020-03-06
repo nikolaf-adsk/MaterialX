@@ -1,5 +1,10 @@
 #!/bin/bash
+timestamp() {
+  date +"%T"
+}
+
 echo "Generating Javascript MaterialXCore Bindings"
+timestamp
 cd ./JsMaterialXCore
 em++ --bind \
     JsTypes.cpp \
@@ -8,6 +13,7 @@ em++ --bind \
     JsElement.cpp \
     JsInterface.cpp \
     JsNode.cpp \
+    JsDefinition.cpp \
     JsDocument.cpp \
     ../../../wasm/_build/source/MaterialXCore/libMaterialXCore.a \
     -I../../ \
