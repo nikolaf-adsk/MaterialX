@@ -20,7 +20,7 @@ extern "C"
             .smart_ptr<std::shared_ptr<const Document>>("Document")
             .function("initialize", &Document::initialize)
             .function("copy", &Document::copy)
-            .function("importLibrary", optional_override([](Document &self, const ConstDocumentPtr& library, CopyOptions copyOptions) {
+            .function("importLibrary", optional_override([](Document &self, const ConstDocumentPtr &library, CopyOptions copyOptions) {
                           const CopyOptions *co = &copyOptions;
                           return self.Document::importLibrary(library, co);
                       }))
@@ -28,7 +28,6 @@ extern "C"
                           StringSet referenced = self.Document::getReferencedSourceUris();
                           int size = referenced.size();
                           return arrayToVec((string *)&referenced, size);
-
                       }))
             .function("addNodeGraph", &Document::addNodeGraph)
             .function("getNodeGraph", &Document::getNodeGraph)
@@ -46,7 +45,7 @@ extern "C"
 
             /** TODO: unbound types: Geom.h */
             .function("addGeomInfo", &Document::addGeomInfo)
-                // arg("name") = EMPTY_STRING, arg("geom") = UNIVERSAL_GEOM_NAME)
+            // arg("name") = EMPTY_STRING, arg("geom") = UNIVERSAL_GEOM_NAME)
             .function("getGeomInfo", &Document::getGeomInfo)
             .function("getGeomInfos", &Document::getGeomInfos)
             .function("removeGeomInfo", &Document::removeGeomInfo)
@@ -79,38 +78,32 @@ extern "C"
             .function("removeCollection", &Document::removeCollection)
             /*******************************************/
 
-            /** TODO: unbound types: Definition.h */
             .function("addTypeDef", &Document::addTypeDef)
-                // arg("name") = EMPTY_STRING)
             .function("getTypeDef", &Document::getTypeDef)
             .function("getTypeDefs", &Document::getTypeDefs)
             .function("removeTypeDef", &Document::removeTypeDef)
             .function("addNodeDef", &Document::addNodeDef)
-                // arg("name") = EMPTY_STRING, arg("type") = DEFAULT_TYPE_STRING, arg("node") = EMPTY_STRING)
             .function("getNodeDef", &Document::getNodeDef)
             .function("getNodeDefs", &Document::getNodeDefs)
             .function("removeNodeDef", &Document::removeNodeDef)
             .function("getMatchingNodeDefs", &Document::getMatchingNodeDefs)
-            /***************************************/
-            
+
             .function("getMatchingImplementations", &Document::getMatchingImplementations)
-            
+
             /** TODO: unbound types: Property.h */
             .function("addPropertySet", &Document::addPropertySet)
-                // arg("name") = EMPTY_STRING)
+            // arg("name") = EMPTY_STRING)
             .function("getPropertySet", &Document::getPropertySet)
             .function("getPropertySets", &Document::getPropertySets)
             .function("removePropertySet", &Document::removePropertySet)
             .function("addVariantSet", &Document::addVariantSet)
-                // arg("name") = EMPTY_STRING)
+            // arg("name") = EMPTY_STRING)
             .function("getVariantSet", &Document::getVariantSet)
             .function("getVariantSets", &Document::getVariantSets)
             .function("removeVariantSet", &Document::removeVariantSet)
             /***************************************/
 
-            /** TODO: unbound types: Definition.h */
             .function("addImplementation", &Document::addImplementation)
-                // arg("name") = EMPTY_STRING)
             .function("getImplementation", &Document::getImplementation)
             .function("getImplementations", &Document::getImplementations)
             .function("removeImplementation", &Document::removeImplementation)
@@ -122,7 +115,6 @@ extern "C"
             .function("getUnitTypeDef", &Document::getUnitTypeDef)
             .function("getUnitTypeDefs", &Document::getUnitTypeDefs)
             .function("removeUnitTypeDef", &Document::removeUnitTypeDef)
-            /***************************************/
 
             .function("upgradeVersion", &Document::upgradeVersion)
             .function("setColorManagementSystem", &Document::setColorManagementSystem)
@@ -130,11 +122,14 @@ extern "C"
             .function("getColorManagementSystem", &Document::getColorManagementSystem)
             .function("setColorManagementConfig", &Document::setColorManagementConfig)
             .function("hasColorManagementConfig", &Document::hasColorManagementConfig)
-            .function("getColorManagementConfig", &Document::getColorManagementConfig)
-            ;
+            .function("getColorManagementConfig", &Document::getColorManagementConfig);
 
         register_vector<NodeGraphPtr>("vector<NodeGraphPtr>");
         // register_vector<MaterialPtr>("vector<MaterialPtr>");
         register_vector<InterfaceElementPtr>("vector<InterfaceElementPtr>");
+        register_vector<TypeDefPtr>("vector<TypeDefPtr>");
+        register_vector<NodeDefPtr>("vector<NodeDefPtr>");
+        register_vector<ImplementationPtr>("vector<ImplementationPtr>");
+        register_vector<UnitTypeDefPtr>("vector<UnitTypeDefPtr>");
     }
 }
