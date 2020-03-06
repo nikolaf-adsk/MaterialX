@@ -19,7 +19,7 @@ extern "C"
             .property("skipConflictingElements", &CopyOptions::skipConflictingElements);
 
         class_<Element>("Element")
-            .smart_ptr_constructor("Element", &std::make_shared<Element, ElementPtr, const string &, const string &>)
+            .smart_ptr<std::shared_ptr<Element>>("Element")
             .smart_ptr<std::shared_ptr<const Element>>("Element") // ConstElementPtr
             .function("setCategory", &Element::setCategory)
             .function("getCategory", &Element::getCategory)
@@ -145,7 +145,8 @@ extern "C"
             .class_property("DOC_ATTRIBUTE", &Element::DOC_ATTRIBUTE);
 
         class_<TypedElement, base<Element>>("TypedElement")
-            .constructor<ElementPtr, const string &, const string &>()
+            .smart_ptr<std::shared_ptr<TypedElement>>("TypedElement")
+            .smart_ptr<std::shared_ptr<const TypedElement>>("TypedElement")
             .function("setType", &TypedElement::setType)
             .function("hasType", &TypedElement::hasType)
             .function("getType", &TypedElement::getType)
@@ -154,7 +155,8 @@ extern "C"
             .class_property("TYPE_ATTRIBUTE", &TypedElement::TYPE_ATTRIBUTE);
 
         class_<ValueElement, base<TypedElement>>("ValueElement")
-            .smart_ptr_constructor("ValueElement", &std::make_shared<ValueElement, ElementPtr, const string &, const string &>)
+            .smart_ptr<std::shared_ptr<ValueElement>>("ValueElement")
+            .smart_ptr<std::shared_ptr<const ValueElement>>("ValueElement")
             .function("setValueString", &ValueElement::setValueString)
             .function("hasValueString", &ValueElement::hasValueString)
             .function("getValueString", &ValueElement::getValueString)

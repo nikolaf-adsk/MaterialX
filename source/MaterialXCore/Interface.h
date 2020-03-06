@@ -103,11 +103,7 @@ class Parameter : public ValueElement
 /// Port elements support spatially-varying upstream connections to nodes.
 class PortElement : public ValueElement
 {
-#ifdef EMSCRIPTEN
-  public:
-#else
   protected:
-#endif
     PortElement(ElementPtr parent, const string& category, const string& name) :
         ValueElement(parent, category, name)
     {
@@ -375,11 +371,7 @@ class Output : public PortElement
 /// with an API for setting their values.
 class InterfaceElement : public TypedElement
 {
-#ifdef EMSCRIPTEN
-  public:
-#else
   protected:
-#endif
     InterfaceElement(ElementPtr parent, const string& category, const string& name) :
         TypedElement(parent, category, name),
         _parameterCount(0),

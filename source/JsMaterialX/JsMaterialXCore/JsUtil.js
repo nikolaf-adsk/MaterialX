@@ -47,8 +47,9 @@ var JsUtil = {
             MaterialX.splitString('hello', 'l');
             MaterialX.replaceSubstrings('This.is.a.test///', { '.': '_', '//': ')' });
 
-            var element = new MaterialX.Element(null, 'hello', 'world');
-            console.log('prettyPrint(element): ' + MaterialX.prettyPrint(element));
+            var doc = MaterialX.createDocument();
+            var element = doc.addChildOfCategory("generic");
+            MaterialX.prettyPrint(element);
         });
         validator.validate();
     }

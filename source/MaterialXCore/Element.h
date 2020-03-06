@@ -63,11 +63,7 @@ using ElementPredicate = std::function<bool(ConstElementPtr)>;
 /// number of child elements and attributes.
 class Element : public std::enable_shared_from_this<Element>
 {
-#ifdef EMSCRIPTEN
-  public:
-#else
   protected:
-#endif
     Element(ElementPtr parent, const string& category, const string& name) :
         _category(category),
         _name(name),
@@ -903,11 +899,7 @@ class Element : public std::enable_shared_from_this<Element>
 /// The base class for typed elements.
 class TypedElement : public Element
 {
-#ifdef EMSCRIPTEN
-  public:
-#else
   protected:
-#endif
     TypedElement(ElementPtr parent, const string& category, const string& name) :
         Element(parent, category, name)
     {
@@ -964,11 +956,7 @@ public:
 /// The base class for elements that support typed values.
 class ValueElement : public TypedElement
 {
-#ifdef EMSCRIPTEN
-  public:
-#else
   protected:
-#endif
     ValueElement(ElementPtr parent, const string& category, const string& name) :
         TypedElement(parent, category, name)
     {

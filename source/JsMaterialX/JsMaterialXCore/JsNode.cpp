@@ -16,7 +16,7 @@ extern "C"
     {
         class_<Node, base<InterfaceElement>>("Node")
             .smart_ptr_constructor("Node", &std::make_shared<Node, ElementPtr, const string &>)
-
+            .smart_ptr<std::shared_ptr<const Node>>("Node")
             .function("setConnectedNode", &Node::setConnectedNode)
             .function("getConnectedNode", &Node::getConnectedNode)
             .function("setConnectedNodeName", &Node::setConnectedNodeName)
@@ -27,8 +27,8 @@ extern "C"
             .class_property("CATEGORY", &Node::CATEGORY);
 
         class_<GraphElement, base<InterfaceElement>>("GraphElement")
-            .smart_ptr_constructor("GraphElement", &std::make_shared<GraphElement, ElementPtr, const string &, const string &>)
-
+            .smart_ptr<std::shared_ptr<GraphElement>>("GraphElement")
+            .smart_ptr<std::shared_ptr<const GraphElement>>("GraphElement")
             .function("addNode", &GraphElement::addNode)
             .function("addNodeInstance", &GraphElement::addNodeInstance) /** TODO: need to bind Definition.h */
             .function("getNode", &GraphElement::getNode)
@@ -44,12 +44,14 @@ extern "C"
 
         class_<NodeGraph, base<GraphElement>>("NodeGraph")
             .smart_ptr_constructor("NodeGraph", &std::make_shared<NodeGraph, ElementPtr, const string &>)
+            .smart_ptr<std::shared_ptr<const NodeGraph>>("NodeGraph")
             .function("setNodeDef", &NodeGraph::setNodeDef) /** TODO: need to bind Definition.h */
             .function("getNodeDef", &NodeGraph::getNodeDef)
             .class_property("CATEGORY", &NodeGraph::CATEGORY);
 
         class_<Backdrop, base<Element>>("Backdrop")
             .smart_ptr_constructor("Backdrop", &std::make_shared<Backdrop, ElementPtr, const string &>)
+            .smart_ptr<std::shared_ptr<const Backdrop>>("Backdrop")
             .function("getContains", &Backdrop::getContains)
             .function("setContains", &Backdrop::setContains)
             .function("getWidth", &Backdrop::getWidth)

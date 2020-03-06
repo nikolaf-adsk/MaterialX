@@ -21,17 +21,16 @@ var JsElement = {
 
         var _getNamePath = Module.Element.prototype.getNamePath;
         api.Element.prototype.getNamePath = function() {
-            if (arguments.length === 0) {
-                arguments = [null];
-            }
-            return _getNamePath.apply(this, arguments);
+            var arg1 = arguments[0] || null;
+            return _getNamePath.call(this, arg1);
         };
 
         var _addChildOfCategory = Module.Element.prototype.addChildOfCategory;
         api.Element.prototype.addChildOfCategory = function() {
-            arguments[1] = arguments[1] || '';
-            arguments[2] = arguments[2] || true;
-            return _addChildOfCategory.apply(this, arguments);
+            var arg1 = arguments[0];
+            var arg2 =arguments[1] || '';
+            var arg3 =arguments[2] || true;
+            return _addChildOfCategory.call(this, arg1, arg2, arg3);
         };
 
         var _getAttributeNames = Module.Element.prototype.getAttributeNames;
@@ -42,8 +41,8 @@ var JsElement = {
 
         var _copyContentFrom = Module.Element.prototype.copyContentFrom;
         api.Element.prototype.copyContentFrom = function() {
-            arguments[1] = arguments[1] === undefined ? null : arguments[1];
-            return _copyContentFrom.apply(this, arguments);
+            var arg1 = arguments[1] === undefined ? null : arguments[1];
+            return _copyContentFrom.call(this, arg1);
         };
 
         /** Setup the TypedElement class */
@@ -74,7 +73,8 @@ var JsElement = {
         validator.classValidatorCb(
             'Element',
             function() {
-                var element = new MaterialX.Element(null, 'test', 'parent');
+                var doc = MaterialX.createDocument();
+                var element = doc.addChildOfCategory("generic");
                 element.getCategory();
                 element.setCategory('TEST');
                 element.getCategory();
@@ -108,7 +108,8 @@ var JsElement = {
         validator.classValidatorCb(
             'TypedElement',
             function() {
-                var typedElement = new MaterialX.TypedElement(null, 'hello', 'world');
+                var doc = MaterialX.createDocument();
+                var typedElement = doc.addToken("TOKEN");
                 typedElement.setType('newType');
                 typedElement.hasType();
                 typedElement.getType();
@@ -123,7 +124,8 @@ var JsElement = {
         validator.classValidatorCb(
             'ValueElement',
             function() {
-                var valueElement = new MaterialX.ValueElement(null, 'hello', 'world');
+                var doc = MaterialX.createDocument();
+                var valueElement = doc.addParameter("ValueElement")
                 // Make sure that a method defined in Element is callable.
                 // This is checks that inheritance works.
                 valueElement.getVersionIntegers();

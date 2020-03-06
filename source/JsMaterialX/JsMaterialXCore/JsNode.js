@@ -22,12 +22,10 @@ var JsNode = {
             return _getImplementation.call(this, arg1, arg2);
         };
 
-        /** Setup the GraphElement class */
-        api.GraphElement = wrapperFactory(Module.GraphElement);
         var _addNode = Module.Node.prototype.addNode;
         api.Node.prototype.addNode = function() {
             var arg1 = arguments[0];
-            var arg2 = arguments[1] || "";
+            var arg2 = arguments[1] || '';
             var arg3 = arguments[2] || api.DEFAULT_TYPE_STRING;
             return _addNode.call(this, arg1, arg2, arg3);
         };
@@ -35,27 +33,30 @@ var JsNode = {
         var _addNodeInstance = Module.Node.prototype.addNodeInstance;
         api.Node.prototype.addNodeInstance = function() {
             var arg1 = arguments[0];
-            var arg2 = arguments[1] || "";
+            var arg2 = arguments[1] || '';
             return _addNodeInstance.call(this, arg1, arg2);
         };
 
         var _getNodes = Module.Node.prototype.getNodes;
         api.Node.prototype.getNodes = function() {
-            var arg1 = arguments[0] || "";
+            var arg1 = arguments[0] || '';
             return _getNodes.call(this, arg1);
         };
 
         var _addBackdrop = Module.Node.prototype.addBackdrop;
         api.Node.prototype.addBackdrop = function() {
-            var arg1 = arguments[0] || "";
+            var arg1 = arguments[0] || '';
             return _addBackdrop.call(this, arg1);
         };
 
         var _flattenSubgraphs = Module.Node.prototype.flattenSubgraphs;
         api.Node.prototype.flattenSubgraphs = function() {
-            var arg1 = arguments[0] || "";
+            var arg1 = arguments[0] || '';
             return _flattenSubgraphs.call(this, arg1);
         };
+
+        /** Setup the GraphElement class */
+        api.GraphElement = wrapperFactory(Module.GraphElement);
 
         /** Setup the NodeGraph class */
         api.NodeGraph = wrapperFactory(Module.NodeGraph);
@@ -73,8 +74,10 @@ var JsNode = {
         validator.classValidatorCb(
             'Node',
             function() {
-                var node = new MaterialX.Node(null, 'Node1');
-                // node.setConnectedNode("name", NodePtr);
+                var doc = MaterialX.createDocument();
+                var node = doc.addNode("Node", "TTT", "TTT");
+                var node1 = doc.addNode("Node1", "TTT1", "TTT1");
+                node.setConnectedNode("name", node1);
                 node.getConnectedNode('name');
                 node.setConnectedNodeName('inputname', 'Node1');
                 node.getConnectedNodeName('inputname');
@@ -88,50 +91,59 @@ var JsNode = {
         );
 
         validator.classValidatorCb('GraphElement', function() {
-            var graphElement = new MaterialX.GraphElement(null, 'category', 'name');
-            graphElement.addNode("category", "name", "type");
+            var graphElement = MaterialX.createDocument();
+            graphElement.addNode('category', 'name', 'type');
             // graphElement.addNodeInstance(constNodeDefPtr, "name");
-            graphElement.getNode("name");
-            graphElement.getNodes("category");
-            graphElement.removeNode("name");
-            graphElement.addBackdrop("name");
-            graphElement.getBackdrop("name");
+            graphElement.getNode('name');
+            graphElement.getNodes('category');
+            graphElement.removeNode('name');
+            graphElement.addBackdrop('name');
+            graphElement.getBackdrop('name');
             graphElement.getBackdrops();
-            graphElement.removeBackdrop("name");
-            graphElement.flattenSubgraphs("something");
+            graphElement.removeBackdrop('name');
+            graphElement.flattenSubgraphs('something');
             graphElement.topologicalSort();
             graphElement.asStringDot();
-
         });
 
-        validator.classValidatorCb('NodeGraph', function() {
-            var nodeGraph = new MaterialX.NodeGraph(null, 'name');
-            // nodeGraph.getNodeDef();
-            // nodeGraph.setNodeDef(constNodeDefPtr);
-            // nodeGraph.getNodeDef();
-        }, function() {
-            MaterialX.NodeGraph.CATEGORY;
-        });
+        validator.classValidatorCb(
+            'NodeGraph',
+            function() {
+                var doc = MaterialX.createDocument();
+                var nodeGraph = doc.addNodeGraph("NodeGraph")
+                var nodeDef = doc.addNodeDef();
+                nodeGraph.getNodeDef();
+                nodeGraph.setNodeDef(nodeDef);
+                nodeGraph.getNodeDef();
+            },
+            function() {
+                MaterialX.NodeGraph.CATEGORY;
+            }
+        );
 
-        validator.classValidatorCb('Backdrop', function() {
-            var backdrop = new MaterialX.Backdrop(null, 'name');
-            backdrop.getContains();
-            backdrop.setContains("something");
-            backdrop.getContains();
+        validator.classValidatorCb(
+            'Backdrop',
+            function() {
+                var backdrop = new MaterialX.Backdrop(null, 'name');
+                backdrop.getContains();
+                backdrop.setContains('something');
+                backdrop.getContains();
 
-            backdrop.getWidth();
-            backdrop.setWidth(44.0);
-            backdrop.getWidth();
+                backdrop.getWidth();
+                backdrop.setWidth(44.0);
+                backdrop.getWidth();
 
-            backdrop.getHeight();
-            backdrop.setHeight(33);
-            backdrop.getHeight();
-        }, function() {
-            MaterialX.Backdrop.CATEGORY;
-            MaterialX.Backdrop.CONTAINS_ATTRIBUTE;
-            MaterialX.Backdrop.WIDTH_ATTRIBUTE;
-            MaterialX.Backdrop.HEIGHT_ATTRIBUTE;
-        });
+                backdrop.getHeight();
+                backdrop.setHeight(33);
+                backdrop.getHeight();
+            },
+            function() {
+                MaterialX.Backdrop.CATEGORY;
+                MaterialX.Backdrop.CONTAINS_ATTRIBUTE;
+                MaterialX.Backdrop.WIDTH_ATTRIBUTE;
+                MaterialX.Backdrop.HEIGHT_ATTRIBUTE;
+            }
+        );
 
         validator.validate();
     }

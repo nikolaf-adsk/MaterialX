@@ -89,7 +89,8 @@ var JsInterface = {
         );
 
         validator.classValidatorCb('PortElement', function() {
-            var portElement = new MaterialX.PortElement(null, 'category', 'tttt');
+            var doc = MaterialX.createDocument();
+            var portElement = doc.addInput("PortElement");
             // Make sure that a method defined in Element is callable.
             // This is checks that inheritance works.
             portElement.getVersionIntegers();
@@ -104,7 +105,8 @@ var JsInterface = {
         validator.classValidatorCb(
             'Input',
             function() {
-                var input = new MaterialX.Input(null, 'tttt');
+                var doc = MaterialX.createDocument();
+                var input = doc.addInput("Input");
                 input.getVersionIntegers();
                 input.setDefaultGeomPropString('geomProp');
                 input.hasDefaultGeomPropString();
@@ -119,7 +121,8 @@ var JsInterface = {
         validator.classValidatorCb(
             'Output',
             function() {
-                var output = new MaterialX.Output(null, 'tttt');
+                var doc = MaterialX.createDocument();
+                var output = doc.addOutput("Output");
                 // Make sure that a method defined in Element is callable.
                 // This is checks that inheritance works.
                 output.getVersionIntegers();
@@ -134,7 +137,8 @@ var JsInterface = {
         validator.classValidatorCb(
             'InterfaceElement',
             function() {
-                var interfaceElement = new MaterialX.InterfaceElement(null, 'category', 'name');
+                var doc = MaterialX.createDocument();
+                var interfaceElement = doc.addNode("Category", "", "Default");
                 // Make sure that a method defined in Element is callable.
                 // This is checks that inheritance works.
                 interfaceElement.getVersionIntegers();

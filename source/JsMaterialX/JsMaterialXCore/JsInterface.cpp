@@ -22,7 +22,7 @@ extern "C"
             .class_property("CATEGORY", &Parameter::CATEGORY);
 
         class_<PortElement, base<ValueElement>>("PortElement")
-            .smart_ptr_constructor("PortElement", &std::make_shared<PortElement, ElementPtr, const string &, const string &>)
+            .smart_ptr<std::shared_ptr<PortElement>>("PortElement")
             .smart_ptr<std::shared_ptr<const PortElement>>("PortElement")
             .function("setNodeName", &PortElement::setNodeName)
             .function("getNodeName", &PortElement::getNodeName)
@@ -42,17 +42,13 @@ extern "C"
 
         class_<Output, base<PortElement>>("Output")
             .smart_ptr_constructor("Output", &std::make_shared<Output, ElementPtr, const string &>)
-            // .constructor<ElementPtr, const string &>()
-            // .smart_ptr<std::shared_ptr<Output>>("Output")
             .smart_ptr<std::shared_ptr<const Output>>("Output")
             .function("hasUpstreamCycle", &Output::hasUpstreamCycle)
             .class_property("CATEGORY", &Output::CATEGORY)
             .class_property("DEFAULT_INPUT_ATTRIBUTE", &Output::DEFAULT_INPUT_ATTRIBUTE);
 
         class_<InterfaceElement, base<TypedElement>>("InterfaceElement")
-            .smart_ptr_constructor("InterfaceElement", &std::make_shared<InterfaceElement, ElementPtr, const string &, const string &>)
-            // .constructor<ElementPtr, const string &, const string &>()
-            // .smart_ptr<std::shared_ptr<InterfaceElement>>("InterfaceElement")
+            .smart_ptr<std::shared_ptr<InterfaceElement>>("InterfaceElement")
             .smart_ptr<std::shared_ptr<const InterfaceElement>>("InterfaceElement")
             .function("setNodeDefString", &InterfaceElement::setNodeDefString)
             .function("hasNodeDefString", &InterfaceElement::hasNodeDefString)
