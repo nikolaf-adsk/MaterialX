@@ -4,24 +4,18 @@
   var MaterialX = {};
   var Module = {
     onRuntimeInitialized: function () {
-      // Generate MaterialX api
-      JsTypes.generateWrappers(Module, MaterialX);
-      JsUtil.generateWrappers(Module, MaterialX);
-      JsElement.generateWrappers(Module, MaterialX);
-      JsInterface.generateWrappers(Module, MaterialX);
-      JsNode.generateWrappers(Module, MaterialX);
-      JsDefinition.generateWrappers(Module, MaterialX);
-      JsDocument.generateWrappers(Module, MaterialX);
+
+      var bindings = [JsTypes, JsUtil, JsElement, JsInterface, JsNode, JsDefinition, JsDocument, JsLook]
+      // Generate wrappers
+      bindings.forEach(function (binding) {
+        binding.generateWrappers(Module, MaterialX)
+      });
 
 
       // Run "tests"
-      JsTypes.test();
-      JsUtil.test();
-      JsElement.test();
-      JsInterface.test();
-      JsNode.test();
-      JsDefinition.test();
-      JsDocument.test();
+      bindings.forEach(function (binding) {
+        binding.test()
+      });
     }
   };
 </script>
@@ -35,6 +29,7 @@
 <script src="JsNode.js"></script>
 <script src="JsDocument.js"></script>
 <script src="JsDefinition.js"></script>
+<script src="JsLook.js"></script>
 
 <!-- output from em++ -->
 <script src="./MaterialXCore.js"></script>
