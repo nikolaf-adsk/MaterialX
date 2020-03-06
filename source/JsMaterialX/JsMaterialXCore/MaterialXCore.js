@@ -640,8 +640,8 @@ var wasmMemory;
 // In the wasm backend, we polyfill the WebAssembly object,
 // so this creates a (non-native-wasm) table for us.
 var wasmTable = new WebAssembly.Table({
-  'initial': 3961,
-  'maximum': 3961 + 0,
+  'initial': 4265,
+  'maximum': 4265 + 0,
   'element': 'anyfunc'
 });
 
@@ -1242,11 +1242,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5334176,
+    STACK_BASE = 5340256,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 91296,
-    DYNAMIC_BASE = 5334176,
-    DYNAMICTOP_PTR = 91120;
+    STACK_MAX = 97376,
+    DYNAMIC_BASE = 5340256,
+    DYNAMICTOP_PTR = 97200;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1770,7 +1770,7 @@ var ASM_CONSTS = {
 
 
 
-// STATICTOP = STATIC_BASE + 90272;
+// STATICTOP = STATIC_BASE + 96352;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -1920,7 +1920,7 @@ var ASM_CONSTS = {
   
       var pointer = ___cxa_is_pointer_type(throwntype);
       // can_catch receives a **, add indirection
-      var buffer = 91280;
+      var buffer = 97360;
       HEAP32[((buffer)>>2)]=thrown;
       thrown = buffer;
       // The different catch blocks are denoted by different types.
@@ -1957,7 +1957,7 @@ var ASM_CONSTS = {
   
       var pointer = ___cxa_is_pointer_type(throwntype);
       // can_catch receives a **, add indirection
-      var buffer = 91280;
+      var buffer = 97360;
       HEAP32[((buffer)>>2)]=thrown;
       thrown = buffer;
       // The different catch blocks are denoted by different types.
@@ -6542,7 +6542,7 @@ var ASM_CONSTS = {
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 91120;
+      return 97200;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {

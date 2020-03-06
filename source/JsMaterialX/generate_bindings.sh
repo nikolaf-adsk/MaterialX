@@ -17,6 +17,7 @@ em++ --bind \
     JsDocument.cpp \
     JsLook.cpp \
     JsProperty.cpp \
+    JsGeom.cpp \
     ../../../wasm/_build/source/MaterialXCore/libMaterialXCore.a \
     -I../../ \
     -std=c++17 \
