@@ -5,7 +5,7 @@
   var Module = {
     onRuntimeInitialized: function () {
 
-      var bindings = [JsTypes, JsUtil, JsElement, JsInterface, JsNode, JsDefinition, JsDocument, JsLook]
+      var bindings = [JsTypes, JsUtil, JsElement, JsInterface, JsNode, JsDefinition, JsDocument, JsLook, JsProperty]
       // Generate wrappers
       bindings.forEach(function (binding) {
         binding.generateWrappers(Module, MaterialX)
@@ -30,6 +30,7 @@
 <script src="JsDocument.js"></script>
 <script src="JsDefinition.js"></script>
 <script src="JsLook.js"></script>
+<script src="JsProperty.js"></script>
 
 <!-- output from em++ -->
 <script src="./MaterialXCore.js"></script>
