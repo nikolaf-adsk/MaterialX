@@ -1,5 +1,10 @@
 #include "helpers.h"
-#include <MaterialXCore/Element.h>
+#include <MaterialXCore/Document.h>
+#include <MaterialXCore/Geom.h>
+#include <MaterialXCore/Look.h>
+#include <MaterialXCore/Material.h>
+#include <MaterialXCore/Node.h>
+#include <MaterialXCore/Traversal.h>
 
 #include <emscripten.h>
 #include <emscripten/bind.h>
@@ -9,6 +14,12 @@ using namespace emscripten;
 namespace mx = MaterialX;
 
 using namespace mx;
+
+#define BIND_ELEMENT_FUNC_INSTANCE(T)                                                                          \
+.function("_addChild" #T, &Element::addChild<T>)                                                           \
+.function("_getChildOfType" #T, &Element::getChildOfType<T>)                                           \
+.function("_getChildrenOfType" #T, &Element::getChildrenOfType<T>) \
+.function("_removeChildOfType" #T, &Element::removeChildOfType<T>)
 
 extern "C"
 {
@@ -133,6 +144,28 @@ extern "C"
             .function("createStringResolver", &Element::createStringResolver) /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX14StringResolverEEE, NSt3__210shared_ptrIKN9MaterialX8MaterialEEE */
             .function("asString", &Element::asString)
             .function("__str__", &Element::asString)
+            BIND_ELEMENT_FUNC_INSTANCE(BindParam)
+            BIND_ELEMENT_FUNC_INSTANCE(BindInput)
+            BIND_ELEMENT_FUNC_INSTANCE(BindToken)
+            BIND_ELEMENT_FUNC_INSTANCE(Collection)
+            BIND_ELEMENT_FUNC_INSTANCE(Document)
+            BIND_ELEMENT_FUNC_INSTANCE(GeomAttr)
+            BIND_ELEMENT_FUNC_INSTANCE(GeomInfo)
+            BIND_ELEMENT_FUNC_INSTANCE(Implementation)
+            BIND_ELEMENT_FUNC_INSTANCE(Look)
+            BIND_ELEMENT_FUNC_INSTANCE(Material)
+            BIND_ELEMENT_FUNC_INSTANCE(MaterialAssign)
+            BIND_ELEMENT_FUNC_INSTANCE(Node)
+            BIND_ELEMENT_FUNC_INSTANCE(NodeDef)
+            BIND_ELEMENT_FUNC_INSTANCE(NodeGraph)
+            BIND_ELEMENT_FUNC_INSTANCE(Parameter)
+            BIND_ELEMENT_FUNC_INSTANCE(Property)
+            BIND_ELEMENT_FUNC_INSTANCE(PropertySet)
+            BIND_ELEMENT_FUNC_INSTANCE(PropertySetAssign)
+            BIND_ELEMENT_FUNC_INSTANCE(ShaderRef)
+            BIND_ELEMENT_FUNC_INSTANCE(Token)
+            BIND_ELEMENT_FUNC_INSTANCE(TypeDef)
+            BIND_ELEMENT_FUNC_INSTANCE(Visibility)
             .class_property("NAME_ATTRIBUTE", &Element::NAME_ATTRIBUTE)
             .class_property("FILE_PREFIX_ATTRIBUTE", &Element::FILE_PREFIX_ATTRIBUTE)
             .class_property("GEOM_PREFIX_ATTRIBUTE", &Element::GEOM_PREFIX_ATTRIBUTE)

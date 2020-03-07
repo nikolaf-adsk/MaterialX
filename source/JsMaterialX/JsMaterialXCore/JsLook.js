@@ -40,6 +40,55 @@ var JsLook = {
             return _addVisibility.call(this, arg1);
         };
 
+        var _getPropertyAssigns = Module.Look.prototype.getPropertyAssigns;
+        api.Look.prototype.getPropertyAssigns = function() {
+            var vec = _getPropertyAssigns.call(this);
+            return vecToArray(vec);
+        };
+
+        var _getActivePropertyAssigns = Module.Look.prototype.getActivePropertyAssigns;
+        api.Look.prototype.getActivePropertyAssigns = function() {
+            var vec = _getActivePropertyAssigns.call(this);
+            return vecToArray(vec);
+        };
+
+        var _getPropertySetAssigns = Module.Look.prototype.getPropertySetAssigns;
+        api.Look.prototype.getPropertySetAssigns = function() {
+            var vec = _getPropertySetAssigns.call(this);
+            return vecToArray(vec);
+        };
+
+
+        var _getActivePropertySetAssigns = Module.Look.prototype.getActivePropertySetAssigns;
+        api.Look.prototype.getActivePropertySetAssigns = function() {
+            var vec = _getActivePropertySetAssigns.call(this);
+            return vecToArray(vec);
+        };
+
+        var _getVisibilities = Module.Look.prototype.getVisibilities;
+        api.Look.prototype.getVisibilities = function() {
+            var vec = _getVisibilities.call(this);
+            return vecToArray(vec);
+        };
+
+        var _getActiveVisibilities = Module.Look.prototype.getActiveVisibilities;
+        api.Look.prototype.getActiveVisibilities = function() {
+            var vec = _getActiveVisibilities.call(this);
+            return vecToArray(vec);
+        };
+
+        var _getMaterialAssigns = Module.Look.prototype.getMaterialAssigns;
+        api.Look.prototype.getMaterialAssigns = function() {
+            var vec = _getMaterialAssigns.call(this);
+            return vecToArray(vec);
+        };
+
+        var _getActiveMaterialAssigns = Module.Look.prototype.getActiveMaterialAssigns;
+        api.Look.prototype.getActiveMaterialAssigns = function() {
+            var vec = _getActiveMaterialAssigns.call(this);
+            return vecToArray(vec);
+        };
+
         /** Setup the LookGroup class */
         api.LookGroup = wrapperFactory(Module.LookGroup);
 
@@ -61,16 +110,35 @@ var JsLook = {
             function() {
                 var doc = MaterialX.createDocument();
                 var look = doc.addLook('Look1');
-                // var materialAssign = look.addMaterialAssign('Name', 'Material');
-                // look.getMaterialAssign('Name');
+                look.addMaterialAssign('Name', 'Material');
+                look.getMaterialAssign('Name');
+                look.getMaterialAssigns();
+                look.getActiveMaterialAssigns();
+                look.removeMaterialAssign('Name');
+                look.getMaterialAssigns();
 
-                // var propertyAssign = look.addPropertyAssign("PropertyAssign");
+                look.addPropertyAssign('PropertyAssign');
+                look.getPropertyAssign('PropertyAssign');
+                look.getPropertyAssigns();
+                look.getActivePropertyAssigns();
+                look.removePropertyAssign("PropertyAssign");
+                look.getPropertyAssigns();
 
-                // var propertySetAssign = look.addPropertySetAssign("PropertySetAssign");
+                look.addPropertySetAssign("PropertySetAssign");
+                look.getPropertySetAssign("PropertySetAssign");
+                look.getPropertySetAssigns();
+                look.getActivePropertySetAssigns();
+                look.removePropertySetAssign("PropertySetAssign");
+                look.getPropertySetAssigns();
 
                 // var variantAssign = look.addVariantAssign('VariantAssign');
 
-                // var visibility = look.addVisibility('Visibility');
+                look.addVisibility('Visibility');
+                look.getVisibility('Visibility');
+                look.getVisibilities();
+                look.getActiveVisibilities();
+                look.removeVisibility('Visibility');
+                look.getVisibilities();
             },
             function() {
                 MaterialX.Look.CATEGORY;
@@ -102,13 +170,12 @@ var JsLook = {
             function() {
                 var doc = MaterialX.createDocument();
                 var look = doc.addLook('Look2');
-                // var materialAssign = look.addMaterialAssign("MAterialAssign", "MaTerial")
-
-                // materialAssign.setMaterial("material1");
-                // materialAssign.hasMaterial();
-                // materialAssign.getMaterial();
-                // materialAssign.setExclusive(true);
-                // materialAssign.getExclusive();
+                var materialAssign = look.addMaterialAssign("MAterialAssign", "MaTerial")
+                materialAssign.setMaterial("material1");
+                materialAssign.hasMaterial();
+                materialAssign.getMaterial();
+                materialAssign.setExclusive(true);
+                materialAssign.getExclusive();
                 // materialAssign.getReferencedMaterial();
                 // materialAssign.getReferencedMaterialNode();
             },
@@ -121,6 +188,20 @@ var JsLook = {
             'Visibility',
             function() {
                 var doc = MaterialX.createDocument();
+                var visibility = doc._addChildVisibility("Visibility");
+                visibility.setViewerGeom("geom");
+                visibility.hasViewerGeom();
+                visibility.getViewerGeom();
+                visibility.setViewerCollection("collection");
+                visibility.hasViewerCollection();
+                visibility.getViewerCollection();
+                visibility.setVisibilityType("type");
+                visibility.hasVisibilityType();
+                visibility.getVisibilityType();
+                visibility.setVisible(true);
+                visibility.getVisible();
+                visibility.setVisible(false);
+                visibility.getVisible();
             },
             function() {
                 MaterialX.Visibility.CATEGORY;

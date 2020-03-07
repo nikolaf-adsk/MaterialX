@@ -49,11 +49,11 @@ var JsDocument = {
             return _addMaterial.call(this, arg1);
         };
 
-        var _addLook = Module.Document.prototype.addLook;
-        api.Document.prototype.addLook = function() {
-            var arg1 = arguments[1] || '';
-            return _addLook.call(this, arg1);
-        };
+        // var _addLook = Module.Document.prototype.addLook;
+        // api.Document.prototype.addLook = function() {
+        //     var arg1 = arguments[1] || '';
+        //     return _addLook.call(this, arg1);
+        // };
 
         var _getMatchingImplementations = Module.Document.prototype.getMatchingImplementations;
         api.Document.prototype.getMatchingImplementations = function() {
