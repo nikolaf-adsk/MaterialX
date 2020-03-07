@@ -1,11 +1,11 @@
-# Shader Generation
+# Shader Generation {#shadergeneration}
 
 ## 1.1 Scope
 A shader generation framework is implemented as part of MaterialX. This can help applications to transform the agnostic MaterialX data description into executable shader code for a specific renderer. A library module named MaterialXGenShader contains the core shader generation features, and support for specific languages resides in separate libraries, e.g. [MaterialXGenGlsl](/source/MaterialXGenGlsl), [MaterialXGenOsl](/source/MaterialXGenOsl).
 
 Note that this system has no runtime and the output produced is source code, not binary executable code. The source code produced needs to be compiled by a shading language compiler before being executed by the renderer. See Figure 1 for a high level overview of the system.
 
-![Shader generation with multiple shader generators](/documents/Images/shadergen.png)
+![Shader generation with multiple shader generators](../Images/shadergen.png)
 
 **Figure 1**: Shader generation with multiple shader generators.
 
@@ -359,7 +359,7 @@ Uniform variables
 | u_viewDirection                     | vec3    | World-space direction of the viewer. |
 | u_frame                             | float   | The current frame number as defined by the host application. |
 | u_time                              | float   | The current time in seconds. |
-| u_geomattr_\<name>                   | \<type> | A named attribute of given \<type> where \<name> is the name of the variable on the geometry. |
+| u_geomprop_\<name>                   | \<type> | A named property of given \<type> where \<name> is the name of the variable on the geometry. |
 | u_numActiveLightSources             | int     | The number of currently active light sources. Note that in shader this is clamped against the maximum allowed number of light sources. |
 | u_lightData[]                       | struct  | Array of struct LightData holding parameters for active light sources. The `LightData` struct is built dynamically depending on requirements for bound light shaders. |
 | u_\<unitType>UnitTarget[]            | integer  | An attribute indicating the target unit for a given unit type definition (\<unitType>). |

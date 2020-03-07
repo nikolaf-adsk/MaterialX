@@ -118,7 +118,8 @@ class ShaderGraph : public ShaderNode
     /// Create node connections corresponding to the connection between a pair of elements.
     /// @param downstreamElement Element representing the node to connect to.
     /// @param upstreamElement Element representing  the node to connect from
-    /// @param connectionElement If non-null, specifies the element on on the downstream node to connect to.
+    /// @param connectingElement If non-null, specifies the element on on the downstream node to connect to.
+    /// @param context Context for generation.
     /// @param rootNode Root node for downstream element. Only required for handing ShaderRef elements.
     void createConnectedNodes(const ElementPtr& downstreamElement,
                               const ElementPtr& upstreamElement,
@@ -178,13 +179,13 @@ class ShaderGraph : public ShaderNode
     /// to avoid name conflicts during shader generation.
     void setVariableNames(GenContext& context);
 
-    /// Populates the input color transform map if the provided input/parameter
+    /// Populates the input or output color transform map if the provided input/parameter
     /// has a color space attribute and has a type of color3 or color4.
-    void populateInputColorTransformMap(ColorManagementSystemPtr colorManagementSystem, ShaderNodePtr shaderNode, ValueElementPtr input, const string& targetColorSpace);
+    void populateColorTransformMap(ColorManagementSystemPtr colorManagementSystem, ShaderPort* shaderPort, ValueElementPtr element, const string& targetColorSpace, bool asInput);
 
     /// Populates the appropriate unit transform map if the provided input/parameter or output
     /// has a unit attribute and is of the supported type
-    void populateUnitTransformMap(bool asInput, UnitSystemPtr unitSystem, ShaderPort* shaderPort, ValueElementPtr element, const string& targetUnitSpace);
+    void populateUnitTransformMap(UnitSystemPtr unitSystem, ShaderPort* shaderPort, ValueElementPtr element, const string& targetUnitSpace, bool asInput);
 
     /// Break all connections on a node
     void disconnect(ShaderNode* node) const;

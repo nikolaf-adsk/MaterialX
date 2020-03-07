@@ -36,6 +36,8 @@ namespace
     static const RtTokenSet genericMetadata     = { RtToken("name"), RtToken("kind") };
     static const RtTokenSet stageMetadata       = {};
 
+    static const RtToken DEFAULT_OUTPUT("out");
+    static const RtToken OUTPUT_ELEMENT_PREFIX("OUT_");
     static const RtToken MULTIOUTPUT("multioutput");
 
     PvtPrim* findPrimOrThrow(const RtToken& name, PvtPrim* parent)
@@ -144,7 +146,11 @@ namespace
             for (const InputPtr& elemInput : nodeElem->getInputs())
             {
                 PvtInput* input = findInputOrThrow(RtToken(elemInput->getName()), node);
-                const string& connectedNodeName = elemInput->getNodeName();
+                string connectedNodeName = elemInput->getNodeName();
+                if (connectedNodeName.empty())
+                {
+                    connectedNodeName = elemInput->getNodeGraphName();
+                }
                 if (!connectedNodeName.empty())
                 {
                     PvtPrim* connectedNode = findPrimOrThrow(RtToken(connectedNodeName), parent);
@@ -420,14 +426,25 @@ namespace
             PvtPrim* assignPrim = stage->createPrim(parent->getPath(), RtToken(matAssign->getName()), RtMaterialAssign::typeName());
             RtMaterialAssign rtMatAssign(assignPrim->hnd());
             
-            PvtPrim* collection = findPrimOrThrow(RtToken(matAssign->getCollectionString()), parent);
-            rtMatAssign.getCollection().addTarget(collection->hnd());
+            if (!matAssign->getCollectionString().empty()) {
+                PvtPrim* collection = findPrimOrThrow(RtToken(matAssign->getCollectionString()), parent);
+                rtMatAssign.getCollection().addTarget(collection->hnd());
+            }
 
-            PvtPrim* material = findPrimOrThrow(RtToken(matAssign->getMaterial()), parent);
-            rtMatAssign.getMaterial().addTarget(material->hnd());
+            if (!matAssign->getMaterial().empty()) {
+                PvtPrim* material = findPrimOrThrow(RtToken(matAssign->getMaterial()), parent);
+                rtMatAssign.getMaterial().addTarget(material->hnd());
+            }
 
-            rtMatAssign.getExclusive().getValue().asBool() = matAssign->getExclusive();
+            if (matAssign->hasAttribute(MaterialAssign::EXCLUSIVE_ATTRIBUTE)) {
+                rtMatAssign.getExclusive().getValue().asBool() = matAssign->getExclusive();
+            } else {
+                rtMatAssign.getExclusive().getValue().asBool() = true; // default
+            }
+
             rtMatAssign.getGeom().getValue().asString() = matAssign->getActiveGeom();
+
+            look.getMaterialAssigns().addTarget(assignPrim->hnd());
         }
         return lookPrim;
     }
@@ -554,8 +571,7 @@ namespace
         {
             if (!filter || filter(nodedef))
             {
-                PvtPath path(ROOT_PATH + nodedef->getName());
-                if (!stage->getPrimAtPath(path))
+                if (!RtApi::get().hasMasterPrim(RtToken(nodedef->getName())))
                 {
                     PvtPrim* prim = readNodeDef(nodedef, stage);
                     RtNodeDef(prim->hnd()).registerMasterPrim();
@@ -585,7 +601,13 @@ namespace
                 }
                 else
                 {
-                    readGenericPrim(elem, stage->getRootPrim(), stage);
+                    const RtToken category(elem->getCategory());
+                    if (category != RtLook::typeName() &&
+                        category != RtLookGroup::typeName() &&
+                        category != RtMaterialAssign::typeName() &&
+                        category != RtCollection::typeName()) {
+                        readGenericPrim(elem, stage->getRootPrim(), stage);
+                    }
                 }
             }
         }
@@ -594,7 +616,7 @@ namespace
         createNodeConnections(doc->getNodes(), stage->getRootPrim());
 
         // Read look information
-        if (readOptions && readOptions->readLookInformation)
+        if (!readOptions || readOptions->readLookInformation)
         {
             readLookInformation(doc, stage, readOptions);
         }
@@ -741,101 +763,67 @@ namespace
         return destNode;
     }
 
-    void createMaterialNode(const PvtPrim* prim, NodePtr mxNode, DocumentPtr doc)
+    void writeMaterialElement(NodePtr mxNode, DocumentPtr doc, const RtWriteOptions* writeOptions)
     {
-        // Check to see if the surfaceshader node is already connected to a material node
-        bool isConnectedToMaterialNode = false;
-        const PvtOutput* output = prim->getOutput(PvtAttribute::DEFAULT_OUTPUT_NAME);
-        if (output && output->getType() == RtType::SURFACESHADER && output->isConnected())
+        string uniqueName = doc->createValidChildName(mxNode->getName() + "_Material");
+        string materialName = mxNode->getName();
+        mxNode->setName(uniqueName);
+
+        InputPtr materialNodeSurfaceShaderInput = mxNode->getInput(RtType::SURFACESHADER);
+        NodePtr surfaceShader = materialNodeSurfaceShaderInput->getConnectedNode();
+        if (surfaceShader)
         {
-            for (const RtObject& dest : output->getConnections())
+            MaterialPtr material = doc->addMaterial(materialName);
+            ShaderRefPtr shaderRef =
+                material->addShaderRef(surfaceShader->getName(), surfaceShader->getCategory());
+
+            for (InputPtr input : surfaceShader->getActiveInputs())
             {
-                RtInput destInput = dest.asA<RtInput>();
-                RtPrim destNode = destInput.getParent();
-                RtOutput destOutput = destNode.getOutput(PvtAttribute::DEFAULT_OUTPUT_NAME);
-                if (destOutput.getType() == RtType::MATERIAL)
+                BindInputPtr bindInput = shaderRef->addBindInput(input->getName(), input->getType());
+                if (input->hasNodeName() && input->hasOutputString())
                 {
-                    isConnectedToMaterialNode = true;
-                    break;
-                }
-            }
-        }
-
-        if (!isConnectedToMaterialNode)
-        {
-            NodePtr materialNode = doc->addNode(SURFACE_MATERIAL_NODE_STRING, mxNode->getName() + "_SurfaceMaterial", MATERIAL_TYPE_STRING);
-            materialNode->setConnectedNode(SURFACE_SHADER_TYPE_STRING, mxNode);
-        }
-    }
-
-    void writeMaterialElementsHelper(const PvtPrim* prim, NodePtr mxNode, const string& materialBaseName, DocumentPtr doc, const RtWriteOptions* writeOptions)
-    {
-        MaterialPtr material = doc->addMaterial(materialBaseName + "_Material");
-        ShaderRefPtr shaderRef =
-            material->addShaderRef("sref", mxNode->getCategory());
-
-        for (InputPtr input : mxNode->getActiveInputs())
-        {
-            BindInputPtr bindInput = shaderRef->addBindInput(input->getName(), input->getType());
-            if (input->hasNodeName())
-            {
-                if (input->hasOutputString())
-                {
-                    bindInput->setNodeGraphString(input->getNodeName());
-                    bindInput->setOutputString(input->getOutputString());
-                }
-            }
-            else
-            {
-                bindInput->setValueString(input->getValueString());
-            }
-        }
-        for (ParameterPtr param : mxNode->getActiveParameters())
-        {
-            BindParamPtr bindParam = shaderRef->addBindParam(param->getName(), param->getType());
-            bindParam->setValueString(param->getValueString());
-        }
-        // Should we delete the surface shader?
-        if (writeOptions->materialWriteOp & RtWriteOptions::MaterialWriteOp::DELETE)
-        {
-            doc->removeChild(prim->getName());
-        }
-        // Should we create a look for the material element?
-        if (writeOptions->materialWriteOp & RtWriteOptions::MaterialWriteOp::LOOK)
-        {
-            LookPtr look = doc->addLook();
-            MaterialAssignPtr materialAssign = look->addMaterialAssign();
-            materialAssign->setMaterial(material->getName());
-            CollectionPtr collection = doc->addCollection();
-            collection->setIncludeGeom("/*");
-            materialAssign->setCollection(collection);
-        }
-    }
-
-    void writeMaterialElements(const PvtPrim* prim, NodePtr mxNode, DocumentPtr doc, const RtWriteOptions* writeOptions)
-    {
-        if (writeOptions->materialWriteOp & RtWriteOptions::MaterialWriteOp::ADD_MATERIAL_NODES_FOR_SHADERS)
-        {
-            // Get the connected material nodes and create material elements from them (using their names)
-            const PvtOutput* output = prim->getOutput(PvtAttribute::DEFAULT_OUTPUT_NAME);
-            if (output->isConnected())
-            {
-                for (const RtObject& dest : output->getConnections())
-                {
-                    RtInput destInput = dest.asA<RtInput>();
-                    RtPrim destNode = destInput.getParent();
-                    RtOutput destOutput = destNode.getOutput(PvtAttribute::DEFAULT_OUTPUT_NAME);
-                    if (destOutput.getType() == RtType::MATERIAL)
+                    if (doc->getNodeGraph(input->getNodeName()))
                     {
-                        writeMaterialElementsHelper(prim, mxNode, destNode.getName(), doc, writeOptions);
+                        bindInput->setNodeGraphString(input->getNodeName());
+                        bindInput->setOutputString(input->getOutputString());
+                    }
+                    else
+                    {
+                        const auto outputName = std::string(OUTPUT_ELEMENT_PREFIX.c_str()) +
+                                                input->getNodeName() + "_" + 
+                                                input->getOutputString();
+                        if (!doc->getOutput(outputName)) {
+                            auto output = doc->addOutput(outputName, input->getType());
+                            output->setNodeName(input->getNodeName());
+                            output->setOutputString(input->getOutputString());
+                        }
+                        bindInput->setOutputString(outputName);
                     }
                 }
+                else
+                {
+                    bindInput->setValueString(input->getValueString());
+                }
+            }
+            for (ParameterPtr param : surfaceShader->getActiveParameters())
+            {
+                BindParamPtr bindParam = shaderRef->addBindParam(param->getName(), param->getType());
+                bindParam->setValueString(param->getValueString());
+            }
+
+            // Should we create a look for the material element?
+            if (writeOptions->materialWriteOp & RtWriteOptions::MaterialWriteOp::CREATE_LOOKS)
+            {
+                LookPtr look = doc->addLook();
+                MaterialAssignPtr materialAssign = look->addMaterialAssign();
+                materialAssign->setMaterial(materialName);
+                CollectionPtr collection = doc->addCollection();
+                collection->setIncludeGeom("/*");
+                materialAssign->setCollection(collection);
             }
         }
-        else
-        {
-            writeMaterialElementsHelper(prim, mxNode, mxNode->getName(), doc, writeOptions);
-        }
+
+        doc->removeChild(uniqueName);
     }
 
     void writeNodeGraph(const PvtPrim * src, DocumentPtr dest)
@@ -936,16 +924,11 @@ namespace
                     if (massign)
                     {
                         massign->setExclusive(rtMatAssign.getExclusive().getValue().asBool());
-                        for (const RtObject& collectionObj : rtMatAssign.getCollection().getTargets())
-                        {
-                            massign->setCollectionString(collectionObj.getName());
-                            break;
-                        }
-                        for (const RtObject& materialObj : rtMatAssign.getMaterial().getTargets())
-                        {
-                            massign->setMaterial(materialObj.getName());
-                            break;
-                        }
+                        auto iter = rtMatAssign.getCollection().getTargets();
+                        massign->setCollectionString((*iter).getName());
+
+                        iter = rtMatAssign.getMaterial().getTargets();
+                        massign->setMaterial((*iter).getName());
                         massign->setGeom(rtMatAssign.getGeom().getValueString());
                     }
                 }
@@ -1020,6 +1003,7 @@ namespace
         }
 
         RtWriteOptions::WriteFilter filter = writeOptions ? writeOptions->writeFilter : nullptr;
+        std::vector<NodePtr> materialElements;
         for (RtPrim child : stage->getRootPrim()->getChildren(filter))
         {
             const PvtPrim* prim = PvtObject::ptr<PvtPrim>(child);
@@ -1031,28 +1015,19 @@ namespace
             else if (typeName == RtNode::typeName())
             {
                 NodePtr mxNode = writeNode(prim, doc);
-
-                if (writeOptions)
+                RtNode node(prim->hnd());
+                const RtOutput& output = node.getOutput(DEFAULT_OUTPUT);
+                if (output && output.getType() == MATERIAL_TYPE_STRING && writeOptions &&
+                    writeOptions->materialWriteOp & RtWriteOptions::MaterialWriteOp::WRITE_MATERIALS_AS_ELEMENTS)
                 {
-                    const PvtOutput* output = prim->getOutput(PvtAttribute::DEFAULT_OUTPUT_NAME);
-                    if (output && output->getType() == RtType::SURFACESHADER)
-                    {
-                        if (writeOptions->materialWriteOp & RtWriteOptions::MaterialWriteOp::ADD_MATERIAL_NODES_FOR_SHADERS)
-                        {
-                            createMaterialNode(prim, mxNode, doc);
-                        }
-                        if (writeOptions->materialWriteOp & RtWriteOptions::MaterialWriteOp::WRITE_MATERIALS_AS_ELEMENTS)
-                        {
-                            writeMaterialElements(prim, mxNode, doc, writeOptions);
-                        }
-                    }
+                    materialElements.push_back(mxNode);
                 }
             }
             else if (typeName == RtNodeGraph::typeName())
             {
                 writeNodeGraph(prim, doc);
             }
-            else if (typeName != RtLook::typeName() && 
+            else if (typeName != RtLook::typeName() &&
                      typeName != RtLookGroup::typeName() &&
                      typeName != RtMaterialAssign::typeName() &&
                      typeName != RtCollection::typeName())
@@ -1062,15 +1037,39 @@ namespace
         }
 
         // Write the existing look information
-        if (!writeOptions || !(writeOptions->materialWriteOp & RtWriteOptions::MaterialWriteOp::LOOK))
+        if (!writeOptions || 
+            (writeOptions->materialWriteOp & RtWriteOptions::MaterialWriteOp::WRITE_LOOKS) ||
+            (writeOptions->materialWriteOp & RtWriteOptions::MaterialWriteOp::CREATE_LOOKS))
         {
             writeCollections(stage, *doc, filter);
             writeLooks(stage, *doc, filter);
             writeLookGroups(stage, *doc, filter);
         }
+
+        for (auto & mxNode: materialElements) {
+            writeMaterialElement(mxNode, doc, writeOptions);
+        }
     }
 
 } // end anonymous namespace
+
+RtReadOptions::RtReadOptions() :
+    skipConflictingElements(true),
+    readFilter(nullptr),
+    readLookInformation(false),
+    desiredMajorVersion(MATERIALX_MAJOR_VERSION),
+    desiredMinorVersion(MATERIALX_MINOR_VERSION + 1)
+{
+}
+
+RtWriteOptions::RtWriteOptions() :
+    writeIncludes(true),
+    writeFilter(nullptr),
+    materialWriteOp(NONE),
+    desiredMajorVersion(MATERIALX_MAJOR_VERSION),
+    desiredMinorVersion(MATERIALX_MINOR_VERSION + 1)
+{
+}
 
 void RtFileIo::read(const FilePath& documentPath, const FileSearchPath& searchPaths, const RtReadOptions* readOptions)
 {
@@ -1083,7 +1082,7 @@ void RtFileIo::read(const FilePath& documentPath, const FileSearchPath& searchPa
         {
             xmlReadOptions.skipConflictingElements = readOptions->skipConflictingElements;
             xmlReadOptions.desiredMajorVersion = readOptions->desiredMajorVersion;
-            xmlReadOptions.desiredMajorVersion = readOptions->desiredMinorVersion;
+            xmlReadOptions.desiredMinorVersion = readOptions->desiredMinorVersion;
         }
         readFromXmlFile(document, documentPath, searchPaths, &xmlReadOptions);
 
@@ -1137,9 +1136,7 @@ void RtFileIo::readLibraries(const StringVec& libraryPaths, const FileSearchPath
     // when node instances are loaded later.
     for (const NodeDefPtr& nodedef : doc->getNodeDefs())
     {
-        PvtPath path(stage->getPath());
-        path.push(RtToken(nodedef->getName()));
-        if (!stage->getPrimAtPath(path))
+        if (!RtApi::get().hasMasterPrim(RtToken(nodedef->getName())))
         {
             PvtPrim* prim = readNodeDef(nodedef, stage);
             RtNodeDef(prim->hnd()).registerMasterPrim();
@@ -1183,6 +1180,7 @@ void RtFileIo::write(const FilePath& documentPath, const RtWriteOptions* options
     if (options)
     {
         xmlWriteOptions.writeXIncludeEnable = options->writeIncludes;
+        document->setVersionString(makeVersionString(options->desiredMajorVersion, options->desiredMinorVersion));
     }
     writeToXmlFile(document, documentPath, &xmlWriteOptions);
 }
@@ -1198,6 +1196,7 @@ void RtFileIo::write(std::ostream& stream, const RtWriteOptions* options)
     if (options)
     {
         xmlWriteOptions.writeXIncludeEnable = options->writeIncludes;
+        document->setVersionString(makeVersionString(options->desiredMajorVersion, options->desiredMinorVersion));
     }
     writeToXmlStream(document, stream, &xmlWriteOptions);
 }
