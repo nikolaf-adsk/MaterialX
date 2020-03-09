@@ -26,7 +26,7 @@ extern "C"
             .function("hasNodeGroup", &NodeDef::hasNodeGroup)
             .function("getNodeGroup", &NodeDef::getNodeGroup)
             .function("getImplementation", &NodeDef::getImplementation)
-            .function("getInstantiatingShaderRefs", &NodeDef::getInstantiatingShaderRefs) /** TODO: unbound types: NSt3__26vectorINS_10shared_ptrIN9MaterialX9ShaderRefEEENS_9allocatorIS4_EEEE" */
+            .function("getInstantiatingShaderRefs", &NodeDef::getInstantiatingShaderRefs)
             .function("isVersionCompatible", &NodeDef::isVersionCompatible)
             .class_property("CATEGORY", &NodeDef::CATEGORY)
             .class_property("NODE_ATTRIBUTE", &NodeDef::NODE_ATTRIBUTE)

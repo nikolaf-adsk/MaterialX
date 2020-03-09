@@ -35,20 +35,10 @@ extern "C"
             .function("setCategory", &Element::setCategory)
             .function("getCategory", &Element::getCategory)
             .function("getName", &Element::getName)
-
-            /** TODO: How the pointer is constructed needs to be fixed for the setName function
-            *** TODO: Example:
-            *** var element = new MaterialX.Element(null, 'test', 'test1');
-            *** var element2 = new MaterialX.Element(element, "Hello", "World");
-            *** Throws a "Passing raw pointer to smart pointer is illegal"
-            **/
             .function("setName", &Element::setName)
             .function("getNamePath", &Element::getNamePath) // might need to do something with the ConstElementPtr relativeTo parameter
             .function("setInheritsFrom", &Element::setInheritsFrom)
             .function("hasInheritedBase", &Element::hasInheritedBase)
-            /*************************************************************************************/
-
-            /** TODO: setAttribute (called by setFilePrefix) depends on Document class. **/
             .function("setFilePrefix", &Element::setFilePrefix)
             .function("setColorSpace", &Element::setColorSpace)
             .function("setGeomPrefix", &Element::setGeomPrefix)
@@ -59,17 +49,12 @@ extern "C"
             .function("setDefaultVersion", &Element::setDefaultVersion)
             .function("setDocString", &Element::setDocString)
             .function("addChildOfCategory", &Element::addChildOfCategory)
-            /******************************************************************************/
-
-            /** TODO: This API needs a reference to the parent. This will not work due to the pointer issue. **/
             .function("getActiveFilePrefix", &Element::getActiveFilePrefix)
             .function("getActiveGeomPrefix", &Element::getActiveGeomPrefix)
             .function("getActiveColorSpace", &Element::getActiveColorSpace)
             .function("getInheritsFrom", &Element::getInheritsFrom)
             .function("hasInheritanceCycle", &Element::hasInheritanceCycle)
             .function("getQualifiedName", &Element::getQualifiedName)
-            /**************************************************************************************************/
-
             .function("hasFilePrefix", &Element::hasFilePrefix)
             .function("hasGeomPrefix", &Element::hasGeomPrefix)
             .function("hasColorSpace", &Element::hasColorSpace)
@@ -77,7 +62,6 @@ extern "C"
             .function("hasInheritString", &Element::hasInheritString)
             .function("hasNamespace", &Element::hasNamespace)
             .function("hasVersionString", &Element::hasVersionString)
-
             .function("getFilePrefix", &Element::getFilePrefix)
             .function("getGeomPrefix", &Element::getGeomPrefix)
             .function("getColorSpace", &Element::getColorSpace)
@@ -95,7 +79,7 @@ extern "C"
             .function("getDocString", &Element::getDocString)
 
             .function("getChild", &Element::getChild)
-            .function("getChildren", &Element::getChildren) /** TODO: unbound types: NSt3__26vectorINS_10shared_ptrIN9MaterialX7ElementEEENS_9allocatorIS4_EEEE */
+            .function("getChildren", &Element::getChildren)
             .function("setChildIndex", &Element::setChildIndex)
             .function("getChildIndex", &Element::getChildIndex)
             .function("removeChild", &Element::removeChild)
@@ -114,8 +98,8 @@ extern "C"
             .function("getRoot", optional_override([](Element &self) {
                           return self.Element::getRoot();
                       }))
-            .function("getDocument", optional_override([](Element &self) { /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX8DocumentEEE */
-                                                                           return self.Element::getDocument();
+            .function("getDocument", optional_override([](Element &self) {
+                          return self.Element::getDocument();
                       }))
             .function("traverseTree", &Element::traverseTree) /** TODO: unbound types: N9MaterialX12TreeIteratorE*/
 

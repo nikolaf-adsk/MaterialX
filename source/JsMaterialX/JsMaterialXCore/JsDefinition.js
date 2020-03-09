@@ -76,7 +76,7 @@ var JsDefinition = {
                 nodeDef.hasNodeGroup();
                 nodeDef.getNodeGroup();
                 nodeDef.getImplementation('test', 'this');
-                // nodeDef.getInstantiatingShaderRefs();
+                nodeDef.getInstantiatingShaderRefs();
 
                 var node = doc.addNode('Category', 'Name11', 'Type');
                 nodeDef.isVersionCompatible(node);

@@ -28,8 +28,8 @@ var JsElement = {
         var _addChildOfCategory = Module.Element.prototype.addChildOfCategory;
         api.Element.prototype.addChildOfCategory = function() {
             var arg1 = arguments[0];
-            var arg2 =arguments[1] || '';
-            var arg3 =arguments[2] || true;
+            var arg2 = arguments[1] || '';
+            var arg3 = arguments[2] || true;
             return _addChildOfCategory.call(this, arg1, arg2, arg3);
         };
 
@@ -43,6 +43,12 @@ var JsElement = {
         api.Element.prototype.copyContentFrom = function() {
             var arg1 = arguments[1] === undefined ? null : arguments[1];
             return _copyContentFrom.call(this, arg1);
+        };
+
+        var _getChildren = Module.Element.prototype.getChildren;
+        api.Element.prototype.getChildren = function() {
+            var vec = _getChildren.call(this);
+            return vecToArray(vec);
         };
 
         /** Setup the TypedElement class */
@@ -74,22 +80,44 @@ var JsElement = {
             'Element',
             function() {
                 var doc = MaterialX.createDocument();
-                var element = doc.addChildOfCategory("generic");
+                var element = doc.addChildOfCategory('generic');
                 element.getCategory();
                 element.setCategory('TEST');
                 element.getCategory();
 
                 element.getName();
-                // This MaterialX does not yet work please see comments in JsElement.cpp
                 element.setName('element');
-                element.getName();
+                var element2 = doc.addChildOfCategory('generic');
+                element.getNamePath(element2);
+                var parent = doc.addChildOfCategory('parent');
+                element.setInheritsFrom(parent);
+                element.getInheritsFrom();
+                element.hasInheritedBase(parent);
 
-                // This MaterialX does not yet work please see comments in JsElement.cpp
-                // element.setFilePrefix("PREFIX");
+                element.setFilePrefix('PREFIX');
+                element.getActiveFilePrefix();
+                element.setColorSpace('colorSpace');
+                element.getActiveColorSpace();
+                element.setGeomPrefix('GeomPrefix');
+                element.getActiveGeomPrefix();
+                element.setTarget('target');
+                element.setInheritString('inherit');
+                element.setNamespace('space');
+                element.setVersionString('10.2.2');
+                element.setDefaultVersion(true);
+                element.setDocString('doc');
+
+                element.hasInheritanceCycle();
+                element.getQualifiedName('element');
+
                 element.hasFilePrefix();
                 element.getFilePrefix();
 
                 element.getVersionIntegers();
+
+                element.getChildren();
+
+                element.getDocument();
             },
             function() {
                 MaterialX.Element.NAME_ATTRIBUTE;
@@ -109,7 +137,7 @@ var JsElement = {
             'TypedElement',
             function() {
                 var doc = MaterialX.createDocument();
-                var typedElement = doc.addToken("TOKEN");
+                var typedElement = doc.addToken('TOKEN');
                 typedElement.setType('newType');
                 typedElement.hasType();
                 typedElement.getType();
@@ -125,7 +153,7 @@ var JsElement = {
             'ValueElement',
             function() {
                 var doc = MaterialX.createDocument();
-                var valueElement = doc.addParameter("ValueElement")
+                var valueElement = doc.addParameter('ValueElement');
                 // Make sure that a method defined in Element is callable.
                 // This is checks that inheritance works.
                 valueElement.getVersionIntegers();
