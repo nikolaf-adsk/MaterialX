@@ -45,20 +45,106 @@ var JsDocument = {
 
         var _addMaterial = Module.Document.prototype.addMaterial;
         api.Document.prototype.addMaterial = function() {
-            var arg1 = arguments[1] || '';
+            var arg1 = arguments[0] || '';
             return _addMaterial.call(this, arg1);
         };
 
-        // var _addLook = Module.Document.prototype.addLook;
-        // api.Document.prototype.addLook = function() {
-        //     var arg1 = arguments[1] || '';
-        //     return _addLook.call(this, arg1);
-        // };
+        var _getMaterials = Module.Document.prototype.getMaterials;
+        api.Document.prototype.getMaterials = function() {
+            var vec = _getMaterials.call(this);
+            return vecToArray(vec);
+        };
+
+        var _addGeomInfo = Module.Document.prototype.addGeomInfo;
+        api.Document.prototype.addGeomInfo = function() {
+            var arg1 = arguments[0] || '';
+            var arg2 = arguments[1] || api.UNIVERSAL_GEOM_NAME;
+            return _addGeomInfo.call(this, arg1, arg2);
+        };
+
+        var _getGeomInfos = Module.Document.prototype.getGeomInfos;
+        api.Document.prototype.getGeomInfos = function() {
+            var vec = _getGeomInfos.call(this);
+            return vecToArray(vec);
+        };
+
+        var _getGeomAttrValue = Module.Document.prototype.getGeomAttrValue;
+        api.Document.prototype.getGeomAttrValue = function() {
+            var arg1 = arguments[0];
+            var arg2 = arguments[1] || api.UNIVERSAL_GEOM_NAME;
+            return _getGeomAttrValue.call(this, arg1, arg2);
+        };
+
+        var _getGeomPropDefs = Module.Document.prototype.getGeomPropDefs;
+        api.Document.prototype.getGeomPropDefs = function() {
+            var vec = _getGeomPropDefs.call(this);
+            return vecToArray(vec);
+        };
+
+        var _addLook = Module.Document.prototype.addLook;
+        api.Document.prototype.addLook = function() {
+            var arg1 = arguments[0] || '';
+            return _addLook.call(this, arg1);
+        };
+
+        var _getLooks = Module.Document.prototype.getLooks;
+        api.Document.prototype.getLooks = function() {
+            var vec = _getLooks.call(this);
+            return vecToArray(vec);
+        };
+
+        var _addLookGroup = Module.Document.prototype.addLookGroup;
+        api.Document.prototype.addLookGroup = function() {
+            var arg1 = arguments[0] || '';
+            return _addLookGroup.call(this, arg1);
+        };
+
+        var _getLookGroups = Module.Document.prototype.getLookGroups;
+        api.Document.prototype.getLookGroups = function() {
+            var vec = _getLookGroups.call(this);
+            return vecToArray(vec);
+        };
+
+        var _addCollection = Module.Document.prototype.addCollection;
+        api.Document.prototype.addCollection = function() {
+            var arg1 = arguments[0] || '';
+            return _addCollection.call(this, arg1);
+        };
+
+        var _getCollections = Module.Document.prototype.getCollections;
+        api.Document.prototype.getCollections = function() {
+            var vec = _getCollections.call(this);
+            return vecToArray(vec);
+        };
 
         var _getMatchingImplementations = Module.Document.prototype.getMatchingImplementations;
         api.Document.prototype.getMatchingImplementations = function() {
             var arg1 = arguments[0];
             var vec = _getMatchingImplementations.call(this, arg1);
+            return vecToArray(vec);
+        };
+
+        var _addPropertySet = Module.Document.prototype.addPropertySet;
+        api.Document.prototype.addPropertySet = function() {
+            var arg1 = arguments[0] || '';
+            return _addPropertySet.call(this, arg1);
+        };
+
+        var _getPropertySets = Module.Document.prototype.getPropertySets;
+        api.Document.prototype.getPropertySets = function() {
+            var vec = _getPropertySets.call(this);
+            return vecToArray(vec);
+        };
+
+        var _addVariantSet = Module.Document.prototype.addVariantSet;
+        api.Document.prototype.addVariantSet = function() {
+            var arg1 = arguments[0] || '';
+            return _addVariantSet.call(this, arg1);
+        };
+
+        var _getVariantSets = Module.Document.prototype.getVariantSets;
+        api.Document.prototype.getVariantSets = function() {
+            var vec = _getVariantSets.call(this);
             return vecToArray(vec);
         };
 
@@ -148,9 +234,54 @@ var JsDocument = {
 
                 doc.getMatchingPorts('NodeName');
 
-                // doc.addMaterial("NewMaterial");
+                doc.addMaterial('NewMaterial11');
+                doc.getMaterial('NewMaterial11');
+                doc.getMaterials();
+                doc.removeMaterial('NewMaterial11');
+                doc.getMaterials();
+
+                doc.addGeomInfo('GeomInfo');
+                doc.getGeomInfo('GeomInfo');
+                doc.getGeomInfos();
+                doc.removeGeomInfo('GeomInfo');
+                doc.getGeomInfos();
+                doc.getGeomAttrValue('Attribute');
+                doc.addGeomPropDef('Name', 'GeomProp');
+                doc.getGeomPropDef('Name');
+                doc.getGeomPropDefs();
+                doc.removeGeomPropDef('Name');
+                doc.getGeomPropDefs();
+
+                doc.addLook("Look1");
+                doc.getLook("Look1");
+                doc.getLooks();
+                doc.removeLook("Look1");
+                doc.getLooks();
+
+                doc.addLookGroup("LookGroup1");
+                doc.getLookGroup("LookGroup1");
+                doc.getLookGroups();
+                doc.removeLookGroup("LookGroup1");
+                doc.getLookGroups();
+
+                doc.addCollection("Collection1");
+                doc.getCollection("Collection1");
+                doc.getCollections();
+                doc.removeCollection("Collection1");
 
                 doc.getMatchingImplementations('Something');
+
+                doc.addPropertySet("PropSet1");
+                doc.getPropertySet("PropSet1");
+                doc.getPropertySets();
+                doc.removePropertySet("PropSet1");
+                doc.getPropertySets();
+
+                doc.addVariantSet("VariantSet1");
+                doc.getVariantSet("VariantSet1");
+                doc.getVariantSets();
+                doc.removeVariantSet("VariantSet1");
+                doc.getVariantSets();
 
                 doc.upgradeVersion(12, 22);
 
@@ -162,7 +293,7 @@ var JsDocument = {
                 doc.getColorManagementConfig();
 
                 doc.addTypeDef('TypeDef');
-                // doc.getTypeDef("TypeDef");
+                // doc.getTypeDef('TypeDef');
                 doc.getTypeDefs();
                 doc.removeTypeDef('TypeDef');
                 doc.getTypeDefs();
