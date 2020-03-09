@@ -73,11 +73,5 @@ extern "C"
             .function("setPropertySet", &PropertySetAssign::setPropertySet)
             .function("getPropertySet", &PropertySetAssign::getPropertySet)
             .class_property("CATEGORY", &PropertySetAssign::CATEGORY);
-
-
-        // register_vector<MaterialAssignPtr>("vector<MaterialAssignPtr>");
-        // register_vector<PropertyAssignPtr>("vector<PropertyAssignPtr>");
-
-        
     }
 }

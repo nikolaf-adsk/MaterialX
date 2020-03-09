@@ -100,10 +100,5 @@ extern "C"
             .smart_ptr<std::shared_ptr<const UnitTypeDef>>("UnitTypeDef")
             .function("getUnitDefs", &UnitTypeDef::getUnitDefs)
             .class_property("CATEGORY", &UnitTypeDef::CATEGORY);
-
-        register_vector<MemberPtr>("vector<MemberPtr>");
-        register_vector<UnitPtr>("vector<UnitPtr>");
-        register_vector<UnitDefPtr>("vector<UnitDefPtr>");
-        // register_vector<ShaderRefPtr>("vector<ShaderRefPtr>");
     }
 }

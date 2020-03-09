@@ -123,13 +123,5 @@ extern "C"
             .function("setColorManagementConfig", &Document::setColorManagementConfig)
             .function("hasColorManagementConfig", &Document::hasColorManagementConfig)
             .function("getColorManagementConfig", &Document::getColorManagementConfig);
-
-        register_vector<NodeGraphPtr>("vector<NodeGraphPtr>");
-        // register_vector<MaterialPtr>("vector<MaterialPtr>");
-        register_vector<InterfaceElementPtr>("vector<InterfaceElementPtr>");
-        register_vector<TypeDefPtr>("vector<TypeDefPtr>");
-        register_vector<NodeDefPtr>("vector<NodeDefPtr>");
-        register_vector<ImplementationPtr>("vector<ImplementationPtr>");
-        register_vector<UnitTypeDefPtr>("vector<UnitTypeDefPtr>");
     }
 }

@@ -90,12 +90,5 @@ extern "C"
             .function("setVisible", &Visibility::setVisible)
             .function("getVisible", &Visibility::getVisible)
             .class_property("CATEGORY", &Visibility::CATEGORY);
-
-        register_vector<MaterialAssignPtr>("vector<MaterialAssignPtr>");
-        register_vector<PropertyAssignPtr>("vector<PropertyAssignPtr>");
-        register_vector<PropertySetAssignPtr>("vector<PropertySetAssignPtr>");
-
-        register_vector<VariantAssignPtr>("vector<VariantAssignPtr>");
-        register_vector<VisibilityPtr>("vector<VisibilityPtr>");
     }
 }

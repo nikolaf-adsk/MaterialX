@@ -103,7 +103,10 @@ extern "C"
             .class_property("CATEGORY", &Collection::CATEGORY);
 
         function("geomStringsMatch", &geomStringsMatch);
-
-        // register_vector<MaterialPtr>("vector<MaterialPtr>");
+        
+        function("UNIVERSAL_GEOM_NAME", optional_override([]() {
+            return UNIVERSAL_GEOM_NAME;
+        }));
+        
     }
 }

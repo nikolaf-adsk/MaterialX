@@ -38,7 +38,5 @@ extern "C"
             .function("hasVariantString", &VariantAssign::hasVariantString)
             .function("getVariantString", &VariantAssign::getVariantString)
             .class_property("CATEGORY", &VariantAssign::CATEGORY);
-
-        register_vector<VariantPtr>("vector<VariantPtr>");
     }
 }

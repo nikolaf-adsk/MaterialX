@@ -62,10 +62,5 @@ extern "C"
             .class_property("CONTAINS_ATTRIBUTE", &Backdrop::CONTAINS_ATTRIBUTE)
             .class_property("WIDTH_ATTRIBUTE", &Backdrop::WIDTH_ATTRIBUTE)
             .class_property("HEIGHT_ATTRIBUTE", &Backdrop::HEIGHT_ATTRIBUTE);
-
-        register_vector<PortElementPtr>("vector<PortElementPtr>");
-        register_vector<NodePtr>("vector<NodePtr>");
-        register_vector<BackdropPtr>("vector<BackdropPtr>");
-        register_vector<ElementPtr>("vector<ElementPtr>");
     }
 }

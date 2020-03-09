@@ -22,6 +22,8 @@ var JsGeom = {
         api.Collection = wrapperFactory(Module.Collection);
 
         api.geomStringsMatch = wrapperFunction(Module.geomStringsMatch);
+
+        api.UNIVERSAL_GEOM_NAME = Module.UNIVERSAL_GEOM_NAME();
     },
 
     /**

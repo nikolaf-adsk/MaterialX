@@ -20,6 +20,8 @@ em++ --bind \
     JsGeom.cpp \
     JsVariant.cpp \
     JsValue.cpp \
+    JsMaterial.cpp \
+    JsRegisteredVectors.cpp \
     ../../../wasm/_build/source/MaterialXCore/libMaterialXCore.a \
     -I../../ \
     -std=c++17 \

@@ -94,11 +94,5 @@ extern "C"
             .function("isTypeCompatible", &InterfaceElement::isTypeCompatible)
 
             .class_property("NODE_DEF_ATTRIBUTE", &InterfaceElement::NODE_DEF_ATTRIBUTE);
-
-        register_vector<ParameterPtr>("vector<ParameterPtr>");
-        register_vector<InputPtr>("vector<InputPtr>");
-        register_vector<OutputPtr>("vector<OutputPtr>");
-        register_vector<TokenPtr>("vector<TokenPtr>");
-        register_vector<ValueElementPtr>("vector<ValueElementPtr>");
     }
 }
