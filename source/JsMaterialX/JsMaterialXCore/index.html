@@ -17,14 +17,15 @@
         JsGeom,
         JsVariant,
         JsValue,
-        JsMaterial
+        JsMaterial,
+        JsTraversal,
       ];
       // Generate wrappers
       bindings.forEach(function (binding) {
         binding.generateWrappers(Module, MaterialX)
       });
 
-      JsDocument.test();
+      JsTraversal.test();
 
       // // Run "tests"
       // bindings.forEach(function (binding) {
@@ -49,6 +50,7 @@
 <script src="JsVariant.js"></script>
 <script src="JsValue.js"></script>
 <script src="JsMaterial.js"></script>
+<script src="JsTraversal.js"></script>
 
 <!-- output from em++ -->
 <script src="./MaterialXCore.js"></script>

@@ -22,6 +22,7 @@ em++ --bind \
     JsValue.cpp \
     JsMaterial.cpp \
     JsRegisteredVectors.cpp \
+    JsTraversal.cpp \
     ../../../wasm/_build/source/MaterialXCore/libMaterialXCore.a \
     -I../../ \
     -std=c++17 \
