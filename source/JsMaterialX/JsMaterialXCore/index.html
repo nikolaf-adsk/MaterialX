@@ -19,13 +19,14 @@
         JsValue,
         JsMaterial,
         JsTraversal,
+        JsObserver
       ];
       // Generate wrappers
       bindings.forEach(function (binding) {
         binding.generateWrappers(Module, MaterialX)
       });
 
-      JsTraversal.test();
+      JsObserver.test();
 
       // // Run "tests"
       // bindings.forEach(function (binding) {
@@ -51,6 +52,7 @@
 <script src="JsValue.js"></script>
 <script src="JsMaterial.js"></script>
 <script src="JsTraversal.js"></script>
+<script src="JsObserver.js"></script>
 
 <!-- output from em++ -->
 <script src="./MaterialXCore.js"></script>
