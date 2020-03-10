@@ -72,6 +72,39 @@ bindParam.setValue(0.5)
 print str(roughness.getBoundValue(material))
 ~~~
 
+#### Javascript
+
+~~~{.js}
+var mx = MaterialX;
+
+// Create a document.
+var doc = mx.createDocument();
+
+// Create a node graph with a single image node and output.
+var nodeGraph = doc.addNodeGraph();
+var image = nodeGraph.addNode('image');
+image.setParameterValue('file', 'image1.tif', 'filename');
+var output = nodeGraph.addOutput();
+output.setConnectedNode(image);
+
+// Create a simple shader interface.
+var simpleSrf = doc.addNodeDef('ND_simpleSrf', 'surfaceshader', 'simpleSrf');
+var diffColor = simpleSrf.setInputValue('diffColor', mx.Color3(1.0));
+var specColor = simpleSrf.setInputValue('specColor', mx.Color3(0.0));
+var roughness = simpleSrf.setParameterValue('roughness', 0.25);
+
+// Create a material that instantiates the shader.
+var material = doc.addMaterial();
+var refSimpleSrf = material.addShaderRef('SR_simpleSrf', 'simpleSrf');
+
+// Bind roughness to a new value within this material.
+var bindParam = refSimpleSrf.addBindParam('roughness');
+bindParam.setValue(0.5);
+
+// Display the value of roughness in the context of this material.
+console.log(roughness.getBoundValue(material));
+~~~
+
 ### Traversing a Document Tree:
 
 #### C++
@@ -120,6 +153,30 @@ for elem in doc.traverseTree():
         if param:
             filename = param.getValueString()
             print 'Image node', elem.getName(), 'references', filename
+~~~
+
+#### Javascript
+
+~~~{.js}
+var mx = MaterialX;
+
+// Read a document from disk.
+var doc = mx.createDocument();
+mx.readFromXmlFile(doc, 'ExampleFile.mtlx');
+
+// Traverse the document tree in depth-first order.
+var elements = doc.traverseTree();
+for (var i = 0; i < elements.length; i++ ) {
+    var elem = elements[i];
+    // Display the filename of each image node.
+    if (elem.isA(mx.Node, 'image')){
+        var param = elem.getParameter('file');
+        if (param) {
+            filename = param.getValueString();
+            console.log('Image node ' + elem.getName() + ' references ' + filename);
+        }
+    }
+}
 ~~~
 
 ### Traversing a Dataflow Graph:

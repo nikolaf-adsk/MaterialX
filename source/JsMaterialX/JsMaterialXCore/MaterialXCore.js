@@ -640,8 +640,8 @@ var wasmMemory;
 // In the wasm backend, we polyfill the WebAssembly object,
 // so this creates a (non-native-wasm) table for us.
 var wasmTable = new WebAssembly.Table({
-  'initial': 6052,
-  'maximum': 6052 + 0,
+  'initial': 6116,
+  'maximum': 6116 + 0,
   'element': 'anyfunc'
 });
 
@@ -1242,11 +1242,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5374496,
+    STACK_BASE = 5376288,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 131616,
-    DYNAMIC_BASE = 5374496,
-    DYNAMICTOP_PTR = 131440;
+    STACK_MAX = 133408,
+    DYNAMIC_BASE = 5376288,
+    DYNAMICTOP_PTR = 133232;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1770,7 +1770,7 @@ var ASM_CONSTS = {
 
 
 
-// STATICTOP = STATIC_BASE + 130592;
+// STATICTOP = STATIC_BASE + 132384;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -1920,7 +1920,7 @@ var ASM_CONSTS = {
   
       var pointer = ___cxa_is_pointer_type(throwntype);
       // can_catch receives a **, add indirection
-      var buffer = 131600;
+      var buffer = 133392;
       HEAP32[((buffer)>>2)]=thrown;
       thrown = buffer;
       // The different catch blocks are denoted by different types.
@@ -1957,7 +1957,7 @@ var ASM_CONSTS = {
   
       var pointer = ___cxa_is_pointer_type(throwntype);
       // can_catch receives a **, add indirection
-      var buffer = 131600;
+      var buffer = 133392;
       HEAP32[((buffer)>>2)]=thrown;
       thrown = buffer;
       // The different catch blocks are denoted by different types.
@@ -6542,7 +6542,7 @@ var ASM_CONSTS = {
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 131440;
+      return 133232;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {
@@ -7455,6 +7455,12 @@ var __growWasmMemory = Module["__growWasmMemory"] = function() {
   return Module["asm"]["__growWasmMemory"].apply(null, arguments)
 };
 
+var dynCall_iiiifi = Module["dynCall_iiiifi"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["dynCall_iiiifi"].apply(null, arguments)
+};
+
 var dynCall_vif = Module["dynCall_vif"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -7471,12 +7477,6 @@ var dynCall_viif = Module["dynCall_viif"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["dynCall_viif"].apply(null, arguments)
-};
-
-var dynCall_iiiifi = Module["dynCall_iiiifi"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_iiiifi"].apply(null, arguments)
 };
 
 var dynCall_iif = Module["dynCall_iif"] = function() {
@@ -8521,6 +8521,59 @@ addWrapper(function(Module, api) {
         var arg1 = arguments[0] || '';
         return _getDeclaration.call(this, arg1);
     };
+
+    var funcs = [
+        'setParameterValueinteger',
+        'setParameterValueboolean',
+        'setParameterValuefloat',
+        'setParameterValuecolor2',
+        'setParameterValuecolor3',
+        'setParameterValuecolor4',
+        'setParameterValuevector2',
+        'setParameterValuevector3',
+        'setParameterValuevector4',
+        'setParameterValuematrix33',
+        'setParameterValuematrix44',
+        'setParameterValuestring',
+        'setParameterValueintegerarray',
+        'setParameterValuebooleanarray',
+        'setParameterValuefloatarray',
+        'setParameterValuestringarray',
+        'setInputValueinteger',
+        'setInputValueboolean',
+        'setInputValuefloat',
+        'setInputValuecolor2',
+        'setInputValuecolor3',
+        'setInputValuecolor4',
+        'setInputValuevector2',
+        'setInputValuevector3',
+        'setInputValuevector4',
+        'setInputValuematrix33',
+        'setInputValuematrix44',
+        'setInputValuestring',
+        'setInputValueintegerarray',
+        'setInputValuebooleanarray',
+        'setInputValuefloatarray',
+        'setInputValuestringarray'
+    ];
+
+    function iterateFunctionNames(funcNames, cb) {
+        for (var i = 0; i < funcNames.length; i++) {
+            var name = funcNames[i];
+            cb && cb(name);
+        }
+    }
+
+    /** Setup the typedValue classes */
+    iterateFunctionNames(funcs, function(funcName) {
+        var _func = Module.InterfaceElement.prototype[funcName];
+        api.InterfaceElement.prototype[funcName] = function() {
+            var arg1 = arguments[0];
+            var arg2 = arguments[1];
+            var arg3 = arguments[2] || '';
+            return _func.call(this, arg1, arg2, arg3);
+        };
+    });
 });
 
 // jsLook
@@ -8929,9 +8982,10 @@ addWrapper(function(Module, api) {
     ];
 
     function iterateTypedValues(cb) {
-        typedValues.forEach(function(typedValue) {
+        for (var i = 0; i < typedValues.length; i++) {
+            var typedValue = typedValues[i];
             cb && cb(typedValue);
-        });
+        }
     }
 
     /** Setup the Value class */

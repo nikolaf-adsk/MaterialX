@@ -11,6 +11,10 @@ namespace mx = MaterialX;
 
 using namespace mx;
 
+#define BIND_INTERFACE_TYPE_INSTANCE(NAME, T)                                 \
+.function("setParameterValue" #NAME, &InterfaceElement::setParameterValue<T>) \
+.function("setInputValue" #NAME, &InterfaceElement::setInputValue<T>)
+
 extern "C"
 {
     EMSCRIPTEN_BINDINGS(interface)
@@ -92,6 +96,22 @@ extern "C"
             .function("getTokenValue", &InterfaceElement::getTokenValue)
             .function("getDeclaration", &InterfaceElement::getDeclaration)
             .function("isTypeCompatible", &InterfaceElement::isTypeCompatible)
+            BIND_INTERFACE_TYPE_INSTANCE(integer, int)
+            BIND_INTERFACE_TYPE_INSTANCE(boolean, bool)
+            BIND_INTERFACE_TYPE_INSTANCE(float, float)
+            BIND_INTERFACE_TYPE_INSTANCE(color2, Color2)
+            BIND_INTERFACE_TYPE_INSTANCE(color3, Color3)
+            BIND_INTERFACE_TYPE_INSTANCE(color4, Color4)
+            BIND_INTERFACE_TYPE_INSTANCE(vector2, Vector2)
+            BIND_INTERFACE_TYPE_INSTANCE(vector3, Vector3)
+            BIND_INTERFACE_TYPE_INSTANCE(vector4, Vector4)
+            BIND_INTERFACE_TYPE_INSTANCE(matrix33, Matrix33)
+            BIND_INTERFACE_TYPE_INSTANCE(matrix44, Matrix44)
+            BIND_INTERFACE_TYPE_INSTANCE(string, std::string)
+            BIND_INTERFACE_TYPE_INSTANCE(integerarray, IntVec)
+            BIND_INTERFACE_TYPE_INSTANCE(booleanarray, BoolVec)
+            BIND_INTERFACE_TYPE_INSTANCE(floatarray, FloatVec)
+            BIND_INTERFACE_TYPE_INSTANCE(stringarray, StringVec)
 
             .class_property("NODE_DEF_ATTRIBUTE", &InterfaceElement::NODE_DEF_ATTRIBUTE);
     }

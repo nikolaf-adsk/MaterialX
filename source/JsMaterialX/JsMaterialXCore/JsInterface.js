@@ -61,4 +61,57 @@ addWrapper(function(Module, api) {
         var arg1 = arguments[0] || '';
         return _getDeclaration.call(this, arg1);
     };
+
+    var funcs = [
+        'setParameterValueinteger',
+        'setParameterValueboolean',
+        'setParameterValuefloat',
+        'setParameterValuecolor2',
+        'setParameterValuecolor3',
+        'setParameterValuecolor4',
+        'setParameterValuevector2',
+        'setParameterValuevector3',
+        'setParameterValuevector4',
+        'setParameterValuematrix33',
+        'setParameterValuematrix44',
+        'setParameterValuestring',
+        'setParameterValueintegerarray',
+        'setParameterValuebooleanarray',
+        'setParameterValuefloatarray',
+        'setParameterValuestringarray',
+        'setInputValueinteger',
+        'setInputValueboolean',
+        'setInputValuefloat',
+        'setInputValuecolor2',
+        'setInputValuecolor3',
+        'setInputValuecolor4',
+        'setInputValuevector2',
+        'setInputValuevector3',
+        'setInputValuevector4',
+        'setInputValuematrix33',
+        'setInputValuematrix44',
+        'setInputValuestring',
+        'setInputValueintegerarray',
+        'setInputValuebooleanarray',
+        'setInputValuefloatarray',
+        'setInputValuestringarray'
+    ];
+
+    function iterateFunctionNames(funcNames, cb) {
+        for (var i = 0; i < funcNames.length; i++) {
+            var name = funcNames[i];
+            cb && cb(name);
+        }
+    }
+
+    /** Setup the typedValue classes */
+    iterateFunctionNames(funcs, function(funcName) {
+        var _func = Module.InterfaceElement.prototype[funcName];
+        api.InterfaceElement.prototype[funcName] = function() {
+            var arg1 = arguments[0];
+            var arg2 = arguments[1];
+            var arg3 = arguments[2] || '';
+            return _func.call(this, arg1, arg2, arg3);
+        };
+    });
 });

@@ -20,9 +20,10 @@ addWrapper(function(Module, api) {
     ];
 
     function iterateTypedValues(cb) {
-        typedValues.forEach(function(typedValue) {
+        for (var i = 0; i < typedValues.length; i++) {
+            var typedValue = typedValues[i];
             cb && cb(typedValue);
-        });
+        }
     }
 
     /** Setup the Value class */
