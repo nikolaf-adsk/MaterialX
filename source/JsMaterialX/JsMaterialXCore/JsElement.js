@@ -41,8 +41,9 @@ var JsElement = {
 
         var _copyContentFrom = Module.Element.prototype.copyContentFrom;
         api.Element.prototype.copyContentFrom = function() {
-            var arg1 = arguments[1] === undefined ? null : arguments[1];
-            return _copyContentFrom.call(this, arg1);
+            var arg1 = arguments[0];
+            var arg2 = arguments[1] === undefined ? new Module.CopyOptions() : arguments[1];
+            return _copyContentFrom.call(this, arg1, arg2);
         };
 
         var _getChildren = Module.Element.prototype.getChildren;
@@ -51,11 +52,46 @@ var JsElement = {
             return vecToArray(vec);
         };
 
+        var _getUpstreamEdge = Module.Element.prototype.getUpstreamEdge;
+        api.Element.prototype.getUpstreamEdge = function() {
+            var arg1 = arguments[0] || null;
+            var arg2 = arguments[1] || 0;
+            return _getUpstreamEdge.call(this, arg1, arg2);
+        };
+
+        var _getUpstreamElement = Module.Element.prototype.getUpstreamElement;
+        api.Element.prototype.getUpstreamElement = function() {
+            var arg1 = arguments[0] || null;
+            var arg2 = arguments[1] || 0;
+            return _getUpstreamElement.call(this, arg1, arg2);
+        };
+
+        var _validate = Module.Element.prototype.validate;
+        api.Element.prototype.validate = function() {
+            var arg1 = arguments[0] || '';
+            return _validate.call(this, arg1);
+        };
+
+        var _createStringResolver = Module.Element.prototype.createStringResolver;
+        api.Element.prototype.createStringResolver = function() {
+            var arg1 = arguments[0] || '';
+            var arg2 = arguments[0] || null;
+            var arg3 = arguments[0] || '';
+            var arg4 = arguments[0] || '';
+            return _createStringResolver.call(this, arg1, arg2, arg3, arg4);
+        };
+
         /** Setup the TypedElement class */
         api.TypedElement = wrapperFactory(Module.TypedElement);
 
         /** Setup the ValueElement class */
         api.ValueElement = wrapperFactory(Module.ValueElement);
+
+        var _getResolvedValueString = Module.ValueElement.prototype.getResolvedValueString;
+        api.ValueElement.prototype.getResolvedValueString = function() {
+            var arg1 = arguments[0] || null;
+            return _getResolvedValueString.call(this, arg1);
+        };
 
         /** Setup the Token class */
         api.Token = wrapperFactory(Module.Token);
@@ -118,6 +154,31 @@ var JsElement = {
                 element.getChildren();
 
                 element.getDocument();
+                element.traverseTree();
+                element.traverseGraph(null);
+                element.getUpstreamEdge();
+                element.getUpstreamEdgeCount();
+                element.getUpstreamElement();
+
+                element.traverseInheritance();
+
+                element.setSourceUri('source/uri');
+                element.hasSourceUri();
+                element.getSourceUri();
+
+                element.getActiveSourceUri();
+                element.validate();
+
+                var element2 = doc.addChildOfCategory('generic');
+                element.copyContentFrom(element2);
+                element.clearContent();
+
+                element.createValidChildName('New Child');
+
+                element.createStringResolver();
+
+                element.asString();
+                element.__str__();
             },
             function() {
                 MaterialX.Element.NAME_ATTRIBUTE;
@@ -142,7 +203,7 @@ var JsElement = {
                 typedElement.hasType();
                 typedElement.getType();
                 typedElement.isMultiOutputType();
-                // typedElement.getTypeDef();
+                typedElement.getTypeDef();
             },
             function() {
                 MaterialX.TypedElement.TYPE_ATTRIBUTE;
@@ -153,23 +214,24 @@ var JsElement = {
             'ValueElement',
             function() {
                 var doc = MaterialX.createDocument();
-                var valueElement = doc.addParameter('ValueElement');
+                var valueElement = doc.addParameter();
                 // Make sure that a method defined in Element is callable.
                 // This is checks that inheritance works.
                 valueElement.getVersionIntegers();
-                valueElement.setValueString('newValue');
+                valueElement.setValueString('hello, world');
                 valueElement.hasValueString();
                 valueElement.getValueString();
-                // valueElement.getResolvedValueString();
+                valueElement.getResolvedValueString();
                 valueElement.setInterfaceName('InterfaceName');
                 valueElement.hasInterfaceName();
                 valueElement.getInterfaceName();
                 valueElement.setImplementationName('test');
                 valueElement.hasImplementationName();
                 valueElement.getImplementationName();
-                // valueElement.getValue();
-                // valueElement.getBoundValue();
-                // valueElement.getDefaultValue(); // Value.h needs to binded for this to work.
+                valueElement.getValue();
+                var material = doc.addMaterial('MATERIAL');
+                valueElement.getBoundValue(material);
+                valueElement.getDefaultValue();
                 valueElement.setUnit('mm');
                 valueElement.hasUnit();
                 valueElement.getUnit();

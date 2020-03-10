@@ -33,15 +33,11 @@ extern "C"
             .function("getPropertySetAssigns", &Look::getPropertySetAssigns)
             .function("getActivePropertySetAssigns", &Look::getActivePropertySetAssigns)
             .function("removePropertySetAssign", &Look::removePropertySetAssign)
-
-            /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX13VariantAssignEEE" */
             .function("addVariantAssign", &Look::addVariantAssign)
             .function("getVariantAssign", &Look::getVariantAssign)
             .function("getVariantAssigns", &Look::getVariantAssigns)
             .function("getActiveVariantAssigns", &Look::getActiveVariantAssigns)
             .function("removeVariantAssign", &Look::removeVariantAssign)
-            /****************************************************************************/
-
             .function("addVisibility", &Look::addVisibility)
             .function("getVisibility", &Look::getVisibility)
             .function("getVisibilities", &Look::getVisibilities)
@@ -69,10 +65,8 @@ extern "C"
             .function("getMaterial", &MaterialAssign::getMaterial)
             .function("setExclusive", &MaterialAssign::setExclusive)
             .function("getExclusive", &MaterialAssign::getExclusive)
-            /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX8MaterialEEE" */
             .function("getReferencedMaterial", &MaterialAssign::getReferencedMaterial)
             .function("getReferencedMaterialNode", &MaterialAssign::getReferencedMaterialNode)
-            /**********************************************************************/
             .class_property("CATEGORY", &MaterialAssign::CATEGORY);
 
         class_<Visibility, base<GeomElement>>("Visibility")

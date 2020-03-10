@@ -21,17 +21,17 @@
         JsTraversal,
         JsObserver
       ];
+
       // Generate wrappers
       bindings.forEach(function (binding) {
         binding.generateWrappers(Module, MaterialX)
       });
 
-      JsObserver.test();
 
-      // // Run "tests"
-      // bindings.forEach(function (binding) {
-      //   binding.test()
-      // });
+      // Run "tests"
+      bindings.forEach(function (binding) {
+        binding.test()
+      });
     }
   };
 </script>

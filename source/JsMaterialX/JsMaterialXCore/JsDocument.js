@@ -14,7 +14,7 @@ var JsDocument = {
         var _importLibrary = Module.Document.prototype.importLibrary;
         api.Document.prototype.importLibrary = function() {
             var arg1 = arguments[0];
-            var arg2 = arguments[1] || null; /** TODO: this should be a nullptr not null. */
+            var arg2 = arguments[1] || null;
             return _importLibrary.call(this, arg1, arg2);
         };
 

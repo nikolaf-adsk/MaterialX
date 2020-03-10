@@ -98,8 +98,9 @@ var JsInterface = {
             portElement.getNodeName();
             portElement.setChannels('channels');
             portElement.getChannels();
-            // portElement.setConnectedNode('connectedNode');
-            // portElement.getConnectedNode();
+            var node = doc.addNode("new Node");
+            portElement.setConnectedNode(node);
+            portElement.getConnectedNode();
         });
 
         validator.classValidatorCb(
@@ -111,7 +112,7 @@ var JsInterface = {
                 input.setDefaultGeomPropString('geomProp');
                 input.hasDefaultGeomPropString();
                 input.getDefaultGeomPropString();
-                // input.getDefaultGeomProp();
+                input.getDefaultGeomProp();
             },
             function() {
                 MaterialX.Input.CATEGORY;
@@ -179,14 +180,15 @@ var JsInterface = {
                 interfaceElement.getActiveValueElement('ValueElement');
                 interfaceElement.getActiveValueElements();
 
-                // interfaceElement.getParameterValue("ParameterValue", "target");
-                // interfaceElement.getInputValue("name", "target");
+                interfaceElement.getParameterValue("ParameterValue", "target");
+                interfaceElement.getInputValue("name", "target");
 
                 interfaceElement.setTokenValue('name', 'value');
                 interfaceElement.getTokenValue('name');
 
-                // interfaceElement.getDeclaration("value");
-                // interfaceElement.isTypeCompatible();
+                interfaceElement.getDeclaration("value");
+                var iElem = doc.addImplementation();
+                interfaceElement.isTypeCompatible(iElem);
             },
             function() {
                 MaterialX.InterfaceElement.NODE_DEF_ATTRIBUTE;

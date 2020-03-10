@@ -89,6 +89,18 @@ var JsLook = {
             return vecToArray(vec);
         };
 
+        var _getVariantAssigns = Module.Look.prototype.getVariantAssigns;
+        api.Look.prototype.getVariantAssigns = function() {
+            var vec = _getVariantAssigns.call(this);
+            return vecToArray(vec);
+        };
+
+        var _getActiveVariantAssigns = Module.Look.prototype.getActiveVariantAssigns;
+        api.Look.prototype.getActiveVariantAssigns = function() {
+            var vec = _getActiveVariantAssigns.call(this);
+            return vecToArray(vec);
+        };
+
         /** Setup the LookGroup class */
         api.LookGroup = wrapperFactory(Module.LookGroup);
 
@@ -131,7 +143,13 @@ var JsLook = {
                 look.removePropertySetAssign("PropertySetAssign");
                 look.getPropertySetAssigns();
 
-                // var variantAssign = look.addVariantAssign('VariantAssign');
+                look.addVariantAssign('VariantAssign');
+                look.getVariantAssign('VariantAssign');
+                look.getVariantAssigns();
+                look.getActiveVariantAssigns();
+                look.removeVariantAssign('VariantAssign');
+                look.getVariantAssigns();
+
 
                 look.addVisibility('Visibility');
                 look.getVisibility('Visibility');
@@ -176,8 +194,8 @@ var JsLook = {
                 materialAssign.getMaterial();
                 materialAssign.setExclusive(true);
                 materialAssign.getExclusive();
-                // materialAssign.getReferencedMaterial();
-                // materialAssign.getReferencedMaterialNode();
+                materialAssign.getReferencedMaterial();
+                materialAssign.getReferencedMaterialNode();
             },
             function() {
                 MaterialX.MaterialAssign.CATEGORY;

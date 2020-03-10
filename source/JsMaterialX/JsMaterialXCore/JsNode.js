@@ -22,41 +22,41 @@ var JsNode = {
             return _getImplementation.call(this, arg1, arg2);
         };
 
-        var _addNode = Module.Node.prototype.addNode;
-        api.Node.prototype.addNode = function() {
+        /** Setup the GraphElement class */
+        api.GraphElement = wrapperFactory(Module.GraphElement);
+
+        var _addNode = Module.GraphElement.prototype.addNode;
+        api.GraphElement.prototype.addNode = function() {
             var arg1 = arguments[0];
             var arg2 = arguments[1] || '';
             var arg3 = arguments[2] || api.DEFAULT_TYPE_STRING;
             return _addNode.call(this, arg1, arg2, arg3);
         };
 
-        var _addNodeInstance = Module.Node.prototype.addNodeInstance;
-        api.Node.prototype.addNodeInstance = function() {
+        var _addNodeInstance = Module.GraphElement.prototype.addNodeInstance;
+        api.GraphElement.prototype.addNodeInstance = function() {
             var arg1 = arguments[0];
             var arg2 = arguments[1] || '';
             return _addNodeInstance.call(this, arg1, arg2);
         };
 
-        var _getNodes = Module.Node.prototype.getNodes;
-        api.Node.prototype.getNodes = function() {
+        var _getNodes = Module.GraphElement.prototype.getNodes;
+        api.GraphElement.prototype.getNodes = function() {
             var arg1 = arguments[0] || '';
             return _getNodes.call(this, arg1);
         };
 
-        var _addBackdrop = Module.Node.prototype.addBackdrop;
-        api.Node.prototype.addBackdrop = function() {
+        var _addBackdrop = Module.GraphElement.prototype.addBackdrop;
+        api.GraphElement.prototype.addBackdrop = function() {
             var arg1 = arguments[0] || '';
             return _addBackdrop.call(this, arg1);
         };
 
-        var _flattenSubgraphs = Module.Node.prototype.flattenSubgraphs;
-        api.Node.prototype.flattenSubgraphs = function() {
+        var _flattenSubgraphs = Module.GraphElement.prototype.flattenSubgraphs;
+        api.GraphElement.prototype.flattenSubgraphs = function() {
             var arg1 = arguments[0] || '';
             return _flattenSubgraphs.call(this, arg1);
         };
-
-        /** Setup the GraphElement class */
-        api.GraphElement = wrapperFactory(Module.GraphElement);
 
         /** Setup the NodeGraph class */
         api.NodeGraph = wrapperFactory(Module.NodeGraph);
@@ -75,13 +75,13 @@ var JsNode = {
             'Node',
             function() {
                 var doc = MaterialX.createDocument();
-                var node = doc.addNode("Node", "TTT", "TTT");
-                var node1 = doc.addNode("Node1", "TTT1", "TTT1");
-                node.setConnectedNode("name", node1);
+                var node = doc.addNode('Node', 'TTT', 'TTT');
+                var node1 = doc.addNode('Node1', 'TTT1', 'TTT1');
+                node.setConnectedNode('name', node1);
                 node.getConnectedNode('name');
                 node.setConnectedNodeName('inputname', 'Node1');
                 node.getConnectedNodeName('inputname');
-                // node.getNodeDef("name");
+                node.getNodeDef('name');
                 node.getImplementation('target', 'java');
                 node.getDownstreamPorts();
             },
@@ -93,7 +93,8 @@ var JsNode = {
         validator.classValidatorCb('GraphElement', function() {
             var graphElement = MaterialX.createDocument();
             graphElement.addNode('category', 'name', 'type');
-            // graphElement.addNodeInstance(constNodeDefPtr, "name");
+            var constNodeDefPtr = doc.addNodeDef('Name33', 'Type33', 'Node33');
+            graphElement.addNodeInstance(constNodeDefPtr, 'nameNodeInstance');
             graphElement.getNode('name');
             graphElement.getNodes('category');
             graphElement.removeNode('name');
@@ -110,7 +111,7 @@ var JsNode = {
             'NodeGraph',
             function() {
                 var doc = MaterialX.createDocument();
-                var nodeGraph = doc.addNodeGraph("NodeGraph")
+                var nodeGraph = doc.addNodeGraph('NodeGraph');
                 var nodeDef = doc.addNodeDef();
                 nodeGraph.getNodeDef();
                 nodeGraph.setNodeDef(nodeDef);
@@ -124,7 +125,8 @@ var JsNode = {
         validator.classValidatorCb(
             'Backdrop',
             function() {
-                var backdrop = new MaterialX.Backdrop(null, 'name');
+                var doc = MaterialX.createDocument();
+                var backdrop = doc.addBackdrop();
                 backdrop.getContains();
                 backdrop.setContains('something');
                 backdrop.getContains();

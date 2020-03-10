@@ -15,11 +15,11 @@ namespace mx = MaterialX;
 
 using namespace mx;
 
-#define BIND_ELEMENT_FUNC_INSTANCE(T)                                                                          \
-.function("_addChild" #T, &Element::addChild<T>)                                                           \
-.function("_getChildOfType" #T, &Element::getChildOfType<T>)                                           \
-.function("_getChildrenOfType" #T, &Element::getChildrenOfType<T>) \
-.function("_removeChildOfType" #T, &Element::removeChildOfType<T>)
+#define BIND_ELEMENT_FUNC_INSTANCE(T)                                  \
+    .function("_addChild" #T, &Element::addChild<T>)                   \
+    .function("_getChildOfType" #T, &Element::getChildOfType<T>)       \
+    .function("_getChildrenOfType" #T, &Element::getChildrenOfType<T>) \
+    .function("_removeChildOfType" #T, &Element::removeChildOfType<T>)
 
 extern "C"
 {
@@ -101,14 +101,14 @@ extern "C"
             .function("getDocument", optional_override([](Element &self) {
                           return self.Element::getDocument();
                       }))
-            .function("traverseTree", &Element::traverseTree) /** TODO: unbound types: N9MaterialX12TreeIteratorE*/
+            .function("traverseTree", &Element::traverseTree)
 
-            .function("traverseGraph", &Element::traverseGraph)     /** TODO: unbound types: N9MaterialX13GraphIteratorE, NSt3__210shared_ptrIKN9MaterialX8MaterialEEE*/
-            .function("getUpstreamEdge", &Element::getUpstreamEdge) /** TODO: unbound types: N9MaterialX4EdgeE, NSt3__210shared_ptrIKN9MaterialX8MaterialEEE*/
+            .function("traverseGraph", &Element::traverseGraph)
+            .function("getUpstreamEdge", &Element::getUpstreamEdge)
             .function("getUpstreamEdgeCount", &Element::getUpstreamEdgeCount)
-            .function("getUpstreamElement", &Element::getUpstreamElement) /** TODO: unbound types: NSt3__210shared_ptrIKN9MaterialX8MaterialEEE*/
+            .function("getUpstreamElement", &Element::getUpstreamElement)
 
-            .function("traverseInheritance", &Element::traverseInheritance) /** TODO: unbound types: N9MaterialX19InheritanceIteratorE */
+            .function("traverseInheritance", &Element::traverseInheritance)
             .function("setSourceUri", &Element::setSourceUri)
             .function("hasSourceUri", &Element::hasSourceUri)
             .function("getSourceUri", &Element::getSourceUri)
@@ -119,13 +119,12 @@ extern "C"
                       }))
             .function("copyContentFrom", optional_override([](Element &self, ConstElementPtr source, CopyOptions copyOptions) {
                           const ConstElementPtr &source1 = source;
-                          //   const CopyOptions copyOptions1 = const_cast<CopyOptions>(copyOptions);
                           const CopyOptions *str1 = &copyOptions;
                           return self.Element::copyContentFrom(source1, str1);
                       }))
             .function("clearContent", &Element::clearContent)
             .function("createValidChildName", &Element::createValidChildName)
-            .function("createStringResolver", &Element::createStringResolver) /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX14StringResolverEEE, NSt3__210shared_ptrIKN9MaterialX8MaterialEEE */
+            .function("createStringResolver", &Element::createStringResolver)
             .function("asString", &Element::asString)
             .function("__str__", &Element::asString)
             BIND_ELEMENT_FUNC_INSTANCE(BindParam)
@@ -216,7 +215,6 @@ extern "C"
 
         class_<StringResolver>("StringResolver")
             .smart_ptr<std::shared_ptr<StringResolver>>("StringResolver")
-            // .smart_ptr_constructor("StringResolver", &std::make_shared<StringResolver>) //<std::shared_ptr<StringResolver>>("StringResolver")
             .class_function("create", &StringResolver::create) // Static function for creating a StringResolver instance
             .function("setFilePrefix", &StringResolver::setFilePrefix)
             .function("getFilePrefix", &StringResolver::getFilePrefix)
@@ -225,7 +223,6 @@ extern "C"
             .function("setUdimString", &StringResolver::setUdimString)
             .function("setUvTileString", &StringResolver::setUvTileString)
             .function("setFilenameSubstitution", &StringResolver::setFilenameSubstitution)
-            // .function("getFilenameSubstitutions", &StringResolver::getFilenameSubstitutions)
             .function("getFilenameSubstitutions", optional_override([](StringResolver &self) {
                           std::unordered_map<string, string> res = self.StringResolver::getFilenameSubstitutions();
                           val obj = val::object();

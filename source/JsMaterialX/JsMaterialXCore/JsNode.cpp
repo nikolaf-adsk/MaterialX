@@ -21,7 +21,7 @@ extern "C"
             .function("getConnectedNode", &Node::getConnectedNode)
             .function("setConnectedNodeName", &Node::setConnectedNodeName)
             .function("getConnectedNodeName", &Node::getConnectedNodeName)
-            .function("getNodeDef", &Node::getNodeDef) /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX7NodeDefEEE" */
+            .function("getNodeDef", &Node::getNodeDef)
             .function("getImplementation", &Node::getImplementation)
             .function("getDownstreamPorts", &Node::getDownstreamPorts)
             .class_property("CATEGORY", &Node::CATEGORY);
@@ -30,7 +30,7 @@ extern "C"
             .smart_ptr<std::shared_ptr<GraphElement>>("GraphElement")
             .smart_ptr<std::shared_ptr<const GraphElement>>("GraphElement")
             .function("addNode", &GraphElement::addNode)
-            .function("addNodeInstance", &GraphElement::addNodeInstance) /** TODO: need to bind Definition.h */
+            .function("addNodeInstance", &GraphElement::addNodeInstance)
             .function("getNode", &GraphElement::getNode)
             .function("getNodes", &GraphElement::getNodes)
             .function("removeNode", &GraphElement::removeNode)
@@ -45,7 +45,7 @@ extern "C"
         class_<NodeGraph, base<GraphElement>>("NodeGraph")
             .smart_ptr_constructor("NodeGraph", &std::make_shared<NodeGraph, ElementPtr, const string &>)
             .smart_ptr<std::shared_ptr<const NodeGraph>>("NodeGraph")
-            .function("setNodeDef", &NodeGraph::setNodeDef) /** TODO: need to bind Definition.h */
+            .function("setNodeDef", &NodeGraph::setNodeDef)
             .function("getNodeDef", &NodeGraph::getNodeDef)
             .class_property("CATEGORY", &NodeGraph::CATEGORY);
 
