@@ -1,50 +1,7 @@
-/**
- * Creates a js array from the passed in vector instance
- * @param {Vector} vec - Wasm vector
- * @return {Array} - Array representing the wasm vector
- */
-function vecToArray(vec) {
-    var size = vec.size();
-    var result = [];
-    for (var i = 0; i < size; i++) {
-        result.push(vec.get(i));
-    }
-    return result;
-}
-
-function catchPtrError(func, handle, args) {
-    var funcName = func.name;
-    try {
-        return func.apply(handle, args);
-    } catch (exception) {
-        console.error(`${funcName}: ${Module.getExceptionMessage(exception)}`);
-    }
-}
-
-function wrapperFunction(func) {
-    return function() {
-        return catchPtrError(func, this, arguments);
-    };
-}
-
-/**
- * Wraps the class prototype functions to catch ptr errors.
- * @param {*} klass
- */
-function wrapperFactory(klass) {
-    var proto = klass.prototype;
-    var funcNames = Object.keys(proto);
-    for (var i = 0; i < funcNames.length; i++) {
-        var funcName = funcNames[i];
-        apiFunc = proto[funcName];
-        function wrap(func) {
-            return function() {
-                return catchPtrError(func, this, arguments);
-            };
-        }
-        proto[funcName] = wrap(apiFunc);
-    }
-    return klass;
+var _validators;
+function addValidator(cb) {
+    if (_validators === undefined) _validators = [];
+    _validators.push(cb);
 }
 
 class Validator {
@@ -80,10 +37,9 @@ class Validator {
 
             var tokenizedVar = command.split('var ');
             if (tokenizedVar.length > 1) {
-                var tokenizedEqual = tokenizedVar[tokenizedVar.length - 1].split(" =");
-                variable = tokenizedEqual.length > 1 ? tokenizedEqual[0]: variable;
+                var tokenizedEqual = tokenizedVar[tokenizedVar.length - 1].split(' =');
+                variable = tokenizedEqual.length > 1 ? tokenizedEqual[0] : variable;
             }
-
 
             if (command.indexOf('//') === 0) {
                 output = `/**Commented out*/ ${command};`;
@@ -92,7 +48,7 @@ class Validator {
                 if (variable !== null) {
                     ret = geval(variable);
                 }
-                ret = ret !== null && typeof ret === "object" ? `${ret.constructor.name} ${JSON.stringify(ret)}` : ret;
+                ret = ret !== null && typeof ret === 'object' ? `${ret.constructor.name} ${JSON.stringify(ret)}` : ret;
                 output = `${command};\n${tab.repeat(2)}// ---> ${ret}`;
             }
             console.log(`${tab}${output}`);

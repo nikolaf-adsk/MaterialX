@@ -53,7 +53,7 @@ EMCC_DEBUG=1 em++ --bind ...
 python -m http.server 9000
 ```
 
-2. In your browser load: http://localhost:9000/JsMaterialXCore/index.html
+2. In your browser load: http://localhost:9000/JsMaterialXCore/test/index.html
 
 There will be some console logs in the browser console. 
 

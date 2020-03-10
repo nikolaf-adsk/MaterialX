@@ -1,294 +1,95 @@
-var JsElement = {
-    /**
-     * Return wrappers for the exported functions.
-     * @param {*} Module - Wasm Module with the exported c++ functions
-     * @param {Object} api - Api object
-     * @returns {Object} - Object containing the wrapped javascript functions
-     */
-    generateWrappers: function(Module, api) {
-        /** Setup the CopyOptions class */
-        api.CopyOptions = Module.CopyOptions;
+// jsElement
+addWrapper(function(Module, api) {
+    /** Setup the CopyOptions class */
+    api.CopyOptions = Module.CopyOptions;
 
-        /** Setup the Element class */
-        api.Element = wrapperFactory(Module.Element);
+    /** Setup the Element class */
+    api.Element = wrapperFactory(Module.Element);
 
-        var _getVersionIntegers = Module.Element.prototype.getVersionIntegers;
-        api.Element.prototype.getVersionIntegers = function() {
-            // The version vector needs to be changed into an array.
-            var vec = _getVersionIntegers.call(this);
-            return vecToArray(vec);
-        };
+    var _getVersionIntegers = Module.Element.prototype.getVersionIntegers;
+    api.Element.prototype.getVersionIntegers = function() {
+        // The version vector needs to be changed into an array.
+        var vec = _getVersionIntegers.call(this);
+        return vecToArray(vec);
+    };
 
-        var _getNamePath = Module.Element.prototype.getNamePath;
-        api.Element.prototype.getNamePath = function() {
-            var arg1 = arguments[0] || null;
-            return _getNamePath.call(this, arg1);
-        };
+    var _getNamePath = Module.Element.prototype.getNamePath;
+    api.Element.prototype.getNamePath = function() {
+        var arg1 = arguments[0] || null;
+        return _getNamePath.call(this, arg1);
+    };
 
-        var _addChildOfCategory = Module.Element.prototype.addChildOfCategory;
-        api.Element.prototype.addChildOfCategory = function() {
-            var arg1 = arguments[0];
-            var arg2 = arguments[1] || '';
-            var arg3 = arguments[2] || true;
-            return _addChildOfCategory.call(this, arg1, arg2, arg3);
-        };
+    var _addChildOfCategory = Module.Element.prototype.addChildOfCategory;
+    api.Element.prototype.addChildOfCategory = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] || '';
+        var arg3 = arguments[2] || true;
+        return _addChildOfCategory.call(this, arg1, arg2, arg3);
+    };
 
-        var _getAttributeNames = Module.Element.prototype.getAttributeNames;
-        api.Element.prototype.getAttributeNames = function() {
-            var vec = _getAttributeNames.call(this);
-            return vecToArray(vec);
-        };
+    var _getAttributeNames = Module.Element.prototype.getAttributeNames;
+    api.Element.prototype.getAttributeNames = function() {
+        var vec = _getAttributeNames.call(this);
+        return vecToArray(vec);
+    };
 
-        var _copyContentFrom = Module.Element.prototype.copyContentFrom;
-        api.Element.prototype.copyContentFrom = function() {
-            var arg1 = arguments[0];
-            var arg2 = arguments[1] === undefined ? new Module.CopyOptions() : arguments[1];
-            return _copyContentFrom.call(this, arg1, arg2);
-        };
+    var _copyContentFrom = Module.Element.prototype.copyContentFrom;
+    api.Element.prototype.copyContentFrom = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] === undefined ? new Module.CopyOptions() : arguments[1];
+        return _copyContentFrom.call(this, arg1, arg2);
+    };
 
-        var _getChildren = Module.Element.prototype.getChildren;
-        api.Element.prototype.getChildren = function() {
-            var vec = _getChildren.call(this);
-            return vecToArray(vec);
-        };
+    var _getChildren = Module.Element.prototype.getChildren;
+    api.Element.prototype.getChildren = function() {
+        var vec = _getChildren.call(this);
+        return vecToArray(vec);
+    };
 
-        var _getUpstreamEdge = Module.Element.prototype.getUpstreamEdge;
-        api.Element.prototype.getUpstreamEdge = function() {
-            var arg1 = arguments[0] || null;
-            var arg2 = arguments[1] || 0;
-            return _getUpstreamEdge.call(this, arg1, arg2);
-        };
+    var _getUpstreamEdge = Module.Element.prototype.getUpstreamEdge;
+    api.Element.prototype.getUpstreamEdge = function() {
+        var arg1 = arguments[0] || null;
+        var arg2 = arguments[1] || 0;
+        return _getUpstreamEdge.call(this, arg1, arg2);
+    };
 
-        var _getUpstreamElement = Module.Element.prototype.getUpstreamElement;
-        api.Element.prototype.getUpstreamElement = function() {
-            var arg1 = arguments[0] || null;
-            var arg2 = arguments[1] || 0;
-            return _getUpstreamElement.call(this, arg1, arg2);
-        };
+    var _getUpstreamElement = Module.Element.prototype.getUpstreamElement;
+    api.Element.prototype.getUpstreamElement = function() {
+        var arg1 = arguments[0] || null;
+        var arg2 = arguments[1] || 0;
+        return _getUpstreamElement.call(this, arg1, arg2);
+    };
 
-        var _validate = Module.Element.prototype.validate;
-        api.Element.prototype.validate = function() {
-            var arg1 = arguments[0] || '';
-            return _validate.call(this, arg1);
-        };
+    var _validate = Module.Element.prototype.validate;
+    api.Element.prototype.validate = function() {
+        var arg1 = arguments[0] || '';
+        return _validate.call(this, arg1);
+    };
 
-        var _createStringResolver = Module.Element.prototype.createStringResolver;
-        api.Element.prototype.createStringResolver = function() {
-            var arg1 = arguments[0] || '';
-            var arg2 = arguments[0] || null;
-            var arg3 = arguments[0] || '';
-            var arg4 = arguments[0] || '';
-            return _createStringResolver.call(this, arg1, arg2, arg3, arg4);
-        };
+    var _createStringResolver = Module.Element.prototype.createStringResolver;
+    api.Element.prototype.createStringResolver = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[0] || null;
+        var arg3 = arguments[0] || '';
+        var arg4 = arguments[0] || '';
+        return _createStringResolver.call(this, arg1, arg2, arg3, arg4);
+    };
 
-        /** Setup the TypedElement class */
-        api.TypedElement = wrapperFactory(Module.TypedElement);
+    /** Setup the TypedElement class */
+    api.TypedElement = wrapperFactory(Module.TypedElement);
 
-        /** Setup the ValueElement class */
-        api.ValueElement = wrapperFactory(Module.ValueElement);
+    /** Setup the ValueElement class */
+    api.ValueElement = wrapperFactory(Module.ValueElement);
 
-        var _getResolvedValueString = Module.ValueElement.prototype.getResolvedValueString;
-        api.ValueElement.prototype.getResolvedValueString = function() {
-            var arg1 = arguments[0] || null;
-            return _getResolvedValueString.call(this, arg1);
-        };
+    var _getResolvedValueString = Module.ValueElement.prototype.getResolvedValueString;
+    api.ValueElement.prototype.getResolvedValueString = function() {
+        var arg1 = arguments[0] || null;
+        return _getResolvedValueString.call(this, arg1);
+    };
 
-        /** Setup the Token class */
-        api.Token = wrapperFactory(Module.Token);
+    /** Setup the Token class */
+    api.Token = wrapperFactory(Module.Token);
 
-        /** Setup the StringResolver class */
-        api.StringResolver = wrapperFactory(Module.StringResolver);
-    },
-
-    /**
-     * Console log the returned values for the the api functions.
-     */
-    test: function() {
-        var validator = new Validator('JsElement.js');
-        validator.classValidatorCb('CopyOptions', function() {
-            var copyOptions = new MaterialX.CopyOptions();
-            copyOptions.skipConflictingElements;
-            copyOptions.skipConflictingElements = true;
-            copyOptions.skipConflictingElements;
-        });
-
-        validator.classValidatorCb(
-            'Element',
-            function() {
-                var doc = MaterialX.createDocument();
-                var element = doc.addChildOfCategory('generic');
-                element.getCategory();
-                element.setCategory('TEST');
-                element.getCategory();
-
-                element.getName();
-                element.setName('element');
-                var element2 = doc.addChildOfCategory('generic');
-                element.getNamePath(element2);
-                var parent = doc.addChildOfCategory('parent');
-                element.setInheritsFrom(parent);
-                element.getInheritsFrom();
-                element.hasInheritedBase(parent);
-
-                element.setFilePrefix('PREFIX');
-                element.getActiveFilePrefix();
-                element.setColorSpace('colorSpace');
-                element.getActiveColorSpace();
-                element.setGeomPrefix('GeomPrefix');
-                element.getActiveGeomPrefix();
-                element.setTarget('target');
-                element.setInheritString('inherit');
-                element.setNamespace('space');
-                element.setVersionString('10.2.2');
-                element.setDefaultVersion(true);
-                element.setDocString('doc');
-
-                element.hasInheritanceCycle();
-                element.getQualifiedName('element');
-
-                element.hasFilePrefix();
-                element.getFilePrefix();
-
-                element.getVersionIntegers();
-
-                element.getChildren();
-
-                element.getDocument();
-                element.traverseTree();
-                element.traverseGraph(null);
-                element.getUpstreamEdge();
-                element.getUpstreamEdgeCount();
-                element.getUpstreamElement();
-
-                element.traverseInheritance();
-
-                element.setSourceUri('source/uri');
-                element.hasSourceUri();
-                element.getSourceUri();
-
-                element.getActiveSourceUri();
-                element.validate();
-
-                var element2 = doc.addChildOfCategory('generic');
-                element.copyContentFrom(element2);
-                element.clearContent();
-
-                element.createValidChildName('New Child');
-
-                element.createStringResolver();
-
-                element.asString();
-                element.__str__();
-            },
-            function() {
-                MaterialX.Element.NAME_ATTRIBUTE;
-                MaterialX.Element.FILE_PREFIX_ATTRIBUTE;
-                MaterialX.Element.GEOM_PREFIX_ATTRIBUTE;
-                MaterialX.Element.COLOR_SPACE_ATTRIBUTE;
-                MaterialX.Element.TARGET_ATTRIBUTE;
-                MaterialX.Element.VERSION_ATTRIBUTE;
-                MaterialX.Element.DEFAULT_VERSION_ATTRIBUTE;
-                MaterialX.Element.INHERIT_ATTRIBUTE;
-                MaterialX.Element.NAMESPACE_ATTRIBUTE;
-                MaterialX.Element.DOC_ATTRIBUTE;
-            }
-        );
-
-        validator.classValidatorCb(
-            'TypedElement',
-            function() {
-                var doc = MaterialX.createDocument();
-                var typedElement = doc.addToken('TOKEN');
-                typedElement.setType('newType');
-                typedElement.hasType();
-                typedElement.getType();
-                typedElement.isMultiOutputType();
-                typedElement.getTypeDef();
-            },
-            function() {
-                MaterialX.TypedElement.TYPE_ATTRIBUTE;
-            }
-        );
-
-        validator.classValidatorCb(
-            'ValueElement',
-            function() {
-                var doc = MaterialX.createDocument();
-                var valueElement = doc.addParameter();
-                // Make sure that a method defined in Element is callable.
-                // This is checks that inheritance works.
-                valueElement.getVersionIntegers();
-                valueElement.setValueString('hello, world');
-                valueElement.hasValueString();
-                valueElement.getValueString();
-                valueElement.getResolvedValueString();
-                valueElement.setInterfaceName('InterfaceName');
-                valueElement.hasInterfaceName();
-                valueElement.getInterfaceName();
-                valueElement.setImplementationName('test');
-                valueElement.hasImplementationName();
-                valueElement.getImplementationName();
-                valueElement.getValue();
-                var material = doc.addMaterial('MATERIAL');
-                valueElement.getBoundValue(material);
-                valueElement.getDefaultValue();
-                valueElement.setUnit('mm');
-                valueElement.hasUnit();
-                valueElement.getUnit();
-                valueElement.getActiveUnit();
-                valueElement.setUnitType('meters');
-                valueElement.hasUnitType();
-                valueElement.getUnitType();
-            },
-            function() {
-                MaterialX.ValueElement.VALUE_ATTRIBUTE;
-                MaterialX.ValueElement.INTERFACE_NAME_ATTRIBUTE;
-                MaterialX.ValueElement.IMPLEMENTATION_NAME_ATTRIBUTE;
-                MaterialX.ValueElement.IMPLEMENTATION_TYPE_ATTRIBUTE;
-                MaterialX.ValueElement.ENUM_ATTRIBUTE;
-                MaterialX.ValueElement.ENUM_VALUES_ATTRIBUTE;
-                MaterialX.ValueElement.UNIT_ATTRIBUTE;
-                MaterialX.ValueElement.UI_NAME_ATTRIBUTE;
-                MaterialX.ValueElement.UI_FOLDER_ATTRIBUTE;
-                MaterialX.ValueElement.UI_MIN_ATTRIBUTE;
-                MaterialX.ValueElement.UI_MAX_ATTRIBUTE;
-                MaterialX.ValueElement.UI_SOFT_MIN_ATTRIBUTE;
-                MaterialX.ValueElement.UI_SOFT_MAX_ATTRIBUTE;
-                MaterialX.ValueElement.UI_STEP_ATTRIBUTE;
-                MaterialX.ValueElement.UI_ADVANCED_ATTRIBUTE;
-            }
-        );
-
-        validator.classValidatorCb(
-            'Token',
-            function() {
-                var token = new MaterialX.Token(null, 'tttt');
-                // Make sure that a method defined in Element is callable.
-                // This is checks that inheritance works.
-                token.getVersionIntegers();
-            },
-            function() {
-                MaterialX.Token.CATEGORY;
-            }
-        );
-
-        validator.classValidatorCb('StringResolver', function() {
-            // Make sure that a method defined in Element is callable.
-            // This is checks that inheritance works.
-            MaterialX.StringResolver.create();
-            var sr = MaterialX.StringResolver.create();
-            sr.setFilePrefix('test');
-            sr.getFilePrefix();
-            sr.setGeomPrefix('geom');
-            sr.getGeomPrefix();
-            sr.setUdimString('u');
-            sr.setUvTileString('uv');
-            sr.setFilenameSubstitution('hello', 'world');
-            sr.getFilenameSubstitutions();
-            sr.setGeomNameSubstitution('geomNameSub', 'blah');
-            sr.getGeomNameSubstitutions();
-            sr.resolve('The is a uv u test//', 'blah');
-        });
-        validator.validate();
-    }
-};
+    /** Setup the StringResolver class */
+    api.StringResolver = wrapperFactory(Module.StringResolver);
+});

@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<script>
+  var Module = {
+    postRun: function () {
+      console.log("Running tests");
+
+      // Run "tests"
+      _validators.forEach(function (validator) {
+        validator();
+      });
+    }
+  };
+</script>
+
+
+<!-- output from em++ -->
+<script src="./../MaterialXCore.js"></script>
+<script src="./helpers.js"></script>
+<script src="./JsDefinition.js"></script>
+<script src="./JsDocument.js"></script>
+<script src="./JsElement.js"></script>
+<script src="./JsGeom.js"></script>
+<script src="./JsInterface.js"></script>
+<script src="./JsLook.js"></script>
+<script src="./JsMaterial.js"></script>
+<script src="./JsNode.js"></script>
+<script src="./JsObserver.js"></script>
+<script src="./JsProperty.js"></script>
+<script src="./JsTraversal.js"></script>
+<script src="./JsTypes.js"></script>
+<script src="./JsUtil.js"></script>
+<script src="./JsValue.js"></script>
+<script src="./JsVariant.js"></script>
+
+</html>

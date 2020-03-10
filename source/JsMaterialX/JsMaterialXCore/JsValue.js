@@ -1,12 +1,6 @@
-var JsValue = {
-    /**
-     * Return wrappers for the exported functions.
-     * @param {*} Module - Wasm Module with the exported c++ functions
-     * @param {Object} api - Api object
-     * @returns {Object} - Object containing the wrapped javascript functions
-     */
-
-    typedValues: [
+// jsValue
+addWrapper(function(Module, api) {
+    var typedValues = [
         'TypedValue_integer',
         'TypedValue_boolean',
         'TypedValue_float',
@@ -23,29 +17,19 @@ var JsValue = {
         'TypedValue_booleanarray',
         'TypedValue_floatarray',
         'TypedValue_stringarray'
-    ],
+    ];
 
-    iterateTypedValues: function(cb) {
-        this.typedValues.forEach(function(typedValue) {
+    function iterateTypedValues(cb) {
+        typedValues.forEach(function(typedValue) {
             cb && cb(typedValue);
         });
-    },
-
-    generateWrappers: function(Module, api) {
-        /** Setup the Value class */
-        api.Value = wrapperFactory(Module.Value);
-
-        /** Setup the typedValue classes */
-        this.iterateTypedValues(function(typedValue) {
-            api[typedValue] = wrapperFactory(Module[typedValue]);
-        });
-    },
-    /**
-     * Console log the returned values for the the api functions.
-     */
-    test: function() {
-        var validator = new Validator('JsValue.js');
-
-        validator.validate();
     }
-};
+
+    /** Setup the Value class */
+    api.Value = wrapperFactory(Module.Value);
+
+    /** Setup the typedValue classes */
+    iterateTypedValues(function(typedValue) {
+        api[typedValue] = wrapperFactory(Module[typedValue]);
+    });
+});
