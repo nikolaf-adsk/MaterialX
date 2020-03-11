@@ -24,20 +24,23 @@ extern "C"
             .property("writeXIncludeEnable", &XmlWriteOptions::writeXIncludeEnable)
             .property("elementPredicate", &XmlWriteOptions::elementPredicate);
 
-        function("readFromXmlFileBase", optional_override([](DocumentPtr doc, FilePath filename, FileSearchPath searchPath = FileSearchPath(), XmlReadOptions readOptions = XmlReadOptions()) {
-                     return readFromXmlFile(doc, (const FilePath &)filename, (const FileSearchPath &)searchPath, (const XmlReadOptions *)&readOptions);
-                 }));
         function("readFromXmlString", optional_override([](DocumentPtr doc, string str, XmlReadOptions readOptions = XmlReadOptions()) {
                      return readFromXmlString(doc, (const string &)str, (const XmlReadOptions *)&readOptions);
                  }));
-        function("writeToXmlFile", optional_override([](DocumentPtr doc, FilePath filename, XmlWriteOptions writeOptions = XmlWriteOptions()) {
-                     return writeToXmlFile(doc, (const FilePath &)filename, (const XmlWriteOptions *)&writeOptions);
-                 }));
+
         function("writeToXmlString", optional_override([](DocumentPtr doc, XmlWriteOptions writeOptions = XmlWriteOptions()) {
                      return writeToXmlString(doc, (const XmlWriteOptions *)&writeOptions);
                  }));
-        function("prependXInclude", optional_override([](DocumentPtr doc, FilePath filename) {
-                     return prependXInclude(doc, (const FilePath &)filename);
-                 }));
+
+        // // The argument overrides do not work. Thus this needs to be done in the Javascript wrapper.
+        // function("readFromXmlFileBase", optional_override([](DocumentPtr doc, FilePath filename, FileSearchPath searchPath = FileSearchPath(), XmlReadOptions readOptions = XmlReadOptions()) {
+        //              return readFromXmlFile(doc, (const FilePath &)filename, (const FileSearchPath &)searchPath, (const XmlReadOptions *)&readOptions);
+        //          }));
+        // function("writeToXmlFile", optional_override([](DocumentPtr doc, FilePath filename, XmlWriteOptions writeOptions = XmlWriteOptions()) {
+        //              return writeToXmlFile(doc, (const FilePath &)filename, (const XmlWriteOptions *)&writeOptions);
+        //          }));
+        // function("prependXInclude", optional_override([](DocumentPtr doc, FilePath filename) {
+        //              return prependXInclude(doc, (const FilePath &)filename);
+        //          }));
     }
 }

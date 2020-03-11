@@ -6,4 +6,7 @@ addWrapper(function(Module, api) {
     /** Setup the XmlWriteOptions class */
     api.XmlWriteOptions = Module.XmlWriteOptions;
 
+    api.readFromXmlString = wrapperFunction(Module.readFromXmlString);
+    api.writeToXmlString = wrapperFunction(Module.writeToXmlString);
+
 });
