@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "../helpers.h"
 #include <MaterialXCore/Document.h>
 #include <MaterialXCore/Geom.h>
 #include <MaterialXCore/Look.h>

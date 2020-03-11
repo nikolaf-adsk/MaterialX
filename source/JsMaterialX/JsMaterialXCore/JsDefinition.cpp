@@ -1,5 +1,5 @@
 
-#include "helpers.h"
+#include "../helpers.h"
 #include <MaterialXCore/Definition.h>
 
 // #include <MaterialXCore/Material.h>

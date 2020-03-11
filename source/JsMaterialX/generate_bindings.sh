@@ -5,44 +5,47 @@ timestamp() {
 
 echo "Generating Javascript MaterialXCore Bindings"
 timestamp
-cd ./JsMaterialXCore
+
 em++ --bind \
-    JsTypes.cpp \
-    JsExceptions.cpp \
-    JsUtil.cpp \
-    JsElement.cpp \
-    JsInterface.cpp \
-    JsNode.cpp \
-    JsDefinition.cpp \
-    JsDocument.cpp \
-    JsLook.cpp \
-    JsProperty.cpp \
-    JsGeom.cpp \
-    JsVariant.cpp \
-    JsValue.cpp \
-    JsMaterial.cpp \
-    JsRegisteredVectors.cpp \
-    JsTraversal.cpp \
-    JsObserver.cpp \
-    ../../../wasm/_build/source/MaterialXCore/libMaterialXCore.a \
-    -I../../ \
+    JsMaterialXCore/JsTypes.cpp \
+    JsMaterialXCore/JsExceptions.cpp \
+    JsMaterialXCore/JsUtil.cpp \
+    JsMaterialXCore/JsElement.cpp \
+    JsMaterialXCore/JsInterface.cpp \
+    JsMaterialXCore/JsNode.cpp \
+    JsMaterialXCore/JsDefinition.cpp \
+    JsMaterialXCore/JsDocument.cpp \
+    JsMaterialXCore/JsLook.cpp \
+    JsMaterialXCore/JsProperty.cpp \
+    JsMaterialXCore/JsGeom.cpp \
+    JsMaterialXCore/JsVariant.cpp \
+    JsMaterialXCore/JsValue.cpp \
+    JsMaterialXCore/JsMaterial.cpp \
+    JsMaterialXCore/JsRegisteredVectors.cpp \
+    JsMaterialXCore/JsTraversal.cpp \
+    JsMaterialXCore/JsObserver.cpp \
+    JsMaterialXFormat/JsXmlIo.cpp \
+    ../../wasm/_build/source/MaterialXCore/libMaterialXCore.a \
+    ../../wasm/_build/source/MaterialXFormat/libMaterialXFormat.a \
+    -I../ \
     -std=c++17 \
     -s WASM=1 \
     -s DISABLE_EXCEPTION_CATCHING=0 \
-    --post-js JsDefinition.js \
-    --post-js JsDocument.js \
-    --post-js JsElement.js \
-    --post-js JsGeom.js \
-    --post-js JsInterface.js \
-    --post-js JsLook.js \
-    --post-js JsMaterial.js \
-    --post-js JsNode.js \
-    --post-js JsObserver.js \
-    --post-js JsProperty.js \
-    --post-js JsTraversal.js \
-    --post-js JsTypes.js \
-    --post-js JsUtil.js \
-    --post-js JsValue.js \
-    --post-js JsVariant.js \
+    --post-js JsMaterialXCore/JsDefinition.js \
+    --post-js JsMaterialXCore/JsDocument.js \
+    --post-js JsMaterialXCore/JsElement.js \
+    --post-js JsMaterialXCore/JsGeom.js \
+    --post-js JsMaterialXCore/JsInterface.js \
+    --post-js JsMaterialXCore/JsLook.js \
+    --post-js JsMaterialXCore/JsMaterial.js \
+    --post-js JsMaterialXCore/JsNode.js \
+    --post-js JsMaterialXCore/JsObserver.js \
+    --post-js JsMaterialXCore/JsProperty.js \
+    --post-js JsMaterialXCore/JsTraversal.js \
+    --post-js JsMaterialXCore/JsTypes.js \
+    --post-js JsMaterialXCore/JsUtil.js \
+    --post-js JsMaterialXCore/JsValue.js \
+    --post-js JsMaterialXCore/JsVariant.js \
+    --post-js JsMaterialXFormat/JsXmlIo.js \
     --post-js initMaterialX.js \
     -o ./MaterialXCore.js

@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "../helpers.h"
 #include <MaterialXCore/Look.h>
 
 #include <emscripten.h>

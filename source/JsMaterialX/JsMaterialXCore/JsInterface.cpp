@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "../helpers.h"
 #include <MaterialXCore/Interface.h>
 #include <MaterialXCore/Node.h>
 

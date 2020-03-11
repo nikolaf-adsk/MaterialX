@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "../helpers.h"
 #include <MaterialXCore/Traversal.h>
 
 #include <MaterialXCore/Observer.h>

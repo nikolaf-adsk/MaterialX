@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "../helpers.h"
 #include <MaterialXCore/Types.h>
 #include <MaterialXCore/Value.h>
 
