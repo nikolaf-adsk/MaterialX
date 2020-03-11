@@ -20,7 +20,7 @@ var Module = typeof Module !== 'undefined' ? Module : {};
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// {{PRE_JSES}}
+
 
 // Sometimes an existing Module object exists with properties
 // meant to overwrite the default module functionality. Here
@@ -640,8 +640,8 @@ var wasmMemory;
 // In the wasm backend, we polyfill the WebAssembly object,
 // so this creates a (non-native-wasm) table for us.
 var wasmTable = new WebAssembly.Table({
-  'initial': 3700,
-  'maximum': 3700 + 0,
+  'initial': 6116,
+  'maximum': 6116 + 0,
   'element': 'anyfunc'
 });
 
@@ -1242,11 +1242,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5328352,
+    STACK_BASE = 5376288,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 85472,
-    DYNAMIC_BASE = 5328352,
-    DYNAMICTOP_PTR = 85296;
+    STACK_MAX = 133408,
+    DYNAMIC_BASE = 5376288,
+    DYNAMICTOP_PTR = 133232;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1770,7 +1770,7 @@ var ASM_CONSTS = {
 
 
 
-// STATICTOP = STATIC_BASE + 84448;
+// STATICTOP = STATIC_BASE + 132384;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -1920,7 +1920,7 @@ var ASM_CONSTS = {
   
       var pointer = ___cxa_is_pointer_type(throwntype);
       // can_catch receives a **, add indirection
-      var buffer = 85456;
+      var buffer = 133392;
       HEAP32[((buffer)>>2)]=thrown;
       thrown = buffer;
       // The different catch blocks are denoted by different types.
@@ -1957,7 +1957,7 @@ var ASM_CONSTS = {
   
       var pointer = ___cxa_is_pointer_type(throwntype);
       // can_catch receives a **, add indirection
-      var buffer = 85456;
+      var buffer = 133392;
       HEAP32[((buffer)>>2)]=thrown;
       thrown = buffer;
       // The different catch blocks are denoted by different types.
@@ -6542,7 +6542,7 @@ var ASM_CONSTS = {
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 85296;
+      return 133232;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {
@@ -7455,6 +7455,12 @@ var __growWasmMemory = Module["__growWasmMemory"] = function() {
   return Module["asm"]["__growWasmMemory"].apply(null, arguments)
 };
 
+var dynCall_iiiifi = Module["dynCall_iiiifi"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["dynCall_iiiifi"].apply(null, arguments)
+};
+
 var dynCall_vif = Module["dynCall_vif"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -7471,6 +7477,12 @@ var dynCall_viif = Module["dynCall_viif"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["dynCall_viif"].apply(null, arguments)
+};
+
+var dynCall_iif = Module["dynCall_iif"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["dynCall_iif"].apply(null, arguments)
 };
 
 var dynCall_viijii = Module["dynCall_viijii"] = function() {
@@ -8072,4 +8084,1006 @@ run();
 // {{MODULE_ADDITIONS}}
 
 
+
+// JsDefinition
+addWrapper(function(Module, api) {
+    /** Setup the NodeDef class */
+    api.NodeDef = wrapperFactory(Module.NodeDef);
+    var _getImplementation = Module.NodeDef.prototype.getImplementation;
+    api.NodeDef.prototype.getImplementation = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || '';
+        return _getImplementation.call(this, arg1, arg2);
+    };
+
+    /** Setup the Implementation class */
+    api.Implementation = wrapperFactory(Module.Implementation);
+
+    /** Setup the TypeDef class */
+    api.TypeDef = wrapperFactory(Module.TypeDef);
+
+    var _getMembers = Module.TypeDef.prototype.getMembers;
+    api.TypeDef.prototype.getMembers = function() {
+        var vec = _getMembers.call(this);
+        return vecToArray(vec);
+    };
+
+    var _addMember = Module.TypeDef.prototype.addMember;
+    api.TypeDef.prototype.addMember = function() {
+        var arg1 = arguments[0] || '';
+        return _addMember.call(this, arg1);
+    };
+
+    /** Setup the Member class */
+    api.Member = wrapperFactory(Module.Member);
+
+    /** Setup the Unit class */
+    api.Unit = wrapperFactory(Module.Unit);
+
+    /** Setup the UnitDef class */
+    api.UnitDef = wrapperFactory(Module.UnitDef);
+
+    var _getUnits = Module.UnitDef.prototype.getUnits;
+    api.UnitDef.prototype.getUnits = function() {
+        var vec = _getUnits.call(this);
+        return vecToArray(vec);
+    };
+
+    /** Setup the UnitTypeDef class */
+    api.UnitTypeDef = wrapperFactory(Module.UnitTypeDef);
+
+    var _getUnitDefs = Module.UnitTypeDef.prototype.getUnitDefs;
+    api.UnitTypeDef.prototype.getUnitDefs = function() {
+        var vec = _getUnitDefs.call(this);
+        return vecToArray(vec);
+    };
+});
+
+// jsDocument
+addWrapper(function(Module, api) {
+    /** Setup the Document class */
+    api.createDocument = wrapperFunction(Module.createDocument);
+
+    api.Document = wrapperFactory(Module.Document);
+
+    var _importLibrary = Module.Document.prototype.importLibrary;
+    api.Document.prototype.importLibrary = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] || null;
+        return _importLibrary.call(this, arg1, arg2);
+    };
+
+    var _getReferencedSourceUris = Module.Document.prototype.getReferencedSourceUris;
+    api.Document.prototype.getReferencedSourceUris = function() {
+        var vec = _getReferencedSourceUris.call(this);
+        return vecToArray(vec);
+    };
+
+    var _addNodeGraph = Module.Document.prototype.addNodeGraph;
+    api.Document.prototype.addNodeGraph = function() {
+        var arg1 = arguments[0] || '';
+        return _addNodeGraph.call(this, arg1);
+    };
+
+    var _getNodeGraphs = Module.Document.prototype.getNodeGraphs;
+    api.Document.prototype.getNodeGraphs = function() {
+        var vec = _getNodeGraphs.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getMatchingPorts = Module.Document.prototype.getMatchingPorts;
+    api.Document.prototype.getMatchingPorts = function() {
+        var arg1 = arguments[0];
+        var vec = _getMatchingPorts.call(this, arg1);
+        return vecToArray(vec);
+    };
+
+    var _addMaterial = Module.Document.prototype.addMaterial;
+    api.Document.prototype.addMaterial = function() {
+        var arg1 = arguments[0] || '';
+        return _addMaterial.call(this, arg1);
+    };
+
+    var _getMaterials = Module.Document.prototype.getMaterials;
+    api.Document.prototype.getMaterials = function() {
+        var vec = _getMaterials.call(this);
+        return vecToArray(vec);
+    };
+
+    var _addGeomInfo = Module.Document.prototype.addGeomInfo;
+    api.Document.prototype.addGeomInfo = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || api.UNIVERSAL_GEOM_NAME;
+        return _addGeomInfo.call(this, arg1, arg2);
+    };
+
+    var _getGeomInfos = Module.Document.prototype.getGeomInfos;
+    api.Document.prototype.getGeomInfos = function() {
+        var vec = _getGeomInfos.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getGeomAttrValue = Module.Document.prototype.getGeomAttrValue;
+    api.Document.prototype.getGeomAttrValue = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] || api.UNIVERSAL_GEOM_NAME;
+        return _getGeomAttrValue.call(this, arg1, arg2);
+    };
+
+    var _getGeomPropDefs = Module.Document.prototype.getGeomPropDefs;
+    api.Document.prototype.getGeomPropDefs = function() {
+        var vec = _getGeomPropDefs.call(this);
+        return vecToArray(vec);
+    };
+
+    var _addLook = Module.Document.prototype.addLook;
+    api.Document.prototype.addLook = function() {
+        var arg1 = arguments[0] || '';
+        return _addLook.call(this, arg1);
+    };
+
+    var _getLooks = Module.Document.prototype.getLooks;
+    api.Document.prototype.getLooks = function() {
+        var vec = _getLooks.call(this);
+        return vecToArray(vec);
+    };
+
+    var _addLookGroup = Module.Document.prototype.addLookGroup;
+    api.Document.prototype.addLookGroup = function() {
+        var arg1 = arguments[0] || '';
+        return _addLookGroup.call(this, arg1);
+    };
+
+    var _getLookGroups = Module.Document.prototype.getLookGroups;
+    api.Document.prototype.getLookGroups = function() {
+        var vec = _getLookGroups.call(this);
+        return vecToArray(vec);
+    };
+
+    var _addCollection = Module.Document.prototype.addCollection;
+    api.Document.prototype.addCollection = function() {
+        var arg1 = arguments[0] || '';
+        return _addCollection.call(this, arg1);
+    };
+
+    var _getCollections = Module.Document.prototype.getCollections;
+    api.Document.prototype.getCollections = function() {
+        var vec = _getCollections.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getMatchingImplementations = Module.Document.prototype.getMatchingImplementations;
+    api.Document.prototype.getMatchingImplementations = function() {
+        var arg1 = arguments[0];
+        var vec = _getMatchingImplementations.call(this, arg1);
+        return vecToArray(vec);
+    };
+
+    var _addPropertySet = Module.Document.prototype.addPropertySet;
+    api.Document.prototype.addPropertySet = function() {
+        var arg1 = arguments[0] || '';
+        return _addPropertySet.call(this, arg1);
+    };
+
+    var _getPropertySets = Module.Document.prototype.getPropertySets;
+    api.Document.prototype.getPropertySets = function() {
+        var vec = _getPropertySets.call(this);
+        return vecToArray(vec);
+    };
+
+    var _addVariantSet = Module.Document.prototype.addVariantSet;
+    api.Document.prototype.addVariantSet = function() {
+        var arg1 = arguments[0] || '';
+        return _addVariantSet.call(this, arg1);
+    };
+
+    var _getVariantSets = Module.Document.prototype.getVariantSets;
+    api.Document.prototype.getVariantSets = function() {
+        var vec = _getVariantSets.call(this);
+        return vecToArray(vec);
+    };
+
+    var _addTypeDef = Module.Document.prototype.addTypeDef;
+    api.Document.prototype.addTypeDef = function() {
+        var arg1 = arguments[0] || '';
+        return _addTypeDef.call(this, arg1);
+    };
+
+    var _getTypeDefs = Module.Document.prototype.getTypeDefs;
+    api.Document.prototype.getTypeDefs = function() {
+        var vec = _getTypeDefs.call(this);
+        return vecToArray(vec);
+    };
+
+    var _addNodeDef = Module.Document.prototype.addNodeDef;
+    api.Document.prototype.addNodeDef = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || api.DEFAULT_TYPE_STRING;
+        var arg3 = arguments[2] || '';
+        return _addNodeDef.call(this, arg1, arg2, arg3);
+    };
+    var _getNodeDefs = Module.Document.prototype.getNodeDefs;
+    api.Document.prototype.getNodeDefs = function() {
+        var vec = _getNodeDefs.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getMatchingNodeDefs = Module.Document.prototype.getMatchingNodeDefs;
+    api.Document.prototype.getMatchingNodeDefs = function() {
+        var arg1 = arguments[0];
+        var vec = _getMatchingNodeDefs.call(this, arg1);
+        return vecToArray(vec);
+    };
+
+    var _addImplementation = Module.Document.prototype.addImplementation;
+    api.Document.prototype.addImplementation = function() {
+        var arg1 = arguments[0] || '';
+        return _addImplementation.call(this, arg1);
+    };
+
+    var _getImplementations = Module.Document.prototype.getImplementations;
+    api.Document.prototype.getImplementations = function() {
+        var vec = _getImplementations.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getUnitDefs = Module.Document.prototype.getUnitDefs;
+    api.Document.prototype.getUnitDefs = function() {
+        var vec = _getUnitDefs.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getUnitTypeDefs = Module.Document.prototype.getUnitTypeDefs;
+    api.Document.prototype.getUnitTypeDefs = function() {
+        var vec = _getUnitTypeDefs.call(this);
+        return vecToArray(vec);
+    };
+});
+
+// jsElement
+addWrapper(function(Module, api) {
+    /** Setup the CopyOptions class */
+    api.CopyOptions = Module.CopyOptions;
+
+    /** Setup the Element class */
+    api.Element = wrapperFactory(Module.Element);
+
+    var _getVersionIntegers = Module.Element.prototype.getVersionIntegers;
+    api.Element.prototype.getVersionIntegers = function() {
+        // The version vector needs to be changed into an array.
+        var vec = _getVersionIntegers.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getNamePath = Module.Element.prototype.getNamePath;
+    api.Element.prototype.getNamePath = function() {
+        var arg1 = arguments[0] || null;
+        return _getNamePath.call(this, arg1);
+    };
+
+    var _addChildOfCategory = Module.Element.prototype.addChildOfCategory;
+    api.Element.prototype.addChildOfCategory = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] || '';
+        var arg3 = arguments[2] || true;
+        return _addChildOfCategory.call(this, arg1, arg2, arg3);
+    };
+
+    var _getAttributeNames = Module.Element.prototype.getAttributeNames;
+    api.Element.prototype.getAttributeNames = function() {
+        var vec = _getAttributeNames.call(this);
+        return vecToArray(vec);
+    };
+
+    var _copyContentFrom = Module.Element.prototype.copyContentFrom;
+    api.Element.prototype.copyContentFrom = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] === undefined ? new Module.CopyOptions() : arguments[1];
+        return _copyContentFrom.call(this, arg1, arg2);
+    };
+
+    var _getChildren = Module.Element.prototype.getChildren;
+    api.Element.prototype.getChildren = function() {
+        var vec = _getChildren.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getUpstreamEdge = Module.Element.prototype.getUpstreamEdge;
+    api.Element.prototype.getUpstreamEdge = function() {
+        var arg1 = arguments[0] || null;
+        var arg2 = arguments[1] || 0;
+        return _getUpstreamEdge.call(this, arg1, arg2);
+    };
+
+    var _getUpstreamElement = Module.Element.prototype.getUpstreamElement;
+    api.Element.prototype.getUpstreamElement = function() {
+        var arg1 = arguments[0] || null;
+        var arg2 = arguments[1] || 0;
+        return _getUpstreamElement.call(this, arg1, arg2);
+    };
+
+    var _validate = Module.Element.prototype.validate;
+    api.Element.prototype.validate = function() {
+        var arg1 = arguments[0] || '';
+        return _validate.call(this, arg1);
+    };
+
+    var _createStringResolver = Module.Element.prototype.createStringResolver;
+    api.Element.prototype.createStringResolver = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[0] || null;
+        var arg3 = arguments[0] || '';
+        var arg4 = arguments[0] || '';
+        return _createStringResolver.call(this, arg1, arg2, arg3, arg4);
+    };
+
+    /** Setup the TypedElement class */
+    api.TypedElement = wrapperFactory(Module.TypedElement);
+
+    /** Setup the ValueElement class */
+    api.ValueElement = wrapperFactory(Module.ValueElement);
+
+    var _getResolvedValueString = Module.ValueElement.prototype.getResolvedValueString;
+    api.ValueElement.prototype.getResolvedValueString = function() {
+        var arg1 = arguments[0] || null;
+        return _getResolvedValueString.call(this, arg1);
+    };
+
+    /** Setup the Token class */
+    api.Token = wrapperFactory(Module.Token);
+
+    /** Setup the StringResolver class */
+    api.StringResolver = wrapperFactory(Module.StringResolver);
+});
+
+// jsGeom
+addWrapper(function(Module, api) {
+    /** Setup the GeomElement class */
+    api.GeomElement = wrapperFactory(Module.GeomElement);
+
+    /** Setup the GeomInfo class */
+    api.GeomInfo = wrapperFactory(Module.GeomInfo);
+
+    /** Setup the GeomAttr class */
+    api.GeomAttr = wrapperFactory(Module.GeomAttr);
+
+    /** Setup the GeomPropDef class */
+    api.GeomPropDef = wrapperFactory(Module.GeomPropDef);
+
+    /** Setup the Collection class */
+    api.Collection = wrapperFactory(Module.Collection);
+
+    api.geomStringsMatch = wrapperFunction(Module.geomStringsMatch);
+
+    api.UNIVERSAL_GEOM_NAME = Module.UNIVERSAL_GEOM_NAME();
+});
+
+// jsInterface
+addWrapper(function(Module, api) {
+    /** Setup the Parameter class */
+    api.Parameter = wrapperFactory(Module.Parameter);
+
+    /** Setup the PortElement class */
+    api.PortElement = wrapperFactory(Module.PortElement);
+
+    /** Setup the Input class */
+    api.Input = wrapperFactory(Module.Input);
+
+    /** Setup the Output class */
+    api.Output = wrapperFactory(Module.Output);
+
+    /** Setup the InterfaceElement class */
+    api.InterfaceElement = wrapperFactory(Module.InterfaceElement);
+
+    var _addParameter = Module.InterfaceElement.prototype.addParameter;
+    api.InterfaceElement.prototype.addParameter = function() {
+        var arg1 = arguments[0] || api.DEFAULT_TYPE_STRING;
+        var arg2 = arguments[1] || api.DEFAULT_TYPE_STRING;
+        return _addParameter.call(this, arg1, arg2);
+    };
+
+    var _addInput = Module.InterfaceElement.prototype.addInput;
+    api.InterfaceElement.prototype.addInput = function() {
+        var arg1 = arguments[0] || api.DEFAULT_TYPE_STRING;
+        var arg2 = arguments[1] || api.DEFAULT_TYPE_STRING;
+        return _addInput.call(this, arg1, arg2);
+    };
+
+    var _addOutput = Module.InterfaceElement.prototype.addOutput;
+    api.InterfaceElement.prototype.addOutput = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || api.DEFAULT_TYPE_STRING;
+        return _addOutput.call(this, arg1, arg2);
+    };
+
+    var _addToken = Module.InterfaceElement.prototype.addToken;
+    api.InterfaceElement.prototype.addToken = function() {
+        var arg1 = arguments[0] || '';
+        return _addToken.call(this, arg1);
+    };
+
+    var _getParameterValue = Module.InterfaceElement.prototype.getParameterValue;
+    api.InterfaceElement.prototype.getParameterValue = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] || '';
+        return _getParameterValue.call(this, arg1, arg2);
+    };
+
+    var _getInputValue = Module.InterfaceElement.prototype.getInputValue;
+    api.InterfaceElement.prototype.getInputValue = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] || '';
+        return _getInputValue.call(this, arg1, arg2);
+    };
+
+    var _getDeclaration = Module.InterfaceElement.prototype.getDeclaration;
+    api.InterfaceElement.prototype.getDeclaration = function() {
+        var arg1 = arguments[0] || '';
+        return _getDeclaration.call(this, arg1);
+    };
+
+    var funcs = [
+        'setParameterValueinteger',
+        'setParameterValueboolean',
+        'setParameterValuefloat',
+        'setParameterValuecolor2',
+        'setParameterValuecolor3',
+        'setParameterValuecolor4',
+        'setParameterValuevector2',
+        'setParameterValuevector3',
+        'setParameterValuevector4',
+        'setParameterValuematrix33',
+        'setParameterValuematrix44',
+        'setParameterValuestring',
+        'setParameterValueintegerarray',
+        'setParameterValuebooleanarray',
+        'setParameterValuefloatarray',
+        'setParameterValuestringarray',
+        'setInputValueinteger',
+        'setInputValueboolean',
+        'setInputValuefloat',
+        'setInputValuecolor2',
+        'setInputValuecolor3',
+        'setInputValuecolor4',
+        'setInputValuevector2',
+        'setInputValuevector3',
+        'setInputValuevector4',
+        'setInputValuematrix33',
+        'setInputValuematrix44',
+        'setInputValuestring',
+        'setInputValueintegerarray',
+        'setInputValuebooleanarray',
+        'setInputValuefloatarray',
+        'setInputValuestringarray'
+    ];
+
+    function iterateFunctionNames(funcNames, cb) {
+        for (var i = 0; i < funcNames.length; i++) {
+            var name = funcNames[i];
+            cb && cb(name);
+        }
+    }
+
+    /** Setup the typedValue classes */
+    iterateFunctionNames(funcs, function(funcName) {
+        var _func = Module.InterfaceElement.prototype[funcName];
+        api.InterfaceElement.prototype[funcName] = function() {
+            var arg1 = arguments[0];
+            var arg2 = arguments[1];
+            var arg3 = arguments[2] || '';
+            return _func.call(this, arg1, arg2, arg3);
+        };
+    });
+});
+
+// jsLook
+addWrapper(function(Module, api) {
+    /** Setup the Look class */
+    api.Look = wrapperFactory(Module.Look);
+
+    var _addMaterialAssign = Module.Look.prototype.addMaterialAssign;
+    api.Look.prototype.addMaterialAssign = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || '';
+        return _addMaterialAssign.call(this, arg1, arg2);
+    };
+
+    var _addPropertyAssign = Module.Look.prototype.addPropertyAssign;
+    api.Look.prototype.addPropertyAssign = function() {
+        var arg1 = arguments[0] || '';
+        return _addPropertyAssign.call(this, arg1);
+    };
+
+    var _addPropertySetAssign = Module.Look.prototype.addPropertySetAssign;
+    api.Look.prototype.addPropertySetAssign = function() {
+        var arg1 = arguments[0] || '';
+        return _addPropertySetAssign.call(this, arg1);
+    };
+
+    var _addVariantAssign = Module.Look.prototype.addVariantAssign;
+    api.Look.prototype.addVariantAssign = function() {
+        var arg1 = arguments[0] || '';
+        return _addVariantAssign.call(this, arg1);
+    };
+
+    var _addVisibility = Module.Look.prototype.addVisibility;
+    api.Look.prototype.addVisibility = function() {
+        var arg1 = arguments[0] || '';
+        return _addVisibility.call(this, arg1);
+    };
+
+    var _getPropertyAssigns = Module.Look.prototype.getPropertyAssigns;
+    api.Look.prototype.getPropertyAssigns = function() {
+        var vec = _getPropertyAssigns.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getActivePropertyAssigns = Module.Look.prototype.getActivePropertyAssigns;
+    api.Look.prototype.getActivePropertyAssigns = function() {
+        var vec = _getActivePropertyAssigns.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getPropertySetAssigns = Module.Look.prototype.getPropertySetAssigns;
+    api.Look.prototype.getPropertySetAssigns = function() {
+        var vec = _getPropertySetAssigns.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getActivePropertySetAssigns = Module.Look.prototype.getActivePropertySetAssigns;
+    api.Look.prototype.getActivePropertySetAssigns = function() {
+        var vec = _getActivePropertySetAssigns.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getVisibilities = Module.Look.prototype.getVisibilities;
+    api.Look.prototype.getVisibilities = function() {
+        var vec = _getVisibilities.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getActiveVisibilities = Module.Look.prototype.getActiveVisibilities;
+    api.Look.prototype.getActiveVisibilities = function() {
+        var vec = _getActiveVisibilities.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getMaterialAssigns = Module.Look.prototype.getMaterialAssigns;
+    api.Look.prototype.getMaterialAssigns = function() {
+        var vec = _getMaterialAssigns.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getActiveMaterialAssigns = Module.Look.prototype.getActiveMaterialAssigns;
+    api.Look.prototype.getActiveMaterialAssigns = function() {
+        var vec = _getActiveMaterialAssigns.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getVariantAssigns = Module.Look.prototype.getVariantAssigns;
+    api.Look.prototype.getVariantAssigns = function() {
+        var vec = _getVariantAssigns.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getActiveVariantAssigns = Module.Look.prototype.getActiveVariantAssigns;
+    api.Look.prototype.getActiveVariantAssigns = function() {
+        var vec = _getActiveVariantAssigns.call(this);
+        return vecToArray(vec);
+    };
+
+    /** Setup the LookGroup class */
+    api.LookGroup = wrapperFactory(Module.LookGroup);
+
+    /** Setup the MaterialAssign class */
+    api.MaterialAssign = wrapperFactory(Module.MaterialAssign);
+
+    /** Setup the Visibility class */
+    api.Visibility = wrapperFactory(Module.Visibility);
+});
+
+// jsMaterial
+addWrapper(function(Module, api) {
+    /** Setup the Material class */
+    api.Material = wrapperFactory(Module.Material);
+
+    var _addShaderRef = Module.Material.prototype.addShaderRef;
+    api.Material.prototype.addShaderRef = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || '';
+        return _addShaderRef.call(this, arg1, arg2);
+    };
+
+    var _getShaderRefs = Module.Material.prototype.getShaderRefs;
+    api.Material.prototype.getShaderRefs = function() {
+        var vec = _getShaderRefs.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getActiveShaderRefs = Module.Material.prototype.getActiveShaderRefs;
+    api.Material.prototype.getActiveShaderRefs = function() {
+        var vec = _getActiveShaderRefs.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getShaderNodeDefs = Module.Material.prototype.getShaderNodeDefs;
+    api.Material.prototype.getShaderNodeDefs = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || '';
+        var vec = _getShaderNodeDefs.call(this, arg1, arg2);
+        return vecToArray(vec);
+    };
+
+    var _getPrimaryShaderNodeDef = Module.Material.prototype.getPrimaryShaderNodeDef;
+    api.Material.prototype.getPrimaryShaderNodeDef = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || '';
+        return _getPrimaryShaderNodeDef.call(this, arg1, arg2);
+    };
+
+    var _getPrimaryShaderName = Module.Material.prototype.getPrimaryShaderName;
+    api.Material.prototype.getPrimaryShaderName = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || '';
+        return _getPrimaryShaderName.call(this, arg1, arg2);
+    };
+
+    var _getPrimaryShaderParameters = Module.Material.prototype.getPrimaryShaderParameters;
+    api.Material.prototype.getPrimaryShaderParameters = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || '';
+        var vec = _getPrimaryShaderParameters.call(this, arg1, arg2);
+        return vecToArray(vec);
+    };
+
+    var _getPrimaryShaderInputs = Module.Material.prototype.getPrimaryShaderInputs;
+    api.Material.prototype.getPrimaryShaderInputs = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || '';
+        var vec = _getPrimaryShaderInputs.call(this, arg1, arg2);
+        return vecToArray(vec);
+    };
+
+    var _getPrimaryShaderTokens = Module.Material.prototype.getPrimaryShaderTokens;
+    api.Material.prototype.getPrimaryShaderTokens = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || '';
+        var vec = _getPrimaryShaderTokens.call(this, arg1, arg2);
+        return vecToArray(vec);
+    };
+
+    var _getGeometryBindings = Module.Material.prototype.getGeometryBindings;
+    api.Material.prototype.getGeometryBindings = function() {
+        var arg1 = arguments[0] || api.UNIVERSAL_GEOM_NAME;
+        var vec = _getGeometryBindings.call(this, arg1);
+        return vecToArray(vec);
+    };
+
+    /** Setup the BindParam class */
+    api.BindParam = wrapperFactory(Module.BindParam);
+
+    /** Setup the BindInput class */
+    api.BindInput = wrapperFactory(Module.BindInput);
+
+    /** Setup the BindToken class */
+    api.BindToken = wrapperFactory(Module.BindToken);
+
+    /** Setup the ShaderRef class */
+    api.ShaderRef = wrapperFactory(Module.ShaderRef);
+
+    var _addBindParam = Module.ShaderRef.prototype.addBindParam;
+    api.ShaderRef.prototype.addBindParam = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] || MaterialX.DEFAULT_TYPE_STRING;
+        return _addBindParam.call(this, arg1, arg2);
+    };
+
+    var _getBindParams = Module.ShaderRef.prototype.getBindParams;
+    api.ShaderRef.prototype.getBindParams = function() {
+        var vec = _getBindParams.call(this);
+        return vecToArray(vec);
+    };
+
+    var _addBindInput = Module.ShaderRef.prototype.addBindInput;
+    api.ShaderRef.prototype.addBindInput = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] || MaterialX.DEFAULT_TYPE_STRING;
+        return _addBindInput.call(this, arg1, arg2);
+    };
+
+    var _getBindInputs = Module.ShaderRef.prototype.getBindInputs;
+    api.ShaderRef.prototype.getBindInputs = function() {
+        var vec = _getBindInputs.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getBindTokens = Module.ShaderRef.prototype.getBindTokens;
+    api.ShaderRef.prototype.getBindTokens = function() {
+        var vec = _getBindTokens.call(this);
+        return vecToArray(vec);
+    };
+
+    var _getReferencedOutputs = Module.ShaderRef.prototype.getReferencedOutputs;
+    api.ShaderRef.prototype.getReferencedOutputs = function() {
+        var vec = _getReferencedOutputs.call(this);
+        return vecToArray(vec);
+    };
+});
+
+// jsNode
+addWrapper(function(Module, api) {
+    /** Setup the Node class */
+    api.Node = wrapperFactory(Module.Node);
+
+    var _getNodeDef = Module.Node.prototype.getNodeDef;
+    api.Node.prototype.getNodeDef = function() {
+        var arg1 = arguments[0] || '';
+        return _getNodeDef.call(this, arg1);
+    };
+
+    var _getImplementation = Module.Node.prototype.getImplementation;
+    api.Node.prototype.getImplementation = function() {
+        var arg1 = arguments[0] || '';
+        var arg2 = arguments[1] || '';
+        return _getImplementation.call(this, arg1, arg2);
+    };
+
+    /** Setup the GraphElement class */
+    api.GraphElement = wrapperFactory(Module.GraphElement);
+
+    var _addNode = Module.GraphElement.prototype.addNode;
+    api.GraphElement.prototype.addNode = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] || '';
+        var arg3 = arguments[2] || api.DEFAULT_TYPE_STRING;
+        return _addNode.call(this, arg1, arg2, arg3);
+    };
+
+    var _addNodeInstance = Module.GraphElement.prototype.addNodeInstance;
+    api.GraphElement.prototype.addNodeInstance = function() {
+        var arg1 = arguments[0];
+        var arg2 = arguments[1] || '';
+        return _addNodeInstance.call(this, arg1, arg2);
+    };
+
+    var _getNodes = Module.GraphElement.prototype.getNodes;
+    api.GraphElement.prototype.getNodes = function() {
+        var arg1 = arguments[0] || '';
+        return _getNodes.call(this, arg1);
+    };
+
+    var _addBackdrop = Module.GraphElement.prototype.addBackdrop;
+    api.GraphElement.prototype.addBackdrop = function() {
+        var arg1 = arguments[0] || '';
+        return _addBackdrop.call(this, arg1);
+    };
+
+    var _flattenSubgraphs = Module.GraphElement.prototype.flattenSubgraphs;
+    api.GraphElement.prototype.flattenSubgraphs = function() {
+        var arg1 = arguments[0] || '';
+        return _flattenSubgraphs.call(this, arg1);
+    };
+
+    /** Setup the NodeGraph class */
+    api.NodeGraph = wrapperFactory(Module.NodeGraph);
+
+    /** Setup the Backdrop class */
+    api.Backdrop = wrapperFactory(Module.Backdrop);
+});
+
+// jsObserver
+addWrapper(function(Module, api) {
+    /** Setup the Observer class */
+    api.Observer = wrapperFactory(Module.Observer);
+
+    api.createObservedDocument = wrapperFunction(Module.createObservedDocument);
+
+    /** Setup the ObservedDocument class */
+    api.ObservedDocument = wrapperFactory(Module.ObservedDocument);
+});
+
+// jsProperty
+addWrapper(function(Module, api) {
+    /** Setup the Property class */
+    api.Property = wrapperFactory(Module.Property);
+
+    /** Setup the PropertyAssign class */
+    api.PropertyAssign = wrapperFactory(Module.PropertyAssign);
+
+    /** Setup the PropertySet class */
+    api.PropertySet = wrapperFactory(Module.PropertySet);
+
+    /** Setup the PropertySetAssign class */
+    api.PropertySetAssign = wrapperFactory(Module.PropertySetAssign);
+});
+
+// jsTraversal
+addWrapper(function(Module, api) {
+    /** Setup the Edge class */
+    api.Edge = wrapperFactory(Module.Edge);
+
+    /** Setup the TreeIterator class */
+    api.TreeIterator = wrapperFactory(Module.TreeIterator);
+
+    /** Setup the GraphIterator class */
+    api.GraphIterator = wrapperFactory(Module.GraphIterator);
+
+    /** Setup the InheritanceIterator class */
+    api.InheritanceIterator = wrapperFactory(Module.InheritanceIterator);
+});
+
+// jsTypes
+addWrapper(function(Module, api) {
+    api.DEFAULT_TYPE_STRING = Module.DEFAULT_TYPE_STRING();
+    api.FILENAME_TYPE_STRING = Module.FILENAME_TYPE_STRING();
+    api.GEOMNAME_TYPE_STRING = Module.GEOMNAME_TYPE_STRING();
+    api.SURFACE_SHADER_TYPE_STRING = Module.SURFACE_SHADER_TYPE_STRING();
+    api.DISPLACEMENT_SHADER_TYPE_STRING = Module.DISPLACEMENT_SHADER_TYPE_STRING();
+    api.VOLUME_SHADER_TYPE_STRING = Module.VOLUME_SHADER_TYPE_STRING();
+    api.LIGHT_SHADER_TYPE_STRING = Module.LIGHT_SHADER_TYPE_STRING();
+    api.MULTI_OUTPUT_TYPE_STRING = Module.MULTI_OUTPUT_TYPE_STRING();
+    api.NONE_TYPE_STRING = Module.NONE_TYPE_STRING();
+    api.VALUE_STRING_TRUE = Module.VALUE_STRING_TRUE();
+    api.VALUE_STRING_FALSE = Module.VALUE_STRING_FALSE();
+    api.NAME_PREFIX_SEPARATOR = Module.NAME_PREFIX_SEPARATOR();
+    api.NAME_PATH_SEPARATOR = Module.NAME_PATH_SEPARATOR();
+    api.ARRAY_VALID_SEPARATORS = Module.ARRAY_VALID_SEPARATORS();
+    api.ARRAY_PREFERRED_SEPARATOR = Module.ARRAY_PREFERRED_SEPARATOR();
+});
+
+// jsUtil
+addWrapper(function(Module, api) {
+    api.getVersionString = Module.getVersionString;
+    api.createValidName = function(str, char) {
+        return Module.createValidName(str, char.charCodeAt(0));
+    };
+
+    api.makeVersionString = Module.makeVersionString;
+    api.isValidName = Module.isValidName;
+    api.incrementName = Module.incrementName;
+
+    api.getVersionIntegers = function() {
+        var vec = Module.getVersionIntegers();
+        return vecToArray(vec);
+    };
+    api.splitString = function(str, spl) {
+        var vecStr = Module.splitString(str, spl);
+        var size = vecStr.size();
+        var result = [];
+        for (var i = 0; i < size; i++) {
+            result.push(vecStr.get(i));
+        }
+        return result;
+    };
+
+    api.replaceSubstrings = Module.replaceSubstrings;
+    api.prettyPrint = Module.prettyPrint;
+});
+
+// jsValue
+addWrapper(function(Module, api) {
+    var typedValues = [
+        'TypedValue_integer',
+        'TypedValue_boolean',
+        'TypedValue_float',
+        'TypedValue_color2',
+        'TypedValue_color3',
+        'TypedValue_color4',
+        'TypedValue_vector2',
+        'TypedValue_vector3',
+        'TypedValue_vector4',
+        'TypedValue_matrix33',
+        'TypedValue_matrix44',
+        'TypedValue_string',
+        'TypedValue_integerarray',
+        'TypedValue_booleanarray',
+        'TypedValue_floatarray',
+        'TypedValue_stringarray'
+    ];
+
+    function iterateTypedValues(cb) {
+        for (var i = 0; i < typedValues.length; i++) {
+            var typedValue = typedValues[i];
+            cb && cb(typedValue);
+        }
+    }
+
+    /** Setup the Value class */
+    api.Value = wrapperFactory(Module.Value);
+
+    /** Setup the typedValue classes */
+    iterateTypedValues(function(typedValue) {
+        api[typedValue] = wrapperFactory(Module[typedValue]);
+    });
+});
+
+// jsVariant
+addWrapper(function(Module, api) {
+    /** Setup the Variant class */
+    api.Variant = wrapperFactory(Module.Variant);
+
+    /** Setup the VariantSet class */
+    api.VariantSet = wrapperFactory(Module.VariantSet);
+
+    var _addVariant = Module.VariantSet.prototype.addVariant;
+    api.VariantSet.prototype.addVariant = function() {
+        var arg1 = arguments[0] || '';
+        return _addVariant.call(this, arg1);
+    };
+
+    var _getVariants = Module.VariantSet.prototype.getVariants;
+    api.VariantSet.prototype.getVariants = function() {
+        var vec = _getVariants.call(this);
+        return vecToArray(vec);
+    };
+
+    /** Setup the VariantAssign class */
+    api.VariantAssign = wrapperFactory(Module.VariantAssign);
+});
+
+/**
+ * Creates a js array from the passed in vector instance
+ * @param {Vector} vec - Wasm vector
+ * @return {Array} - Array representing the wasm vector
+ */
+function vecToArray(vec) {
+    var size = vec.size();
+    var result = [];
+    for (var i = 0; i < size; i++) {
+        result.push(vec.get(i));
+    }
+    return result;
+}
+
+function catchPtrError(func, handle, args) {
+    var funcName = func.name;
+    try {
+        return func.apply(handle, args);
+    } catch (exception) {
+        console.error(`${funcName}: ${Module.getExceptionMessage(exception)}`);
+    }
+}
+
+function wrapperFunction(func) {
+    return function() {
+        return catchPtrError(func, this, arguments);
+    };
+}
+
+/**
+ * Wraps the class prototype functions to catch ptr errors.
+ * @param {*} klass
+ */
+function wrapperFactory(klass) {
+    var proto = klass.prototype;
+    var funcNames = Object.keys(proto);
+    for (var i = 0; i < funcNames.length; i++) {
+        var funcName = funcNames[i];
+        apiFunc = proto[funcName];
+        function wrap(func) {
+            return function() {
+                return catchPtrError(func, this, arguments);
+            };
+        }
+        proto[funcName] = wrap(apiFunc);
+    }
+    return klass;
+}
+
+var _wrappers;
+
+function addWrapper(wrapperCb) {
+    if (_wrappers === undefined) _wrappers = [];
+    _wrappers.push(wrapperCb);
+}
+
+var MaterialX = {};
+Module.onRuntimeInitialized = function() {
+    // Generate wrappers
+    for (var i = 0; i < _wrappers.length; i++) {
+        var wrapper = _wrappers[i];
+        wrapper(Module, MaterialX);
+    }
+    return MaterialX;
+};
 

@@ -58,8 +58,5 @@ extern "C"
                  }));
 
         function("prettyPrint", &prettyPrint);
-
-        register_vector<string>("vector<string>");
-        register_vector<int>("vector<int>");
     }
 }

@@ -1,5 +1,10 @@
 #include "helpers.h"
-#include <MaterialXCore/Element.h>
+#include <MaterialXCore/Document.h>
+#include <MaterialXCore/Geom.h>
+#include <MaterialXCore/Look.h>
+#include <MaterialXCore/Material.h>
+#include <MaterialXCore/Node.h>
+#include <MaterialXCore/Traversal.h>
 
 #include <emscripten.h>
 #include <emscripten/bind.h>
@@ -10,6 +15,12 @@ namespace mx = MaterialX;
 
 using namespace mx;
 
+#define BIND_ELEMENT_FUNC_INSTANCE(T)                                  \
+    .function("_addChild" #T, &Element::addChild<T>)                   \
+    .function("_getChildOfType" #T, &Element::getChildOfType<T>)       \
+    .function("_getChildrenOfType" #T, &Element::getChildrenOfType<T>) \
+    .function("_removeChildOfType" #T, &Element::removeChildOfType<T>)
+
 extern "C"
 {
     EMSCRIPTEN_BINDINGS(element)
@@ -19,25 +30,15 @@ extern "C"
             .property("skipConflictingElements", &CopyOptions::skipConflictingElements);
 
         class_<Element>("Element")
-            .smart_ptr_constructor("Element", &std::make_shared<Element, ElementPtr, const string &, const string &>)
+            .smart_ptr<std::shared_ptr<Element>>("Element")
             .smart_ptr<std::shared_ptr<const Element>>("Element") // ConstElementPtr
             .function("setCategory", &Element::setCategory)
             .function("getCategory", &Element::getCategory)
             .function("getName", &Element::getName)
-
-            /** TODO: How the pointer is constructed needs to be fixed for the setName function
-            *** TODO: Example:
-            *** var element = new MaterialX.Element(null, 'test', 'test1');
-            *** var element2 = new MaterialX.Element(element, "Hello", "World");
-            *** Throws a "Passing raw pointer to smart pointer is illegal"
-            **/
             .function("setName", &Element::setName)
             .function("getNamePath", &Element::getNamePath) // might need to do something with the ConstElementPtr relativeTo parameter
             .function("setInheritsFrom", &Element::setInheritsFrom)
             .function("hasInheritedBase", &Element::hasInheritedBase)
-            /*************************************************************************************/
-
-            /** TODO: setAttribute (called by setFilePrefix) depends on Document class. **/
             .function("setFilePrefix", &Element::setFilePrefix)
             .function("setColorSpace", &Element::setColorSpace)
             .function("setGeomPrefix", &Element::setGeomPrefix)
@@ -48,17 +49,12 @@ extern "C"
             .function("setDefaultVersion", &Element::setDefaultVersion)
             .function("setDocString", &Element::setDocString)
             .function("addChildOfCategory", &Element::addChildOfCategory)
-            /******************************************************************************/
-
-            /** TODO: This API needs a reference to the parent. This will not work due to the pointer issue. **/
             .function("getActiveFilePrefix", &Element::getActiveFilePrefix)
             .function("getActiveGeomPrefix", &Element::getActiveGeomPrefix)
             .function("getActiveColorSpace", &Element::getActiveColorSpace)
             .function("getInheritsFrom", &Element::getInheritsFrom)
             .function("hasInheritanceCycle", &Element::hasInheritanceCycle)
             .function("getQualifiedName", &Element::getQualifiedName)
-            /**************************************************************************************************/
-
             .function("hasFilePrefix", &Element::hasFilePrefix)
             .function("hasGeomPrefix", &Element::hasGeomPrefix)
             .function("hasColorSpace", &Element::hasColorSpace)
@@ -66,7 +62,6 @@ extern "C"
             .function("hasInheritString", &Element::hasInheritString)
             .function("hasNamespace", &Element::hasNamespace)
             .function("hasVersionString", &Element::hasVersionString)
-
             .function("getFilePrefix", &Element::getFilePrefix)
             .function("getGeomPrefix", &Element::getGeomPrefix)
             .function("getColorSpace", &Element::getColorSpace)
@@ -84,7 +79,7 @@ extern "C"
             .function("getDocString", &Element::getDocString)
 
             .function("getChild", &Element::getChild)
-            .function("getChildren", &Element::getChildren) /** TODO: unbound types: NSt3__26vectorINS_10shared_ptrIN9MaterialX7ElementEEENS_9allocatorIS4_EEEE */
+            .function("getChildren", &Element::getChildren)
             .function("setChildIndex", &Element::setChildIndex)
             .function("getChildIndex", &Element::getChildIndex)
             .function("removeChild", &Element::removeChild)
@@ -103,17 +98,17 @@ extern "C"
             .function("getRoot", optional_override([](Element &self) {
                           return self.Element::getRoot();
                       }))
-            .function("getDocument", optional_override([](Element &self) { /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX8DocumentEEE */
-                                                                           return self.Element::getDocument();
+            .function("getDocument", optional_override([](Element &self) {
+                          return self.Element::getDocument();
                       }))
-            .function("traverseTree", &Element::traverseTree) /** TODO: unbound types: N9MaterialX12TreeIteratorE*/
+            .function("traverseTree", &Element::traverseTree)
 
-            .function("traverseGraph", &Element::traverseGraph)     /** TODO: unbound types: N9MaterialX13GraphIteratorE, NSt3__210shared_ptrIKN9MaterialX8MaterialEEE*/
-            .function("getUpstreamEdge", &Element::getUpstreamEdge) /** TODO: unbound types: N9MaterialX4EdgeE, NSt3__210shared_ptrIKN9MaterialX8MaterialEEE*/
+            .function("traverseGraph", &Element::traverseGraph)
+            .function("getUpstreamEdge", &Element::getUpstreamEdge)
             .function("getUpstreamEdgeCount", &Element::getUpstreamEdgeCount)
-            .function("getUpstreamElement", &Element::getUpstreamElement) /** TODO: unbound types: NSt3__210shared_ptrIKN9MaterialX8MaterialEEE*/
+            .function("getUpstreamElement", &Element::getUpstreamElement)
 
-            .function("traverseInheritance", &Element::traverseInheritance) /** TODO: unbound types: N9MaterialX19InheritanceIteratorE */
+            .function("traverseInheritance", &Element::traverseInheritance)
             .function("setSourceUri", &Element::setSourceUri)
             .function("hasSourceUri", &Element::hasSourceUri)
             .function("getSourceUri", &Element::getSourceUri)
@@ -124,15 +119,36 @@ extern "C"
                       }))
             .function("copyContentFrom", optional_override([](Element &self, ConstElementPtr source, CopyOptions copyOptions) {
                           const ConstElementPtr &source1 = source;
-                          //   const CopyOptions copyOptions1 = const_cast<CopyOptions>(copyOptions);
                           const CopyOptions *str1 = &copyOptions;
                           return self.Element::copyContentFrom(source1, str1);
                       }))
             .function("clearContent", &Element::clearContent)
             .function("createValidChildName", &Element::createValidChildName)
-            .function("createStringResolver", &Element::createStringResolver) /** TODO: unbound types: NSt3__210shared_ptrIN9MaterialX14StringResolverEEE, NSt3__210shared_ptrIKN9MaterialX8MaterialEEE */
+            .function("createStringResolver", &Element::createStringResolver)
             .function("asString", &Element::asString)
             .function("__str__", &Element::asString)
+            BIND_ELEMENT_FUNC_INSTANCE(BindParam)
+            BIND_ELEMENT_FUNC_INSTANCE(BindInput)
+            BIND_ELEMENT_FUNC_INSTANCE(BindToken)
+            BIND_ELEMENT_FUNC_INSTANCE(Collection)
+            BIND_ELEMENT_FUNC_INSTANCE(Document)
+            BIND_ELEMENT_FUNC_INSTANCE(GeomAttr)
+            BIND_ELEMENT_FUNC_INSTANCE(GeomInfo)
+            BIND_ELEMENT_FUNC_INSTANCE(Implementation)
+            BIND_ELEMENT_FUNC_INSTANCE(Look)
+            BIND_ELEMENT_FUNC_INSTANCE(Material)
+            BIND_ELEMENT_FUNC_INSTANCE(MaterialAssign)
+            BIND_ELEMENT_FUNC_INSTANCE(Node)
+            BIND_ELEMENT_FUNC_INSTANCE(NodeDef)
+            BIND_ELEMENT_FUNC_INSTANCE(NodeGraph)
+            BIND_ELEMENT_FUNC_INSTANCE(Parameter)
+            BIND_ELEMENT_FUNC_INSTANCE(Property)
+            BIND_ELEMENT_FUNC_INSTANCE(PropertySet)
+            BIND_ELEMENT_FUNC_INSTANCE(PropertySetAssign)
+            BIND_ELEMENT_FUNC_INSTANCE(ShaderRef)
+            BIND_ELEMENT_FUNC_INSTANCE(Token)
+            BIND_ELEMENT_FUNC_INSTANCE(TypeDef)
+            BIND_ELEMENT_FUNC_INSTANCE(Visibility)
             .class_property("NAME_ATTRIBUTE", &Element::NAME_ATTRIBUTE)
             .class_property("FILE_PREFIX_ATTRIBUTE", &Element::FILE_PREFIX_ATTRIBUTE)
             .class_property("GEOM_PREFIX_ATTRIBUTE", &Element::GEOM_PREFIX_ATTRIBUTE)
@@ -145,7 +161,8 @@ extern "C"
             .class_property("DOC_ATTRIBUTE", &Element::DOC_ATTRIBUTE);
 
         class_<TypedElement, base<Element>>("TypedElement")
-            .constructor<ElementPtr, const string &, const string &>()
+            .smart_ptr<std::shared_ptr<TypedElement>>("TypedElement")
+            .smart_ptr<std::shared_ptr<const TypedElement>>("TypedElement")
             .function("setType", &TypedElement::setType)
             .function("hasType", &TypedElement::hasType)
             .function("getType", &TypedElement::getType)
@@ -154,7 +171,8 @@ extern "C"
             .class_property("TYPE_ATTRIBUTE", &TypedElement::TYPE_ATTRIBUTE);
 
         class_<ValueElement, base<TypedElement>>("ValueElement")
-            .smart_ptr_constructor("ValueElement", &std::make_shared<ValueElement, ElementPtr, const string &, const string &>)
+            .smart_ptr<std::shared_ptr<ValueElement>>("ValueElement")
+            .smart_ptr<std::shared_ptr<const ValueElement>>("ValueElement")
             .function("setValueString", &ValueElement::setValueString)
             .function("hasValueString", &ValueElement::hasValueString)
             .function("getValueString", &ValueElement::getValueString)
@@ -197,7 +215,6 @@ extern "C"
 
         class_<StringResolver>("StringResolver")
             .smart_ptr<std::shared_ptr<StringResolver>>("StringResolver")
-            // .smart_ptr_constructor("StringResolver", &std::make_shared<StringResolver>) //<std::shared_ptr<StringResolver>>("StringResolver")
             .class_function("create", &StringResolver::create) // Static function for creating a StringResolver instance
             .function("setFilePrefix", &StringResolver::setFilePrefix)
             .function("getFilePrefix", &StringResolver::getFilePrefix)
@@ -206,7 +223,6 @@ extern "C"
             .function("setUdimString", &StringResolver::setUdimString)
             .function("setUvTileString", &StringResolver::setUvTileString)
             .function("setFilenameSubstitution", &StringResolver::setFilenameSubstitution)
-            // .function("getFilenameSubstitutions", &StringResolver::getFilenameSubstitutions)
             .function("getFilenameSubstitutions", optional_override([](StringResolver &self) {
                           std::unordered_map<string, string> res = self.StringResolver::getFilenameSubstitutions();
                           val obj = val::object();
