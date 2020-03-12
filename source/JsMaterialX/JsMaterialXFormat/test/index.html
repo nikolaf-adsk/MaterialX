@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<script>
+  var Module = {
+    postRun: function () {
+      console.log("Running tests");
+
+      // Run "tests"
+      _validators.forEach(function (validator) {
+        validator();
+      });
+    }
+  };
+</script>
+
+
+<!-- output from em++ -->
+<script src="../../MaterialXCore.js"></script>
+<script src="../../helpers.js"></script>
+<script src="./JsXmlIo.js"></script>
+
+</html>

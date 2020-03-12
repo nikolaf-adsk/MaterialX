@@ -83,7 +83,7 @@ var doc = mx.createDocument();
 // Create a node graph with a single image node and output.
 var nodeGraph = doc.addNodeGraph();
 var image = nodeGraph.addNode('image');
-image.setParameterValue('file', 'image1.tif', 'filename');
+image.setParameterValuestring('file', 'image1.tif', 'filename');
 var output = nodeGraph.addOutput();
 output.setConnectedNode(image);
 
@@ -91,7 +91,7 @@ output.setConnectedNode(image);
 var simpleSrf = doc.addNodeDef('ND_simpleSrf', 'surfaceshader', 'simpleSrf');
 var diffColor = simpleSrf.setInputValue('diffColor', mx.Color3(1.0));
 var specColor = simpleSrf.setInputValue('specColor', mx.Color3(0.0));
-var roughness = simpleSrf.setParameterValue('roughness', 0.25);
+var roughness = simpleSrf.setParameterValuefloat('roughness', 0.25);
 
 // Create a material that instantiates the shader.
 var material = doc.addMaterial();
