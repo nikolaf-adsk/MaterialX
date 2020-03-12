@@ -31,10 +31,11 @@ em++ --bind \
     -std=c++17 \
     -s WASM=1 \
     -s DISABLE_EXCEPTION_CATCHING=0 \
+    --post-js JsMaterialXCore/JsTypes.js \
+    --post-js JsMaterialXCore/JsGeom.js \
     --post-js JsMaterialXCore/JsDefinition.js \
     --post-js JsMaterialXCore/JsDocument.js \
     --post-js JsMaterialXCore/JsElement.js \
-    --post-js JsMaterialXCore/JsGeom.js \
     --post-js JsMaterialXCore/JsInterface.js \
     --post-js JsMaterialXCore/JsLook.js \
     --post-js JsMaterialXCore/JsMaterial.js \
@@ -42,7 +43,6 @@ em++ --bind \
     --post-js JsMaterialXCore/JsObserver.js \
     --post-js JsMaterialXCore/JsProperty.js \
     --post-js JsMaterialXCore/JsTraversal.js \
-    --post-js JsMaterialXCore/JsTypes.js \
     --post-js JsMaterialXCore/JsUtil.js \
     --post-js JsMaterialXCore/JsValue.js \
     --post-js JsMaterialXCore/JsVariant.js \
