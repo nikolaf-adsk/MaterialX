@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "../helpers.h"
 #include <MaterialXCore/Document.h>
 #include <MaterialXCore/Geom.h>
 #include <MaterialXCore/Look.h>
@@ -14,6 +14,9 @@ using namespace emscripten;
 namespace mx = MaterialX;
 
 using namespace mx;
+
+#define BIND_VALUE_ELEMENT_FUNC_INSTANCE(NAME, T)          \
+    .function("setValue" #NAME, &ValueElement::setValue<T>)
 
 #define BIND_ELEMENT_FUNC_INSTANCE(T)                                  \
     .function("_addChild" #T, &Element::addChild<T>)                   \
@@ -207,7 +210,23 @@ extern "C"
             .class_property("UI_SOFT_MIN_ATTRIBUTE", &ValueElement::UI_SOFT_MIN_ATTRIBUTE)
             .class_property("UI_SOFT_MAX_ATTRIBUTE", &ValueElement::UI_SOFT_MAX_ATTRIBUTE)
             .class_property("UI_STEP_ATTRIBUTE", &ValueElement::UI_STEP_ATTRIBUTE)
-            .class_property("UI_ADVANCED_ATTRIBUTE", &ValueElement::UI_ADVANCED_ATTRIBUTE);
+            .class_property("UI_ADVANCED_ATTRIBUTE", &ValueElement::UI_ADVANCED_ATTRIBUTE)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(integer, int)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(boolean, bool)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(float, float)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(color2, Color2)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(color3, Color3)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(color4, Color4)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(vector2, Vector2)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(vector3, Vector3)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(vector4, Vector4)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(matrix33, Matrix33)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(matrix44, Matrix44)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(string, std::string)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(integerarray, IntVec)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(booleanarray, BoolVec)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(floatarray, FloatVec)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(stringarray, StringVec);
 
         class_<Token, base<ValueElement>>("Token")
             .smart_ptr_constructor("Token", &std::make_shared<Token, ElementPtr, const string &>)

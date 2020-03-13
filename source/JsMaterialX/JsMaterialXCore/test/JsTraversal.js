@@ -23,7 +23,7 @@ addValidator(function() {
         treeIt.setPruneSubtree(true);
         treeIt.getPruneSubtree();
         treeIt.__iter__();
-        treeIt.__next__();
+        treeIt.next();
     });
 
     validator.classValidatorCb('GraphIterator', function() {
@@ -40,7 +40,7 @@ addValidator(function() {
         graphIt.setPruneSubgraph(true);
         graphIt.getPruneSubgraph();
         graphIt.__iter__();
-        graphIt.__next__();
+        graphIt.next();
     });
 
     validator.classValidatorCb('InheritanceIterator', function() {
@@ -48,7 +48,7 @@ addValidator(function() {
         var element1 = doc.addChildOfCategory('generic');
         var inherIt = new MaterialX.InheritanceIterator(element1);
         inherIt.__iter__();
-        inherIt.__next__();
+        inherIt.next();
     });
 
     validator.validate();

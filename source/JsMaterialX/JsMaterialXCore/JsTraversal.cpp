@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "../helpers.h"
 #include <MaterialXCore/Traversal.h>
 
 #include <MaterialXCore/Material.h>
@@ -33,7 +33,7 @@ extern "C"
             .function("__iter__", optional_override([](TreeIterator &it) -> TreeIterator & {
                 return it.begin(1);
             }))
-            .function("__next__", optional_override([](TreeIterator &it) {
+            .function("next", optional_override([](TreeIterator &it) {
                 if (++it == it.end())
                     throw Exception("Could not get the next element.");
                 return *it;
@@ -53,9 +53,10 @@ extern "C"
             .function("__iter__", optional_override([](GraphIterator &it) -> GraphIterator & {
                 return it.begin(1);
             }))
-            .function("__next__", optional_override([](GraphIterator &it) {
+            .function("next", optional_override([](GraphIterator &it) {
                 if (++it == it.end())
                     throw Exception("Could not get the next element.");
+                    
                 return *it;
             }));
 
@@ -65,7 +66,7 @@ extern "C"
             .function("__iter__", optional_override([](InheritanceIterator &it) -> InheritanceIterator & {
                 return it.begin(1);
             }))
-            .function("__next__", optional_override([](InheritanceIterator &it) {
+            .function("next", optional_override([](InheritanceIterator &it) {
                 if (++it == it.end())
                     throw Exception("Could not get the next element.");
                 return *it;

@@ -123,10 +123,10 @@ addValidator(function() {
             valueElement.setImplementationName('test');
             valueElement.hasImplementationName();
             valueElement.getImplementationName();
-            valueElement.getValue();
+            // valueElement.getValue();
             var material = doc.addMaterial('MATERIAL');
-            valueElement.getBoundValue(material);
-            valueElement.getDefaultValue();
+            // valueElement.getBoundValue(material);
+            // valueElement.getDefaultValue();
             valueElement.setUnit('mm');
             valueElement.hasUnit();
             valueElement.getUnit();
