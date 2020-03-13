@@ -6,7 +6,7 @@ timestamp() {
 echo "Generating Javascript MaterialXCore Bindings"
 timestamp
 
-em++ --bind \
+em++ -Os --bind \
     JsMaterialXCore/JsTypes.cpp \
     JsMaterialXCore/JsExceptions.cpp \
     JsMaterialXCore/JsUtil.cpp \
@@ -48,4 +48,4 @@ em++ --bind \
     --post-js JsMaterialXCore/JsVariant.js \
     --post-js JsMaterialXFormat/JsXmlIo.js \
     --post-js initMaterialX.js \
-    -o ./MaterialXCore.js
+    -o ./MaterialX.js

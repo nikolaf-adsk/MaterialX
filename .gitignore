@@ -25,3 +25,5 @@ deploy
 # Ignore the build wasm folder
 wasm/_build/*
 
+# Ignore the emscripten output
+source/JsMaterialX/MaterialX.*
