@@ -17,10 +17,36 @@ addWrapper(function(Module, api) {
     /** Setup the TypedElement class */
     api.TypedElement = wrapperFactory(Module.TypedElement);
 
-    /** Setup the ValueElement class */
-    api.ValueElement = wrapperFactory(Module.ValueElement, {
+    var funcs = [
+        'setValueinteger',
+        'setValueboolean',
+        'setValuefloat',
+        'setValuecolor2',
+        'setValuecolor3',
+        'setValuecolor4',
+        'setValuevector2',
+        'setValuevector3',
+        'setValuevector4',
+        'setValuematrix33',
+        'setValuematrix44',
+        'setValuestring',
+        'setValueintegerarray',
+        'setValuebooleanarray',
+        'setValuefloatarray',
+        'setValuestringarray'
+    ];
+
+    var defaultArgs = {
         getResolvedValueString: [null]
-    });
+    };
+
+    for (var i = 0; i < funcs.length; i++) {
+        var name = funcs[i];
+        defaultArgs[name] = [REQUIRED, ''];
+    }
+
+    /** Setup the ValueElement class */
+    api.ValueElement = wrapperFactory(Module.ValueElement, defaultArgs);
 
     /** Setup the Token class */
     api.Token = wrapperFactory(Module.Token);

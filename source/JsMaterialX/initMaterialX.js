@@ -55,7 +55,7 @@ function catchPtrError(func, handle, args, defaultArgs) {
         var args1 = argGen(args, defaultArgs);
         return func.apply(handle, args1);
     } catch (exception) {
-        console.error(`${funcName}: ${Module.getExceptionMessage(exception)}`);
+        throw new Error(`${funcName}: ${Module.getExceptionMessage(exception)}`);
     }
 }
 

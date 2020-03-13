@@ -89,8 +89,8 @@ output.setConnectedNode(image);
 
 // Create a simple shader interface.
 var simpleSrf = doc.addNodeDef('ND_simpleSrf', 'surfaceshader', 'simpleSrf');
-var diffColor = simpleSrf.setInputValue('diffColor', mx.Color3(1.0));
-var specColor = simpleSrf.setInputValue('specColor', mx.Color3(0.0));
+var diffColor = simpleSrf.setInputValuecolor3('diffColor', new mx.Color3(1.0, 1.0, 1.0));
+var specColor = simpleSrf.setInputValuecolor3('specColor', new mx.Color3(0.0, 0.0, 0.0));
 var roughness = simpleSrf.setParameterValuefloat('roughness', 0.25);
 
 // Create a material that instantiates the shader.
@@ -99,10 +99,10 @@ var refSimpleSrf = material.addShaderRef('SR_simpleSrf', 'simpleSrf');
 
 // Bind roughness to a new value within this material.
 var bindParam = refSimpleSrf.addBindParam('roughness');
-bindParam.setValue(0.5);
+bindParam.setValuefloat(0.5);
 
 // Display the value of roughness in the context of this material.
-console.log(roughness.getBoundValue(material));
+console.log(roughness.getBoundValue(material).getValueString());
 ~~~
 
 ### Traversing a Document Tree:
@@ -162,20 +162,21 @@ var mx = MaterialX;
 
 // Read a document from disk.
 var doc = mx.createDocument();
-mx.readFromXmlFile(doc, 'ExampleFile.mtlx');
+mx.readFromXmlString(doc, xmlStr);
 
 // Traverse the document tree in depth-first order.
 var elements = doc.traverseTree();
-for (var i = 0; i < elements.length; i++ ) {
-    var elem = elements[i];
+var elem = elements.next();
+while(elem) {                
     // Display the filename of each image node.
-    if (elem.isA(mx.Node, 'image')){
+    if (elem instanceof mx.Node) {
         var param = elem.getParameter('file');
         if (param) {
             filename = param.getValueString();
             console.log('Image node ' + elem.getName() + ' references ' + filename);
         }
     }
+    elem = elements.next();
 }
 ~~~
 
