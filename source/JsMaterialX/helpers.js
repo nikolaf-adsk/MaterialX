@@ -1,3 +1,20 @@
+function setupModule(Module) {
+    var moduleObj = {
+        locateFile: function(path) {
+            return document.location.origin + '/' + path;
+        }
+    };
+
+    Module(moduleObj).then(function(m) {
+        window.MaterialX = m.getMaterialX();
+        console.log('Running tests');
+        // Run "tests"
+        _validators.forEach(function(validator) {
+            validator();
+        });
+    });
+}
+
 var _validators;
 function addValidator(cb) {
     if (_validators === undefined) _validators = [];

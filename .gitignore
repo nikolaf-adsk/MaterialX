@@ -26,4 +26,4 @@ deploy
 wasm/_build/*
 
 # Ignore the emscripten output
-source/JsMaterialX/MaterialX.*
+source/JsMaterialX/MaterialXLib.*
