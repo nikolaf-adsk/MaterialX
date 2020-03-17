@@ -31,6 +31,9 @@ em++ -Os --bind \
     -std=c++17 \
     -s WASM=1 \
     -s DISABLE_EXCEPTION_CATCHING=0 \
+    -s MODULARIZE=1 \
+    -s EXPORT_ES6=1 \
+    -s USE_ES6_IMPORT_META=0 \
     --post-js JsMaterialXCore/JsTypes.js \
     --post-js JsMaterialXCore/JsGeom.js \
     --post-js JsMaterialXCore/JsDefinition.js \
@@ -48,4 +51,4 @@ em++ -Os --bind \
     --post-js JsMaterialXCore/JsVariant.js \
     --post-js JsMaterialXFormat/JsXmlIo.js \
     --post-js initMaterialX.js \
-    -o ./MaterialX.js
+    -o ./MaterialXLib.js

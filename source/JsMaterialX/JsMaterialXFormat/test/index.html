@@ -1,21 +1,10 @@
 <!doctype html>
 <html>
-<script>
-  var Module = {
-    postRun: function () {
-      console.log("Running tests");
+  <script type="module">
+    import {default as _module} from '../../MaterialXLib.js'
+    setupModule(_module);
+  </script>
 
-      // Run "tests"
-      _validators.forEach(function (validator) {
-        validator();
-      });
-    }
-  };
-</script>
-
-
-<!-- output from em++ -->
-<script src="../../MaterialX.js"></script>
 <script src="../../helpers.js"></script>
 <script src="./JsXmlIo.js"></script>
 

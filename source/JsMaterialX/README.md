@@ -41,7 +41,7 @@ cd ../source/JsMaterialX
 To debug the em++ command append `EMCC_DEBUG=1` to the shell command in `generate_bindings.sh`.
 
 ```sh
-EMCC_DEBUG=1 em++ --bind ...
+EMCC_DEBUG=1 em++ ...
 ```
 
 

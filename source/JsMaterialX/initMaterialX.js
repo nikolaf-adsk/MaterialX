@@ -68,7 +68,7 @@ function wrapperFunction(func, defaultArgs = []) {
         if (ret && ret.constructor && ret.constructor.name && ret.constructor.name.indexOf('vector') === 0) {
             ret = vecToArray(ret);
         }
-        return ret
+        return ret;
     };
 }
 
@@ -95,12 +95,14 @@ function addWrapper(wrapperCb) {
     _wrappers.push(wrapperCb);
 }
 
-var MaterialX = {};
 Module.onRuntimeInitialized = function() {
+    var MaterialX = {};
     // Generate wrappers
     for (var i = 0; i < _wrappers.length; i++) {
         var wrapper = _wrappers[i];
         wrapper(Module, MaterialX);
     }
-    return MaterialX;
+    Module['getMaterialX'] = function() {
+        return MaterialX;
+    };
 };
