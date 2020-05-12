@@ -11,7 +11,7 @@ namespace mx = MaterialX;
 using namespace mx;
 
 #define BIND_GEOMINFO_FUNC_INSTANCE(NAME, T) \
-.function("_setGeomAttrValue" #NAME, &GeomInfo::setGeomAttrValue<T>)
+.function("_setGeomPropValue" #NAME, &GeomInfo::setGeomPropValue<T>)
 
 extern "C"
 {
@@ -33,12 +33,11 @@ extern "C"
         class_<GeomInfo, base<GeomElement>>("GeomInfo")
             .smart_ptr_constructor("GeomInfo", &std::make_shared<GeomInfo, ElementPtr, const string &>)
             .smart_ptr<std::shared_ptr<const GeomInfo>>("GeomInfo")
-            .function("_addGeomAttr", &GeomInfo::addGeomAttr)
-            .function("getGeomAttr", &GeomInfo::getGeomAttr)
-            .function("getGeomAttrs", &GeomInfo::getGeomAttrs)
-            .function("removeGeomAttr", &GeomInfo::removeGeomAttr)
+            .function("addGeomProp", &GeomInfo::addGeomProp)
+            .function("getGeomProp", &GeomInfo::getGeomProp)
+            .function("getGeomProps", &GeomInfo::getGeomProps)
+            .function("removeGeomProp", &GeomInfo::removeGeomProp)
             .function("addToken", &GeomInfo::addToken)
-                //  arg("name") = DEFAULT_TYPE_STRING)
             .function("getToken", &GeomInfo::getToken)
             .function("getTokens", &GeomInfo::getTokens)
             .function("removeToken", &GeomInfo::removeToken)
@@ -61,10 +60,10 @@ extern "C"
             BIND_GEOMINFO_FUNC_INSTANCE(stringarray, StringVec)
             .class_property("CATEGORY", &GeomInfo::CATEGORY);
 
-        class_<GeomAttr, base<ValueElement>>("GeomAttr")
-            .smart_ptr_constructor("GeomAttr", &std::make_shared<GeomAttr, ElementPtr, const string &>)
-            .smart_ptr<std::shared_ptr<const GeomAttr>>("GeomAttr")
-            .class_property("CATEGORY", &GeomAttr::CATEGORY);
+        class_<GeomProp, base<ValueElement>>("GeomProp")
+            .smart_ptr_constructor("GeomProp", &std::make_shared<GeomProp, ElementPtr, const string &>)
+            .smart_ptr<std::shared_ptr<const GeomProp>>("GeomProp")
+            .class_property("CATEGORY", &GeomProp::CATEGORY);
 
         class_<GeomPropDef, base<Element>>("GeomPropDef")
             .smart_ptr_constructor("GeomPropDef", &std::make_shared<GeomPropDef, ElementPtr, const string &>)
@@ -78,9 +77,9 @@ extern "C"
             .function("setIndex", &GeomPropDef::setIndex)
             .function("hasIndex", &GeomPropDef::hasIndex)
             .function("getIndex", &GeomPropDef::getIndex)
-            .function("setAttrName", &GeomPropDef::setAttrName)
-            .function("hasAttrName", &GeomPropDef::hasAttrName)
-            .function("getAttrName", &GeomPropDef::getAttrName)
+            .function("setGeomProp", &GeomPropDef::setGeomProp)
+            .function("hasGeomProp", &GeomPropDef::hasGeomProp)
+            .function("getGeomProp", &GeomPropDef::getGeomProp)
             .class_property("CATEGORY", &GeomPropDef::CATEGORY);
 
         class_<Collection, base<Element>>("Collection")

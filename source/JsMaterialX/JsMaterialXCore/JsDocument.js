@@ -19,7 +19,9 @@ addWrapper(function(Module, api) {
         addTypeDef: [''],
         addNodeDef: ['', api.DEFAULT_TYPE_STRING, ''],
         getMatchingNodeDefs: [REQUIRED],
-        addImplementation: ['']
+        addImplementation: [''],
+        getGeomPropValue: [REQUIRED, api.UNIVERSAL_GEOM_NAME],
+        addNodeDefFromGraph: [REQUIRED, REQUIRED, REQUIRED, REQUIRED, '']
     });
 
 });

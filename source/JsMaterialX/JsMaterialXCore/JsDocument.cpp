@@ -42,7 +42,7 @@ extern "C"
             .function("getGeomInfo", &Document::getGeomInfo)
             .function("getGeomInfos", &Document::getGeomInfos)
             .function("removeGeomInfo", &Document::removeGeomInfo)
-            .function("getGeomAttrValue", &Document::getGeomAttrValue)
+            .function("getGeomPropValue", &Document::getGeomPropValue)
             .function("addGeomPropDef", &Document::addGeomPropDef)
             .function("getGeomPropDef", &Document::getGeomPropDef)
             .function("getGeomPropDefs", &Document::getGeomPropDefs)
@@ -64,6 +64,13 @@ extern "C"
             .function("getTypeDefs", &Document::getTypeDefs)
             .function("removeTypeDef", &Document::removeTypeDef)
             .function("addNodeDef", &Document::addNodeDef)
+            .function("addNodeDefFromGraph", optional_override([](Document &self, NodeGraphPtr nodeGraph, string nodeDefName, string node, string newGraphName, string nodeGroup) {
+                          const string &nodeDefName1 = nodeDefName;
+                          const string &node1 = node;
+                          string &newGraphName1 = newGraphName;
+                          const string &nodeGroup1 = nodeGroup;
+                          return self.Document::addNodeDefFromGraph(nodeGraph, nodeDefName1, node1, newGraphName1, nodeGroup1);
+                      }))
             .function("getNodeDef", &Document::getNodeDef)
             .function("getNodeDefs", &Document::getNodeDefs)
             .function("removeNodeDef", &Document::removeNodeDef)
