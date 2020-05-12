@@ -19,6 +19,7 @@ namespace MaterialX
 {
 
 class RtAttrIterator;
+class RtRelationshipIterator;
 class RtPrimIterator;
 class RtSchemaBase;
 
@@ -63,6 +64,9 @@ public:
     /// if no such relationship exists.
     RtRelationship getRelationship(const RtToken& name) const;
 
+    /// Return an iterator over all relationships of this prim.
+    RtRelationshipIterator getRelationships() const;
+
     /// Add an attribute to the prim.
     RtAttribute createAttribute(const RtToken& name, const RtToken& type, uint32_t flags = 0);
 
@@ -79,13 +83,25 @@ public:
     /// if no such attribute exists.
     RtAttribute getAttribute(const RtToken& name) const;
 
+    /// Return the number of inputs on the prim.
+    size_t numInputs() const;
+
     /// Return an input attribute by name, or a null object
     /// if no such input attribute exists.
     RtInput getInput(const RtToken& name) const;
 
+    /// Return the number of outputs on the prim.
+    size_t numOutputs() const;
+
     /// Return an input attribute by name, or a null object
-    /// if no such input attribute exists.
+    /// if no such input attribute exists. If an empty name
+    /// is provided, then the first output is returned
     RtOutput getOutput(const RtToken& name) const;
+
+    /// Return the single output for single output prims.
+    /// Or if multiple outputs are available return the
+    /// last created output.
+    RtOutput getOutput() const;
 
     /// Return an iterator traversing all attributes
     /// of this prim.
@@ -101,6 +117,9 @@ public:
     /// specific API, etc.
     RtPrimIterator getChildren(RtObjectPredicate predicate = nullptr) const;
 };
+
+/// Function type for creating prims for a typed schema.
+using RtPrimCreateFunc = std::function<RtPrim(const RtToken& typeName, const RtToken& name, RtPrim parent)>;
 
 }
 

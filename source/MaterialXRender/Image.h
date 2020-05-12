@@ -50,9 +50,6 @@ class Image
         return ImagePtr(new Image(width, height, channelCount, baseType));
     }
 
-    /// Create a constant color image with the given properties.
-    static ImagePtr createConstantColor(unsigned int width, unsigned int height, const Color4& color);
-
     ~Image();
 
     /// Return the width of the image.
@@ -129,6 +126,12 @@ class Image
     /// or image resource buffer are invalid, then an exception is thrown.
     Color4 getTexelColor(unsigned int x, unsigned int y) const;
 
+    /// Apply a 3x3 box blur to this image, returning a new blurred image.
+    ImagePtr applyBoxBlur();
+
+    /// Apply a 7x7 Gaussian blur to this image, returning a new blurred image.
+    ImagePtr applyGaussianBlur();
+
     /// Split this image by the given luminance threshold, returning the
     /// resulting underflow and overflow images.
     ImagePair splitByLuminance(float luminance);
@@ -152,6 +155,12 @@ class Image
     ImageBufferDeallocator _resourceBufferDeallocator;
     unsigned int _resourceId;
 };
+
+/// Create a uniform-color image with the given properties.
+ImagePtr createUniformImage(unsigned int width, unsigned int height, const Color4& color);
+
+/// Create a horizontal image strip from a vector of images with identical resolutions and formats.
+ImagePtr createImageStrip(vector<ImagePtr> imageVec);
 
 } // namespace MaterialX
 

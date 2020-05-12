@@ -20,25 +20,8 @@ const string Backdrop::HEIGHT_ATTRIBUTE = "height";
 //
 // Node methods
 //
-NodePtr GraphElement::addNode(const string& category,
-                              const string& name,
-                              const string& type)
-{
-    if (category.empty())
-    {
-        throw Exception("No category specified: type: " + type + ". name: " + name + ". category: " + category);
-    }
-    if (type.empty())
-    {
-        throw Exception("No type specified: type: " + type + ". name: " + name + ". category: " + category);
-    }
-    NodePtr node = addChild<Node>(name);
-    node->setCategory(category);
-    node->setType(type);
-    return node;
-}
 
-InputPtr Node::setConnectedNode(const string& inputName, NodePtr node)
+void Node::setConnectedNode(const string& inputName, NodePtr node)
 {
     InputPtr input = getInput(inputName);
     if (!input)
@@ -53,7 +36,6 @@ InputPtr Node::setConnectedNode(const string& inputName, NodePtr node)
     {
         input->setConnectedNode(node);
     }
-    return input;
 }
 
 NodePtr Node::getConnectedNode(const string& inputName) const
@@ -66,7 +48,7 @@ NodePtr Node::getConnectedNode(const string& inputName) const
     return input->getConnectedNode();    
 }
 
-InputPtr Node::setConnectedNodeName(const string& inputName, const string& nodeName)
+void Node::setConnectedNodeName(const string& inputName, const string& nodeName)
 {
     InputPtr input = getInput(inputName);
     if (!input)
@@ -74,7 +56,6 @@ InputPtr Node::setConnectedNodeName(const string& inputName, const string& nodeN
         input = addInput(inputName);
     }
     input->setNodeName(nodeName);
-    return input;
 }
 
 string Node::getConnectedNodeName(const string& inputName) const
@@ -207,6 +188,7 @@ vector<PortElementPtr> Node::getDownstreamPorts() const
 bool Node::validate(string* message) const
 {
     bool res = true;
+    validateRequire(!getCategory().empty(), res, message, "Missing category");
     validateRequire(hasType(), res, message, "Missing type");
     return InterfaceElement::validate(message) && res;
 }
@@ -500,6 +482,127 @@ void NodeGraph::setNodeDef(ConstNodeDefPtr nodeDef)
     }
 }
 
+ValueElementPtr Node::addInputFromNodeDef(const string& name)
+{
+    ValueElementPtr newChild = nullptr;
+    NodeDefPtr elemNodeDef = getNodeDef();
+    if (elemNodeDef)
+    {
+        ValueElementPtr nodeDefElem = elemNodeDef->getChildOfType<ValueElement>(name);
+        if (nodeDefElem->isA<Input>())
+        {
+            newChild = addInput(nodeDefElem->getName());
+        }
+        else if (nodeDefElem->isA<Parameter>())
+        {
+            newChild = addParameter(nodeDefElem->getName());
+        }
+        if (newChild)
+        {
+            newChild->copyContentFrom(nodeDefElem);
+        }
+    }
+    return newChild;
+}
+
+void NodeGraph::addInterface(const string& childPath, const string& interfaceName)
+{
+    NodeDefPtr nodeDef = getNodeDef();
+    if (!nodeDef)
+    {
+        throw Exception("Cannot declare an interface for a nodegraph which is not associated with a node definition: " + getName());
+    }
+
+    if (nodeDef->getChild(interfaceName))
+    {
+        throw Exception("Interface: " + interfaceName + " has already been declared on the node definition: " + nodeDef->getName());
+    }
+
+    ElementPtr elem = getDescendant(childPath);
+    ValueElementPtr valueElem = elem->asA<ValueElement>();
+    InputPtr input = valueElem ? valueElem->asA<Input>() : nullptr;
+    ParameterPtr param = valueElem ? valueElem->asA<Parameter>() : nullptr;
+    if ((!input && !param) || (input && input->getConnectedNode()))
+    {
+        throw Exception("Invalid nodegraph child to create interface for:  " + childPath);
+    }
+
+    valueElem->setInterfaceName(interfaceName);
+
+    ValuePtr value = valueElem->getValue();
+    if (input)
+    {
+        InputPtr nodeDefInput = nodeDef->addInput(interfaceName, input->getType());
+        if (value)
+        {
+            nodeDefInput->setValueString(value->getValueString());
+        }
+    }
+    else
+    {
+        ParameterPtr nodeDefParam = nodeDef->addParameter(interfaceName, param->getType());
+        if (value)
+        {
+            nodeDefParam->setValueString(value->getValueString());
+        }
+    }
+}
+
+void NodeGraph::removeInterface(const string& childPath)
+{
+    ValueElementPtr valueElem = getChildWithInterface(childPath);
+    if (valueElem)
+    {
+        const string& interfaceName = valueElem->getInterfaceName();
+        getNodeDef()->removeChild(interfaceName);
+        valueElem->setInterfaceName(EMPTY_STRING);
+    }   
+}
+
+void NodeGraph::renameInterface(const string& childPath, const string& interfaceName)
+{
+    ValueElementPtr valueElem = getChildWithInterface(childPath);
+    if (valueElem)
+    {
+        const string& previousName = valueElem->getInterfaceName();
+        ElementPtr previousChild = getNodeDef()->getChild(previousName);
+        previousChild->setName(interfaceName);
+        valueElem->setInterfaceName(interfaceName);
+    }
+}
+
+ValueElementPtr NodeGraph::getChildWithInterface(const string& childPath)
+{
+    NodeDefPtr nodeDef = getNodeDef();
+    if (!nodeDef)
+    {
+        throw Exception("Nodegraph has no not associated node definition: " + getName());
+    }
+
+    ElementPtr elem = getDescendant(childPath);
+    ValueElementPtr valueElem = elem->asA<ValueElement>();
+    InputPtr input = valueElem ? valueElem->asA<Input>() : nullptr;
+    ParameterPtr param = valueElem ? valueElem->asA<Parameter>() : nullptr;
+    if (!input && !param)
+    {
+        throw Exception("Child not found in node graph:  " + childPath);
+    }
+
+    const string& interfaceName = valueElem->getInterfaceName();
+    if (interfaceName.empty())
+    {
+        throw Exception("Interface: " + interfaceName + " is not been declared on the input: " + valueElem->getNamePath());
+    }
+
+    ElementPtr interfaceElem = nodeDef->getChild(interfaceName);
+    if (!interfaceElem)
+    {
+        throw Exception("Interface: " + interfaceName + " is not been declared on the node definition: " + nodeDef->getName());
+    }
+
+    return valueElem;
+}
+
 NodeDefPtr NodeGraph::getNodeDef() const
 {
     return resolveRootNameReference<NodeDef>(getNodeDefString());
@@ -529,6 +632,57 @@ bool NodeGraph::validate(string* message) const
 ConstNodeDefPtr NodeGraph::getDeclaration(const string&) const
 {
     return getNodeDef();
+}
+
+//
+// Backdrop methods
+//
+
+void Backdrop::setContainsElements(const vector<ConstTypedElementPtr>& elems)
+{
+    if (!elems.empty())
+    {
+        StringVec stringVec;
+        for (ConstTypedElementPtr elem : elems)
+        {
+            stringVec.push_back(elem->getName());
+        }
+        setTypedAttribute(CONTAINS_ATTRIBUTE, stringVec);
+    }
+    else
+    {
+        removeAttribute(CONTAINS_ATTRIBUTE);
+    }
+}
+
+vector<TypedElementPtr> Backdrop::getContainsElements() const
+{
+    vector<TypedElementPtr> vec;
+    ConstGraphElementPtr graph = getAncestorOfType<GraphElement>();
+    if (graph)
+    {
+        for (const string& str : getTypedAttribute<StringVec>(CONTAINS_ATTRIBUTE))
+        {
+            TypedElementPtr elem = graph->getChildOfType<TypedElement>(str);
+            if (elem)
+            {
+                vec.push_back(elem);
+            }
+        }
+    }
+    return vec;
+}
+
+bool Backdrop::validate(string* message) const
+{
+    bool res = true;
+    if (hasContainsString())
+    {
+        StringVec stringVec = getTypedAttribute<StringVec>("contains");
+        vector<TypedElementPtr> elemVec = getContainsElements();
+        validateRequire(stringVec.size() == elemVec.size(), res, message, "Invalid element in contains string");
+    }
+    return Element::validate(message) && res;
 }
 
 } // namespace MaterialX

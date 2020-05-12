@@ -7,8 +7,74 @@
 
 #include <MaterialXRender/Types.h>
 
+#include <MaterialXGenShader/Nodes/ConvolutionNode.h>
+
+#include <cstring>
+
 namespace MaterialX
 {
+
+//
+// Global functions
+//
+
+ImagePtr createUniformImage(unsigned int width, unsigned int height, const Color4& color)
+{
+    ImagePtr image = Image::create(width, height, 4, Image::BaseType::FLOAT);
+    image->createResourceBuffer();
+    float* pixel = static_cast<float*>(image->getResourceBuffer());
+    for (size_t i = 0; i < image->getWidth(); i++)
+    {
+        for (size_t j = 0; j < image->getHeight(); j++)
+        {
+            for (unsigned int c = 0; c < image->getChannelCount(); c++)
+            {
+                *pixel++ = color[c];
+            }
+        }
+    }
+    return image;
+}
+
+ImagePtr createImageStrip(vector<ImagePtr> imageVec)
+{
+    if (imageVec.empty())
+    {
+        return nullptr;
+    }
+
+    unsigned int srcWidth = imageVec[0]->getWidth();
+    unsigned int srcHeight = imageVec[0]->getHeight();
+    unsigned int destWidth = srcWidth * (unsigned int) imageVec.size();
+    unsigned int destHeight = srcHeight;
+    unsigned int channelCount = imageVec[0]->getChannelCount();
+    unsigned int pixelStride = imageVec[0]->getBaseStride() * channelCount;
+    Image::BaseType baseType = imageVec[0]->getBaseType();
+
+    ImagePtr imageStrip = Image::create(destWidth, destHeight, channelCount, baseType);
+    imageStrip->createResourceBuffer();
+
+    unsigned int xOffset = 0;
+    for (ImagePtr srcImage : imageVec)
+    {
+        if (srcImage->getWidth() != srcWidth ||
+            srcImage->getHeight() != srcHeight ||
+            srcImage->getChannelCount() != channelCount ||
+            srcImage->getBaseType() != baseType)
+        {
+            throw Exception("Source images must have identical resolutions and formats in createImageStrip");
+        }
+        for (unsigned int y = 0; y < srcHeight; y++)
+        {
+            uint8_t* src = (uint8_t*) srcImage->getResourceBuffer() + y * srcWidth * pixelStride;
+            uint8_t* dst = (uint8_t*) imageStrip->getResourceBuffer() + (y * destWidth + xOffset) * pixelStride;
+            memcpy(dst, src, srcWidth * pixelStride);
+        }
+        xOffset += srcWidth;
+    }
+
+    return imageStrip;
+}
 
 //
 // Image methods
@@ -50,31 +116,6 @@ unsigned int Image::getBaseStride() const
 unsigned int Image::getMaxMipCount() const
 {
     return (unsigned int) std::log2(std::max(_width, _height)) + 1;
-}
-
-ImagePtr Image::createConstantColor(unsigned int width, unsigned int height, const Color4& color)
-{
-    unsigned int channelCount = 4;
-    size_t bufferSize = width * height * channelCount;
-    if (!bufferSize)
-    {
-        return nullptr;
-    }
-
-    ImagePtr image = create(width, height, channelCount, Image::BaseType::FLOAT);
-    image->createResourceBuffer();
-    float* pixel = static_cast<float*>(image->getResourceBuffer());
-    for (size_t i = 0; i < image->getWidth(); i++)
-    {
-        for (size_t j = 0; j < image->getHeight(); j++)
-        {
-            for (unsigned int c = 0; c < image->getChannelCount(); c++)
-            {
-                *pixel++ = color[c];
-            }
-        }
-    }
-    return image;
 }
 
 void Image::setTexelColor(unsigned int x, unsigned int y, const Color4& color)
@@ -133,6 +174,10 @@ Color4 Image::getTexelColor(unsigned int x, unsigned int y) const
         {
             return Color4(data[0], data[1], data[2], 1.0f);
         }
+        else if (_channelCount == 2)
+        {
+            return Color4(data[0], data[1], 0.0f, 1.0f);
+        }
         else if (_channelCount == 1)
         {
             return Color4(data[0], data[0], data[0], 1.0f);
@@ -153,6 +198,10 @@ Color4 Image::getTexelColor(unsigned int x, unsigned int y) const
         {
             return Color4(data[0], data[1], data[2], 1.0f);
         }
+        else if (_channelCount == 2)
+        {
+            return Color4(data[0], data[1], 0.0f, 1.0f);
+        }
         else if (_channelCount == 1)
         {
             return Color4(data[0], data[0], data[0], 1.0f);
@@ -166,6 +215,73 @@ Color4 Image::getTexelColor(unsigned int x, unsigned int y) const
     {
         throw Exception("Unsupported base type in getTexelColor");
     }
+}
+
+ImagePtr Image::applyBoxBlur()
+{
+    ImagePtr blurImage = Image::create(getWidth(), getHeight(), getChannelCount(), getBaseType());
+    blurImage->createResourceBuffer();
+
+    for (int y = 0; y < (int) getHeight(); y++)
+    {
+        for (int x = 0; x < (int) getWidth(); x++)
+        {
+            Color4 blurColor;
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                int sy = std::min(std::max(y + dy, 0), (int) getHeight() - 1);
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    int sx = std::min(std::max(x + dx, 0), (int) getWidth() - 1);
+                    blurColor += getTexelColor(sx, sy);
+                }
+            }
+            blurColor /= 9.0f;
+            blurImage->setTexelColor(x, y, blurColor);
+        }
+    }
+
+    return blurImage;
+}
+
+ImagePtr Image::applyGaussianBlur()
+{
+    ImagePtr blurImage1 = Image::create(getWidth(), getHeight(), getChannelCount(), getBaseType());
+    ImagePtr blurImage2 = Image::create(getWidth(), getHeight(), getChannelCount(), getBaseType());
+    blurImage1->createResourceBuffer();
+    blurImage2->createResourceBuffer();
+
+    for (int y = 0; y < (int) getHeight(); y++)
+    {
+        for (int x = 0; x < (int) getWidth(); x++)
+        {
+            Color4 blurColor;
+            unsigned int weightIndex = 0;
+            for (int dy = -3; dy <= 3; dy++, weightIndex++)
+            {
+                int sy = std::min(std::max(y + dy, 0), (int) getHeight() - 1);
+                blurColor += getTexelColor(x, sy) * GAUSSIAN_KERNEL_7[weightIndex];
+            }
+            blurImage1->setTexelColor(x, y, blurColor);
+        }
+    }
+
+    for (int y = 0; y < (int) getHeight(); y++)
+    {
+        for (int x = 0; x < (int) getWidth(); x++)
+        {
+            Color4 blurColor;
+            unsigned int weightIndex = 0;
+            for (int dx = -3; dx <= 3; dx++, weightIndex++)
+            {
+                int sx = std::min(std::max(x + dx, 0), (int) getWidth() - 1);
+                blurColor += blurImage1->getTexelColor(sx, y) * GAUSSIAN_KERNEL_7[weightIndex];
+            }
+            blurImage2->setTexelColor(x, y, blurColor);
+        }
+    }
+
+    return blurImage2;
 }
 
 ImagePair Image::splitByLuminance(float luminance)

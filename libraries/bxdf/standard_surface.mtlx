@@ -84,7 +84,7 @@
       <input name="opacity" type="color3" value="1, 1, 1" uimin="0,0,0" uimax="1,1,1" uiname="Opacity" uifolder="Geometry"
             doc="The opacity of the entire material." />
       <input name="thin_walled" type="boolean" value="false" uiname="Thin Walled" uifolder="Geometry" uiadvanced="true"
-            doc="If tue the surface is double-sided and represents an infinitely thin shell. Suiteable for thin objects such as tree leafs or paper"/>
+            doc="If true the surface is double-sided and represents an infinitely thin shell. Suiteable for thin objects such as tree leafs or paper"/>
       <input name="normal" type="vector3" defaultgeomprop="Nworld" uiname="Normal" uifolder="Geometry"
             doc="Input geometric normal" />
       <input name="tangent" type="vector3"  defaultgeomprop="Tworld" uiname="Tangent Input" uifolder="Geometry"
@@ -124,7 +124,7 @@
     <rotate3d name="tangent_rotate" type="vector3">
       <input name="in" type="vector3" interfacename="tangent" />
       <input name="amount" type="float" nodename="tangent_rotate_degree" />
-      <parameter name="axis" type="vector3" interfacename="normal"/>
+      <input name="axis" type="vector3" interfacename="normal"/>
     </rotate3d>
     <normalize name="tangent_rotate_normalize" type="vector3">
       <input name="in" type="vector3" nodename="tangent_rotate" />
@@ -144,7 +144,7 @@
     <rotate3d name="coat_tangent_rotate" type="vector3">
       <input name="in" type="vector3" interfacename="tangent" />
       <input name="amount" type="float" nodename="coat_tangent_rotate_degree" />
-      <parameter name="axis" type="vector3" interfacename="coat_normal"/>
+      <input name="axis" type="vector3" interfacename="coat_normal"/>
     </rotate3d>
     <normalize name="coat_tangent_rotate_normalize" type="vector3">
       <input name="in" type="vector3" nodename="coat_tangent_rotate" />

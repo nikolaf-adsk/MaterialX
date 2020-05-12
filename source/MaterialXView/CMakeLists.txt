@@ -40,11 +40,21 @@ set_target_properties(
     MaterialXView PROPERTIES
     DEBUG_POSTFIX "${MATERIALX_DEBUG_POSTFIX}")
 
-target_link_libraries(
+set(LIBS
     MaterialXView
     MaterialXFormat
     MaterialXGenGlsl
-    MaterialXRenderGlsl
+    MaterialXRenderGlsl)
+
+if (MATERIALX_BUILD_GEN_OSL)
+    LIST(APPEND LIBS MaterialXGenOsl)
+endif()
+if (MATERIALX_BUILD_GEN_MDL)
+    LIST(APPEND LIBS MaterialXGenMdl)
+endif()
+
+target_link_libraries(
+     ${LIBS}
     nanogui
     ${NANOGUI_EXTRA_LIBS})
 
@@ -61,6 +71,7 @@ add_custom_command(TARGET MaterialXView POST_BUILD
 add_custom_command(TARGET MaterialXView POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/../../resources ${CMAKE_CURRENT_BINARY_DIR}/resources)
+
 if(MATERIALX_BUILD_OIIO AND OPENIMAGEIO_ROOT_DIR)
     add_custom_command(TARGET MaterialXView POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory

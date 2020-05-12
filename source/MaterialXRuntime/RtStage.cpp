@@ -6,6 +6,8 @@
 #include <MaterialXRuntime/RtStage.h>
 #include <MaterialXRuntime/RtPrim.h>
 #include <MaterialXRuntime/RtPath.h>
+#include <MaterialXRuntime/RtNodeDef.h>
+#include <MaterialXRuntime/RtNodeGraph.h>
 
 #include <MaterialXRuntime/Private/PvtStage.h>
 
@@ -46,6 +48,11 @@ RtStagePtr RtStage::createNew(const RtToken& name)
 const RtToken& RtStage::getName() const
 {
     return _cast(_ptr)->getName();
+}
+
+const RtTokenVec& RtStage::getSourceUri() const
+{
+    return _cast(_ptr)->getSourceUri();
 }
 
 RtPrim RtStage::createPrim(const RtToken& typeName)
@@ -122,6 +129,62 @@ void RtStage::removeReferences()
 void RtStage::setName(const RtToken& name)
 {
     _cast(_ptr)->setName(name);
+}
+
+void RtStage::disposePrim(const RtPath& path)
+{
+    _cast(_ptr)->disposePrim(*static_cast<PvtPath*>(path._ptr));
+}
+
+void RtStage::restorePrim(const RtPath& parentPath, const RtPrim& prim)
+{
+    _cast(_ptr)->restorePrim(*static_cast<PvtPath*>(parentPath._ptr), prim);
+}
+
+
+RtPrim RtStage::createNodeDef(RtNodeGraph& nodeGraph, 
+                              const RtToken& nodeDefName, 
+                              const RtToken& nodeName, 
+                              const RtToken& nodeGroup) 
+{
+    // Must have a nodedef name and a node name
+    if (nodeDefName == EMPTY_TOKEN ||
+        nodeName == EMPTY_TOKEN)
+    {
+        throw ExceptionRuntimeError("Cannot create nodedef with definition name'" + nodeDefName.str() 
+                                    + "', and node name: '" + nodeName.str() + "'");
+    }
+
+    PvtStage* stage = _cast(_ptr);
+    PvtPrim* prim = stage->createPrim(stage->getPath(), nodeDefName, RtNodeDef::typeName());
+
+    RtNodeDef nodedef(prim->hnd());
+    if (nodedef.isMasterPrim())
+    {
+        throw ExceptionRuntimeError("Definition to create already exists '" + nodeDefName.str() + "'");
+    }
+
+    // Set node and optional nodegoroup
+    nodedef.setNode(nodeName);
+    if (nodeGroup != EMPTY_TOKEN)
+    {
+        nodedef.setNodeGroup(nodeGroup);
+    }
+
+    // Add an output per nodegraph output
+    for (auto output : nodeGraph.getOutputs())
+    {
+        RtAttribute attr = nodedef.createOutput(output.getName(), output.getType());
+        attr.setValue(output.getValue());
+    }
+
+    // Set up relationship between nodegraph and nodedef
+    nodeGraph.setNodeDef(prim->hnd());
+
+    // Add definiion
+    nodedef.registerMasterPrim();
+
+    return prim->hnd();
 }
 
 }

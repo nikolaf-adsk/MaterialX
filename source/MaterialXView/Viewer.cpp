@@ -12,6 +12,13 @@
 #include <MaterialXGenShader/DefaultColorManagementSystem.h>
 #include <MaterialXGenShader/Shader.h>
 
+#include <MaterialXGenOsl/OslShaderGenerator.h>
+#include <MaterialXGenMdl/MdlShaderGenerator.h>
+#include <MaterialXGenOgsFx/MayaGlslPluginShaderGenerator.h>
+
+#include <MaterialXFormat/Environ.h>
+#include <MaterialXFormat/Util.h>
+
 #include <nanogui/button.h>
 #include <nanogui/combobox.h>
 #include <nanogui/label.h>
@@ -27,42 +34,20 @@ const int MIN_ENV_SAMPLES = 4;
 const int MAX_ENV_SAMPLES = 1024;
 const int DEFAULT_ENV_SAMPLES = 16;
 
+const int SHADOW_MAP_SIZE = 2048;
+const int IRRADIANCE_MAP_WIDTH = 256;
+const int IRRADIANCE_MAP_HEIGHT = 128;
+
+const std::string DIR_LIGHT_NODE_CATEGORY = "directional_light";
+const std::string IRRADIANCE_MAP_FOLDER = "irradiance";
+
+const float ENV_MAP_SPLIT_RADIANCE = 16.0f;
+const float MAX_ENV_TEXEL_RADIANCE = 100000.0f;
+const float IDEAL_ENV_MAP_RADIANCE = 6.0f;
+
+const float MODEL_SPHERE_RADIUS = 2.0f;
+
 namespace {
-
-mx::Matrix44 createViewMatrix(const mx::Vector3& eye,
-                              const mx::Vector3& target,
-                              const mx::Vector3& up)
-{
-    mx::Vector3 z = (target - eye).getNormalized();
-    mx::Vector3 x = z.cross(up).getNormalized();
-    mx::Vector3 y = x.cross(z);
-
-    return mx::Matrix44(
-         x[0],  x[1],  x[2], -x.dot(eye),
-         y[0],  y[1],  y[2], -y.dot(eye),
-        -z[0], -z[1], -z[2],  z.dot(eye),
-         0.0f,  0.0f,  0.0f,  1.0f);
-}
-
-mx::Matrix44 createPerspectiveMatrix(float left, float right,
-                                     float bottom, float top,
-                                     float nearP, float farP)
-{
-    return mx::Matrix44(
-        (2.0f * nearP) / (right - left), 0.0f, (right + left) / (right - left), 0.0f,
-        0.0f, (2.0f * nearP) / (top - bottom), (top + bottom) / (top - bottom), 0.0f,
-        0.0f, 0.0f, -(farP + nearP) / (farP - nearP), -(2.0f * farP * nearP) / (farP - nearP),
-        0.0f, 0.0f, -1.0f, 0.0f);
-}
-
-bool stringEndsWith(const std::string& str, std::string const& end)
-{
-    if (str.length() >= end.length())
-    {
-        return !str.compare(str.length() - end.length(), end.length(), end);
-    }
-    return false;
-}
 
 void writeTextFile(const std::string& text, const std::string& filePath)
 {
@@ -117,7 +102,7 @@ void applyModifiers(mx::DocumentPtr doc, const DocumentModifiers& modifiers)
         if (elem->hasFilePrefix() && !modifiers.filePrefixTerminator.empty())
         {
             std::string filePrefix = elem->getFilePrefix();
-            if (!stringEndsWith(filePrefix, modifiers.filePrefixTerminator))
+            if (!mx::stringEndsWith(filePrefix, modifiers.filePrefixTerminator))
             {
                 elem->setFilePrefix(filePrefix + modifiers.filePrefixTerminator);
             }
@@ -192,25 +177,41 @@ Viewer::Viewer(const std::string& materialFilename,
         multiSampleCount),
     _eye(0.0f, 0.0f, 5.0f),
     _up(0.0f, 1.0f, 0.0f),
-    _zoom(1.0f),
     _viewAngle(45.0f),
     _nearDist(0.05f),
     _farDist(5000.0f),
+    _cameraYaw(0.0f),
     _modelZoom(1.0f),
-    _translationActive(false),
-    _translationStart(0, 0),
+    _modelYaw(0.0f),
+    _userZoom(1.0f),
+    _userTranslationActive(false),
+    _userTranslationPixel(0, 0),
     _libraryFolders(libraryFolders),
     _searchPath(searchPath),
     _materialFilename(materialFilename),
     _modifiers(modifiers),
     _envRadiancePath(envRadiancePath),
-    _directLighting(false),
+    _directLighting(true),
     _indirectLighting(true),
-    _ambientOcclusionGain(0.85f),
+    _normalizeEnvironment(false),
+    _splitDirectLight(false),
+    _generateReferenceIrradiance(false),
+    _saveGeneratedLights(false),
+    _shadowSoftness(1),
+    _ambientOcclusionGain(0.6f),
     _meshFilename(meshFilename),
     _selectedGeom(0),
     _selectedMaterial(0),
+    _lightHandler(mx::LightHandler::create()),
+    _cameraViewHandler(mx::ViewHandler::create()),
+    _shadowViewHandler(mx::ViewHandler::create()),
     _genContext(mx::GlslShaderGenerator::create()),
+#if MATERIALX_BUILD_GEN_OSL
+    _genContextOsl(mx::OslShaderGenerator::create()),
+#endif
+#if MATERIALX_BUILD_GEN_MDL
+    _genContextMdl(mx::MdlShaderGenerator::create()),
+#endif
     _unitRegistry(mx::UnitConverterRegistry::create()),
     _splitByUdims(false),
     _mergeMaterials(false),
@@ -220,11 +221,13 @@ Viewer::Viewer(const std::string& materialFilename,
     _envSamples(DEFAULT_ENV_SAMPLES),
     _drawEnvironment(false),
     _showAdvancedProperties(false),
-    _captureFrame(false),
-    _drawUVGeometry(false),
-    _uvScale(2.0f, 2.0f, 1.0f),
-    _uvTranslation(-0.5f, 0.5f, 0.0f),
-    _uvZoom(1.0f)
+    _captureRequested(false),
+    _wedgeRequested(false),
+    _wedgePropertyName("specular_roughness"),
+    _wedgePropertyMin(0.0f),
+    _wedgePropertyMax(1.0f),
+    _wedgeImageCount(8),
+    _bakeRequested(false)
 {
     _window = new ng::Window(this, "Viewer Options");
     _window->setPosition(ng::Vector2i(15, 15));
@@ -234,10 +237,20 @@ Viewer::Viewer(const std::string& materialFilename,
     loadStandardLibraries();
 
     // Set default generator options.
-    _genContext.getOptions().hwTransparency = true;
     _genContext.getOptions().hwSpecularEnvironmentMethod = _specularEnvironmentMethod;
+    _genContext.getOptions().hwShadowMap = true;
     _genContext.getOptions().targetColorSpaceOverride = "lin_rec709";
     _genContext.getOptions().fileTextureVerticalFlip = true;
+
+    // Set OSL/MDL generator options.
+#if MATERIALX_BUILD_GEN_OSL
+    _genContextOsl.getOptions().targetColorSpaceOverride = "lin_rec709";
+    _genContextOsl.getOptions().fileTextureVerticalFlip = false;
+#endif
+#if MATERIALX_BUILD_GEN_MDL
+    _genContextMdl.getOptions().targetColorSpaceOverride = "lin_rec709";
+    _genContextMdl.getOptions().fileTextureVerticalFlip = false;
+#endif
 
     // Initialize image handler.
 #if MATERIALX_BUILD_OIIO
@@ -246,13 +259,7 @@ Viewer::Viewer(const std::string& materialFilename,
     mx::ImageLoaderPtr imageLoader = mx::StbImageLoader::create();
 #endif
     _imageHandler = mx::GLTextureHandler::create(imageLoader);
-
-    // Initialize light handler.
-    _lightHandler = mx::LightHandler::create();
-    _lightFilename = "resources/Materials/TestSuite/Utilities/Lights/default_viewer_lights.mtlx";
-    _lightDoc = mx::createDocument();
-    mx::XmlReadOptions options;
-    mx::readFromXmlFile(_lightDoc, _lightFilename, _searchPath, &options);
+    _imageHandler->setSearchPath(_searchPath);
 
     // Initialize user interfaces.
     createLoadMeshInterface(_window, "Load Mesh");
@@ -302,7 +309,6 @@ Viewer::Viewer(const std::string& materialFilename,
     _geometryHandler = mx::GeometryHandler::create();
     _geometryHandler->addLoader(loader);
     _geometryHandler->loadGeometry(_searchPath.find(_meshFilename));
-    updateGeometrySelections();
 
     // Create environment geometry handler.
     _envGeometryHandler = mx::GeometryHandler::create();
@@ -314,17 +320,39 @@ Viewer::Viewer(const std::string& materialFilename,
     loadEnvironmentLight();
 
     // Generate wireframe material.
-    const std::string constantShaderName("__WIRE_SHADER_NAME__");
-    const mx::Color3 color(1.0f);
-    _wireMaterial = Material::create();
     try
     {
-        _wireMaterial->generateConstantShader(_genContext, _stdLib, constantShaderName, color);
+        _wireMaterial = Material::create();
+        _wireMaterial->generateConstantShader(_genContext, _stdLib, "__WIRE_SHADER__", mx::Color3(1.0f));
     }
     catch (std::exception& e)
     {
         _wireMaterial = nullptr;
         new ng::MessageDialog(this, ng::MessageDialog::Type::Warning, "Failed to generate wire shader", e.what());
+    }
+
+    // Generate shadow material.
+    try
+    {
+        _shadowMaterial = Material::create();
+        _shadowMaterial->generateDepthShader(_genContext, _stdLib, "__SHADOW_SHADER__");
+    }
+    catch (std::exception& e)
+    {
+        _shadowMaterial = nullptr;
+        new ng::MessageDialog(this, ng::MessageDialog::Type::Warning, "Failed to generate shadow shader", e.what());
+    }
+
+    // Generate shadow blur material.
+    try
+    {
+        _shadowBlurMaterial = Material::create();
+        _shadowBlurMaterial->generateBlurShader(_genContext, _stdLib, "__SHADOW_BLUR_SHADER__", "gaussian", 1.0f);
+    }
+    catch (std::exception& e)
+    {
+        _shadowBlurMaterial = nullptr;
+        new ng::MessageDialog(this, ng::MessageDialog::Type::Warning, "Failed to generate shadow blur shader", e.what());
     }
 
     // Initialize camera
@@ -334,7 +362,13 @@ Viewer::Viewer(const std::string& materialFilename,
         _arcball.setSize(size);
     });
 
+    // Update geometry selections.
+    updateGeometrySelections();
+
+    // Load the requested material document.
     loadDocument(_materialFilename, _stdLib);
+
+    // Finalize the UI.
     _propertyEditor.setVisible(false);
     performLayout();
 }
@@ -344,69 +378,111 @@ void Viewer::loadEnvironmentLight()
     std::string message;
 
     // Load the requested radiance map.
-    mx::ImagePtr envRadianceMap = _imageHandler->acquireImage(_searchPath.find(_envRadiancePath), true, nullptr, &message);
+    mx::ImagePtr envRadianceMap = _imageHandler->acquireImage(_envRadiancePath, true, nullptr, &message);
     if (!envRadianceMap)
     {
         new ng::MessageDialog(this, ng::MessageDialog::Type::Warning, "Failed to load environment light", message);
         return;
     }
 
-    try
+    // If requested, normalize the environment upon loading.
+    if (_normalizeEnvironment)
     {
-        // Look for an irradiance map using an expected filename convention.
-        const std::string IRRADIANCE_MAP_SUFFIX("_diffuse");
-        mx::FilePath envIrradiancePath = _envRadiancePath.getParentPath();
-        std::string envIrradianceName = mx::removeExtension(_envRadiancePath.getBaseName()) +
-            IRRADIANCE_MAP_SUFFIX + "." + _envRadiancePath.getExtension();
-        envIrradiancePath = envIrradiancePath / envIrradianceName;
-        mx::ImagePtr envIrradianceMap = _imageHandler->acquireImage(_searchPath.find(envIrradiancePath), true, nullptr, &message);
-
-        // If not found, then generate an irradiance map via spherical harmonics.
-        if (!envIrradianceMap)
+        envRadianceMap = mx::normalizeEnvironment(envRadianceMap, IDEAL_ENV_MAP_RADIANCE, MAX_ENV_TEXEL_RADIANCE);
+        if (_saveGeneratedLights)
         {
-            mx::Sh3ColorCoeffs shIrradiance = mx::projectEnvironment(envRadianceMap, true);
-            envIrradianceMap = mx::renderEnvironment(shIrradiance, 256, 128);
-        }
-
-        // Release any existing environment maps and store the new ones.
-        _imageHandler->releaseRenderResources(_lightHandler->getEnvRadianceMap());
-        _imageHandler->releaseRenderResources(_lightHandler->getEnvIrradianceMap());
-        _lightHandler->setEnvRadianceMap(envRadianceMap);
-        _lightHandler->setEnvIrradianceMap(envIrradianceMap);
-
-        const mx::MeshList& meshes = _envGeometryHandler->getMeshes();
-        if (!meshes.empty())
-        {
-            // Set up world matrix for drawing
-            const float scaleFactor = 300.0f;
-            const float rotationRadians = PI / 2.0f; // 90 degree rotation 
-            _envMatrix = mx::Matrix44::createScale(mx::Vector3(scaleFactor)) * mx::Matrix44::createRotationY(rotationRadians);
-
-            // Create environment shader.
-            mx::FilePath envFilename = _searchPath.find(
-                mx::FilePath("resources/Materials/TestSuite/Utilities/Lights/envmap_shader.mtlx"));
-            _envMaterial = Material::create();
-            _envMaterial->generateEnvironmentShader(_genContext, envFilename, _stdLib, _envRadiancePath);
-            _envMaterial->bindMesh(_envGeometryHandler->getMeshes()[0]);
+            _imageHandler->saveImage("NormalizedRadiance.hdr", envRadianceMap);
         }
     }
-    catch (std::exception& e)
+
+    // If requested, split the environment into indirect and direct components.
+    if (_splitDirectLight)
     {
-        new ng::MessageDialog(this, ng::MessageDialog::Type::Warning, "Failed to load environment light", e.what());
+        splitDirectLight(envRadianceMap, envRadianceMap, _lightRigDoc);
+        if (_saveGeneratedLights)
+        {
+            _imageHandler->saveImage("IndirectRadiance.hdr", envRadianceMap);
+            mx::writeToXmlFile(_lightRigDoc, "DirectLightRig.mtlx");
+        }
+    }
+
+    // Look for an irradiance map using an expected filename convention.
+    mx::ImagePtr envIrradianceMap;
+    if (!_normalizeEnvironment && !_splitDirectLight)
+    {
+        mx::FilePath envIrradiancePath = _envRadiancePath.getParentPath() / IRRADIANCE_MAP_FOLDER / _envRadiancePath.getBaseName();
+        envIrradianceMap = _imageHandler->acquireImage(envIrradiancePath, true, nullptr, &message);
+    }
+
+    // If not found, then generate an irradiance map via spherical harmonics.
+    if (!envIrradianceMap)
+    {
+        if (_generateReferenceIrradiance)
+        {
+            envIrradianceMap = mx::renderReferenceIrradiance(envRadianceMap, IRRADIANCE_MAP_WIDTH, IRRADIANCE_MAP_HEIGHT);
+            if (_saveGeneratedLights)
+            {
+                _imageHandler->saveImage("ReferenceIrradiance.hdr", envIrradianceMap);
+            }
+        }
+        else
+        {
+            mx::Sh3ColorCoeffs shIrradiance = mx::projectEnvironment(envRadianceMap, true);
+            envIrradianceMap = mx::renderEnvironment(shIrradiance, IRRADIANCE_MAP_WIDTH, IRRADIANCE_MAP_HEIGHT);
+            if (_saveGeneratedLights)
+            {
+                _imageHandler->saveImage("SphericalHarmonicIrradiance.hdr", envIrradianceMap);
+            }
+        }
+    }
+
+    // Release any existing environment maps and store the new ones.
+    _imageHandler->releaseRenderResources(_lightHandler->getEnvRadianceMap());
+    _imageHandler->releaseRenderResources(_lightHandler->getEnvIrradianceMap());
+    _lightHandler->setEnvRadianceMap(envRadianceMap);
+    _lightHandler->setEnvIrradianceMap(envIrradianceMap);
+
+    // Look for a light rig using an expected filename convention.
+    if (!_splitDirectLight)
+    {
+        _lightRigFilename = mx::removeExtension(_envRadiancePath).asString() + "." + mx::MTLX_EXTENSION;
+        if (_searchPath.find(_lightRigFilename).exists())
+        {
+            _lightRigDoc = mx::createDocument();
+            mx::readFromXmlFile(_lightRigDoc, _lightRigFilename, _searchPath);
+        }
+        else
+        {
+            _lightRigDoc = nullptr;
+        }
+    }
+
+    const mx::MeshList& meshes = _envGeometryHandler->getMeshes();
+    if (!meshes.empty())
+    {
+        // Set up world matrix for drawing
+        const float scaleFactor = 300.0f;
+        const float rotationRadians = PI / 2.0f; // 90 degree rotation 
+        _envMatrix = mx::Matrix44::createScale(mx::Vector3(scaleFactor)) * mx::Matrix44::createRotationY(rotationRadians);
+
+        // Create environment shader.
+        mx::FilePath envFilename = _searchPath.find(
+            mx::FilePath("resources/Materials/TestSuite/lights/envmap_shader.mtlx"));
+        _envMaterial = Material::create();
+        _envMaterial->generateEnvironmentShader(_genContext, envFilename, _stdLib, _envRadiancePath);
+        _envMaterial->bindMesh(_envGeometryHandler->getMeshes()[0]);
     }
 }
 
 void Viewer::applyDirectLights(mx::DocumentPtr doc)
 {
-    if (!_lightDoc)
+    if (_lightRigDoc)
     {
-        return;
+        mx::CopyOptions copyOptions;
+        copyOptions.skipConflictingElements = true;
+        doc->importLibrary(_lightRigDoc, &copyOptions);
+        _xincludeFiles.insert(_lightRigFilename);
     }
-
-    mx::CopyOptions copyOptions;
-    copyOptions.skipConflictingElements = true;
-    doc->importLibrary(_lightDoc, &copyOptions);
-    _xincludeFiles.insert(_lightFilename);
 
     try 
     {
@@ -483,6 +559,9 @@ void Viewer::createLoadMeshInterface(Widget* parent, const std::string& label)
                 }
 
                 initCamera();
+
+                _imageHandler->releaseRenderResources(_shadowMap);
+                _shadowMap = nullptr;
             }
             else
             {
@@ -530,6 +609,10 @@ void Viewer::createLoadEnvironmentInterface(Widget* parent, const std::string& l
         {
             _envRadiancePath = filename;
             loadEnvironmentLight();
+            loadDocument(_materialFilename, _stdLib);
+
+            _imageHandler->releaseRenderResources(_shadowMap);
+            _shadowMap = nullptr;
         }
         mProcessEvents = true;
     });
@@ -548,46 +631,15 @@ void Viewer::createSaveMaterialsInterface(Widget* parent, const std::string& lab
         // Save document
         if (material && !filename.isEmpty())
         {
-            mx::DocumentPtr doc = material->getDocument();
             if (filename.getExtension() != mx::MTLX_EXTENSION)
             {
-                filename = mx::FilePath(filename.asString() + "." + mx::MTLX_EXTENSION);
+                filename.addExtension(mx::MTLX_EXTENSION);
             }
 
-            if (_bakeTextures && material->getMaterialElement())
+            if (_bakeTextures)
             {
-
-                mx::FileSearchPath searchPath = _searchPath;
-                if (material->getDocument())
-                {
-                    mx::FilePath documentFilename = material->getDocument()->getSourceUri();
-                    searchPath.append(documentFilename.getParentPath());
-                }
-
-                mx::ImageHandlerPtr imageHandler = mx::GLTextureHandler::create(mx::StbImageLoader::create());
-                imageHandler->setSearchPath(searchPath);
-                if (!material->getUdim().empty())
-                {
-                    mx::StringResolverPtr resolver = mx::StringResolver::create();
-                    resolver->setUdimString(material->getUdim());
-                    imageHandler->setFilenameResolver(resolver);
-                }
-
-                mx::TextureBakerPtr baker = mx::TextureBaker::create();
-                baker->setImageHandler(imageHandler);
-
-                mx::ShaderRefPtr shaderRef = material->getElement()->asA<mx::ShaderRef>();
-                if (shaderRef)
-                {
-                    baker->bakeShaderInputs(shaderRef, _genContext, filename.getParentPath());
-                    baker->writeBakedDocument(shaderRef, filename);
-                }
-                mx::NodePtr shader = material->getElement()->asA<mx::Node>();
-                if (shader)
-                {
-                    baker->bakeShaderInputs(shader, _genContext, filename.getParentPath());
-                    baker->writeBakedDocument(shader, filename);
-                }
+                _bakeRequested = true;
+                _bakeFilename = filename;
             }
             else
             {
@@ -603,7 +655,7 @@ void Viewer::createSaveMaterialsInterface(Widget* parent, const std::string& lab
                 mx::XmlWriteOptions writeOptions;
                 writeOptions.writeXIncludeEnable = true;
                 writeOptions.elementPredicate = skipXincludes;
-                mx::writeToXmlFile(doc, filename, &writeOptions);
+                mx::writeToXmlFile(material->getDocument(), filename, &writeOptions);
             }
 
             // Update material file name
@@ -668,6 +720,12 @@ void Viewer::createAdvancedSettings(Widget* parent)
     {
         mProcessEvents = false;
         _genContext.getOptions().targetDistanceUnit = _distanceUnitOptions[index];
+#if MATERIALX_BUILD_GEN_OSL
+        _genContextOsl.getOptions().targetDistanceUnit = _distanceUnitOptions[index];
+#endif
+#if MATERIALX_BUILD_GEN_MDL
+        _genContextMdl.getOptions().targetDistanceUnit = _distanceUnitOptions[index];
+#endif
         for (MaterialPtr material : _materials)
         {
             material->bindUnits(_unitRegistry, _genContext);
@@ -689,6 +747,30 @@ void Viewer::createAdvancedSettings(Widget* parent)
     indirectLightingBox->setCallback([this](bool enable)
     {
         _indirectLighting = enable;
+    });
+
+    ng::CheckBox* normalizeEnvironmentBox = new ng::CheckBox(advancedPopup, "Normalize Environment");
+    normalizeEnvironmentBox->setChecked(_normalizeEnvironment);
+    normalizeEnvironmentBox->setCallback([this](bool enable)
+    {
+        _normalizeEnvironment = enable;
+    });
+
+    ng::CheckBox* splitDirectLightBox = new ng::CheckBox(advancedPopup, "Split Direct Light");
+    splitDirectLightBox->setChecked(_splitDirectLight);
+    splitDirectLightBox->setCallback([this](bool enable)
+    {
+        _splitDirectLight = enable;
+    });
+
+    new ng::Label(advancedPopup, "Shadowing Options");
+
+    ng::CheckBox* shadowMapBox = new ng::CheckBox(advancedPopup, "Shadow Map");
+    shadowMapBox->setChecked(_genContext.getOptions().hwShadowMap);
+    shadowMapBox->setCallback([this](bool enable)
+    {
+        _genContext.getOptions().hwShadowMap = enable;
+        reloadShaders();
     });
 
     ng::CheckBox* ambientOcclusionBox = new ng::CheckBox(advancedPopup, "Ambient Occlusion");
@@ -716,14 +798,6 @@ void Viewer::createAdvancedSettings(Widget* parent)
     outlineSelectedGeometryBox->setCallback([this](bool enable)
     {
         _outlineSelection = enable;
-    });
-
-    ng::CheckBox* transparencyBox = new ng::CheckBox(advancedPopup, "Render Transparency");
-    transparencyBox->setChecked(_genContext.getOptions().hwTransparency);
-    transparencyBox->setCallback([this](bool enable)
-    {
-        _genContext.getOptions().hwTransparency = enable;
-        reloadShaders();
     });
 
     ng::CheckBox* drawEnvironmentBox = new ng::CheckBox(advancedPopup, "Render Environment");
@@ -777,6 +851,10 @@ void Viewer::updateGeometrySelections()
     if (_wireMaterial)
     {
         _wireMaterial->bindMesh(mesh);
+    }
+    if (_shadowMaterial)
+    {
+        _shadowMaterial->bindMesh(mesh);
     }
 
     for (size_t partIndex = 0; partIndex < mesh->getPartitionCount(); partIndex++)
@@ -850,8 +928,6 @@ void Viewer::loadDocument(const mx::FilePath& filename, mx::DocumentPtr librarie
 {
     // Set up read options.
     mx::XmlReadOptions readOptions;
-    readOptions.desiredMajorVersion = 1;
-    readOptions.desiredMinorVersion = 38;
     readOptions.skipConflictingElements = true;
     readOptions.readXIncludeFunction = [](mx::DocumentPtr doc, const mx::FilePath& filename,
                                           const mx::FileSearchPath& searchPath, const mx::XmlReadOptions* options)
@@ -927,17 +1003,21 @@ void Viewer::loadDocument(const mx::FilePath& filename, mx::DocumentPtr librarie
                 }
                 materials.push_back(node);
             }
-            else
+            else if (elem->isA<mx::ShaderRef>())
             {
                 mx::ShaderRefPtr shaderRef = elem->asA<mx::ShaderRef>();
-                mx::TypedElementPtr materialRef = (shaderRef ? shaderRef->getParent()->asA<mx::TypedElement>() : nullptr);
+                mx::TypedElementPtr materialRef = shaderRef->getParent()->asA<mx::TypedElement>();
                 materials.push_back(materialRef);
+            }
+            else
+            {
+                materials.push_back(nullptr);
             }
             renderablePaths.push_back(renderableElem->getNamePath());
         }
 
         // Check for any udim set.
-        mx::ValuePtr udimSetValue = doc->getGeomAttrValue("udimset");
+        mx::ValuePtr udimSetValue = doc->getGeomPropValue("udimset");
 
         // Create new materials.
         mx::TypedElementPtr udimElement;
@@ -976,12 +1056,14 @@ void Viewer::loadDocument(const mx::FilePath& filename, mx::DocumentPtr librarie
 
         if (!newMaterials.empty())
         {
+            // Extend the image search path to include this material folder.
+            mx::FilePath materialFolder = _materialFilename.getParentPath();
+            mx::FileSearchPath materialSearchPath = _searchPath;
+            materialSearchPath.append(materialFolder);
+            _imageHandler->setSearchPath(materialSearchPath);
+
             // Add new materials to the global vector.
             _materials.insert(_materials.end(), newMaterials.begin(), newMaterials.end());
-
-            // Set the default image search path.
-            mx::FilePath materialFolder = _materialFilename.getParentPath();
-            _imageHandler->setSearchPath(mx::FileSearchPath(materialFolder));
 
             mx::MeshPtr mesh = _geometryHandler->getMeshes()[0];
             MaterialPtr udimMaterial = nullptr;
@@ -1030,9 +1112,10 @@ void Viewer::loadDocument(const mx::FilePath& filename, mx::DocumentPtr librarie
                         }
                     }
                 }
-                else
+                else if (mat && mat->getMaterialElement())
                 {
-                    mx::NodePtr materialNode = mat->getMaterialElement()->asA<mx::Node>();
+                    mx::TypedElementPtr mtrlElem = mat->getMaterialElement();
+                    mx::NodePtr materialNode = mtrlElem ? mtrlElem->asA<mx::Node>() : nullptr;
                     if (materialNode)
                     {
                         for (mx::MeshPartitionPtr part : _geometryList)
@@ -1075,6 +1158,9 @@ void Viewer::loadDocument(const mx::FilePath& filename, mx::DocumentPtr librarie
         return;
     }
 
+    // Restore the original image search path.
+    _imageHandler->setSearchPath(_searchPath);
+
     // Update material UI.
     updateMaterialSelections();
     updateMaterialSelectionUI();
@@ -1102,7 +1188,7 @@ void Viewer::reloadShaders()
     }
 }
 
-void Viewer::saveShaderSource()
+void Viewer::saveShaderSource(mx::GenContext& context)
 {
     try
     {
@@ -1110,15 +1196,35 @@ void Viewer::saveShaderSource()
         mx::TypedElementPtr elem = material ? material->getElement() : nullptr;
         if (elem)
         {
-            mx::ShaderPtr shader = createShader(elem->getNamePath(), _genContext, elem);
+            mx::ShaderPtr shader = createShader(elem->getNamePath(), context, elem);
             if (shader)
             {
-                std::string vertexShader = shader->getSourceCode(mx::Stage::VERTEX);
-                std::string pixelShader = shader->getSourceCode(mx::Stage::PIXEL);
-                std::string baseName = _searchPath[0] / elem->getName();
-                writeTextFile(vertexShader,  baseName + "_vs.glsl");
-                writeTextFile(pixelShader, baseName + "_ps.glsl");
-                new ng::MessageDialog(this, ng::MessageDialog::Type::Information, "Saved GLSL source: ", baseName);
+                const std::string path = mx::getEnviron("MATERIALX_VIEW_OUTPUT_PATH");
+                const std::string baseName = (path.empty() ? _searchPath[0] : mx::FilePath(path)) / elem->getName();
+                if (context.getShaderGenerator().getLanguage() == mx::GlslShaderGenerator::LANGUAGE && context.getShaderGenerator().getTarget() == mx::GlslShaderGenerator::TARGET)
+                {
+                    const std::string& vertexShader = shader->getSourceCode(mx::Stage::VERTEX);
+                    const std::string& pixelShader = shader->getSourceCode(mx::Stage::PIXEL);
+                    writeTextFile(vertexShader, baseName + "_vs.glsl");
+                    writeTextFile(pixelShader, baseName + "_ps.glsl");
+                    new ng::MessageDialog(this, ng::MessageDialog::Type::Information, "Saved GLSL source: ", baseName);
+                }
+#if MATERIALX_BUILD_GEN_OSL
+                else if (context.getShaderGenerator().getLanguage() == mx::OslShaderGenerator::LANGUAGE)
+                {
+                    const std::string& pixelShader = shader->getSourceCode(mx::Stage::PIXEL);
+                    writeTextFile(pixelShader, baseName + ".osl");
+                    new ng::MessageDialog(this, ng::MessageDialog::Type::Information, "Saved OSL source: ", baseName);
+                }
+#endif
+#if MATERIALX_BUILD_GEN_MDL
+                else if (context.getShaderGenerator().getLanguage() == mx::MdlShaderGenerator::LANGUAGE)
+                {
+                    const std::string& pixelShader = shader->getSourceCode(mx::Stage::PIXEL);
+                    writeTextFile(pixelShader, baseName + ".mdl");
+                    new ng::MessageDialog(this, ng::MessageDialog::Type::Information, "Saved MDL source: ", baseName);
+                }
+#endif
             }
         }
     }
@@ -1140,12 +1246,10 @@ void Viewer::loadShaderSource()
             std::string baseName = _searchPath[0] / elementName;
             std::string vertexShaderFile = baseName + "_vs.glsl";
             std::string pixelShaderFile = baseName + "_ps.glsl";
-            // Ignore transparency for now as we can't know from the source code 
-            // if the shader is transparent or not.
-            if (material->loadSource(vertexShaderFile, pixelShaderFile, baseName, false))
+            bool hasTransparency = false;
+            if (material->loadSource(vertexShaderFile, pixelShaderFile, baseName, hasTransparency))
             {
                 assignMaterial(getSelectedGeometry(), material);
-                new ng::MessageDialog(this, ng::MessageDialog::Type::Information, "Loaded GLSL source: ", baseName);
             }
         }
     }
@@ -1224,33 +1328,44 @@ void Viewer::saveDotFiles()
     }
 }
 
+void Viewer::initContext(mx::GenContext& context)
+{
+    // Initialize search paths.
+    context.registerSourceCodeSearchPath(_searchPath);
+
+    // Initialize color management.
+    mx::DefaultColorManagementSystemPtr cms = mx::DefaultColorManagementSystem::create(context.getShaderGenerator().getLanguage());
+    cms->loadLibrary(_stdLib);
+    context.getShaderGenerator().setColorManagementSystem(cms);
+
+    // Initialize unit management.
+    mx::UnitSystemPtr unitSystem = mx::UnitSystem::create(context.getShaderGenerator().getLanguage());
+    unitSystem->loadLibrary(_stdLib);
+    unitSystem->setUnitConverterRegistry(_unitRegistry);
+    context.getShaderGenerator().setUnitSystem(unitSystem);
+    context.getOptions().targetDistanceUnit = "meter";
+}
+
 void Viewer::loadStandardLibraries()
 {
     // Initialize the standard library.
     _stdLib = loadLibraries(_libraryFolders, _searchPath);
+    if (_stdLib->getChildren().empty())
+    {
+        std::cerr << "Could not find standard data libraries on the given search path: " << _searchPath.asString() << std::endl;
+    }
     for (std::string sourceUri : _stdLib->getReferencedSourceUris())
     {
         _xincludeFiles.insert(sourceUri);
     }
 
-    // Initialize color management.
-    mx::DefaultColorManagementSystemPtr cms = mx::DefaultColorManagementSystem::create(_genContext.getShaderGenerator().getLanguage());
-    cms->loadLibrary(_stdLib);
-    _genContext.registerSourceCodeSearchPath(_searchPath);
-    _genContext.getShaderGenerator().setColorManagementSystem(cms);
-
     // Initialize unit management.
-    mx::UnitSystemPtr unitSystem = mx::UnitSystem::create(_genContext.getShaderGenerator().getLanguage());
-    unitSystem->loadLibrary(_stdLib);
-    unitSystem->setUnitConverterRegistry(_unitRegistry);
-    _genContext.getShaderGenerator().setUnitSystem(unitSystem);
     mx::UnitTypeDefPtr distanceTypeDef = _stdLib->getUnitTypeDef("distance");
     _distanceUnitConverter = mx::LinearUnitConverter::create(distanceTypeDef);
     _unitRegistry->addUnitConverter(distanceTypeDef, _distanceUnitConverter);
     mx::UnitTypeDefPtr angleTypeDef = _stdLib->getUnitTypeDef("angle");
     mx::LinearUnitConverterPtr angleConverter = mx::LinearUnitConverter::create(angleTypeDef);
     _unitRegistry->addUnitConverter(angleTypeDef, angleConverter);
-    _genContext.getOptions().targetDistanceUnit = "meter";
 
     // Create the list of supported distance units.
     auto unitScales = _distanceUnitConverter->getUnitScale();
@@ -1260,6 +1375,15 @@ void Viewer::loadStandardLibraries()
         int location = _distanceUnitConverter->getUnitAsInteger(unitScale.first);
         _distanceUnitOptions[location] = unitScale.first;
     }
+
+    // Initialize the generator contexts.
+    initContext(_genContext);
+#if MATERIALX_BUILD_GEN_OSL
+    initContext(_genContextOsl);
+#endif
+#if MATERIALX_BUILD_GEN_MDL
+    initContext(_genContextMdl);
+#endif
 }
 
 bool Viewer::keyboardEvent(int key, int scancode, int action, int modifiers)
@@ -1267,6 +1391,16 @@ bool Viewer::keyboardEvent(int key, int scancode, int action, int modifiers)
     if (Screen::keyboardEvent(key, scancode, action, modifiers))
     {
         return true;
+    }
+
+    // Adjust camera zoom.
+    if (key == GLFW_KEY_KP_ADD && action == GLFW_PRESS)
+    {
+        _userZoom *= 1.1f;
+    }
+    if (key == GLFW_KEY_KP_SUBTRACT && action == GLFW_PRESS)
+    {
+        _userZoom = std::max(0.1f, _userZoom * 0.9f);
     }
 
     // Reload the current document, and optionally the standard libraries, from
@@ -1287,9 +1421,27 @@ bool Viewer::keyboardEvent(int key, int scancode, int action, int modifiers)
     // Save the current shader source to file.
     if (key == GLFW_KEY_S && action == GLFW_PRESS)
     {
-        saveShaderSource();
+        saveShaderSource(_genContext);
         return true;
     }
+
+#if MATERIALX_BUILD_GEN_OSL
+    // Save OSL shader source to file.
+    if (key == GLFW_KEY_O && action == GLFW_PRESS)
+    {
+        saveShaderSource(_genContextOsl);
+        return true;
+    }
+#endif
+
+#if MATERIALX_BUILD_GEN_MDL
+    // Save MDL shader source to file.
+    if (key == GLFW_KEY_M && action == GLFW_PRESS)
+    {
+        saveShaderSource(_genContextMdl);
+        return true;
+    }
+#endif
 
     // Load shader source from file.  Editing the source files before loading
     // provides a way to debug and experiment with shader source code.
@@ -1306,29 +1458,31 @@ bool Viewer::keyboardEvent(int key, int scancode, int action, int modifiers)
         return true;
     }
 
-    // Capture the current frame and save to file.
+    // Capture the current frame and save as an image file.
     if (key == GLFW_KEY_F && action == GLFW_PRESS)
     {
-        mx::StringSet extensions;
-        _imageHandler->supportedExtensions(extensions);
-        if (!extensions.empty())
+        _captureFilename = ng::file_dialog({ { mx::ImageLoader::TGA_EXTENSION, mx::ImageLoader::TGA_EXTENSION } }, true);
+        if (!_captureFilename.isEmpty())
         {
-            std::vector<std::pair<std::string, std::string>> filetypes;
-            for (const auto& extension : extensions)
+            if (_captureFilename.getExtension() != mx::ImageLoader::TGA_EXTENSION)
             {
-                filetypes.push_back(std::make_pair(extension, extension));
+                _captureFilename.addExtension(mx::ImageLoader::TGA_EXTENSION);
             }
-            std::string fileName = ng::file_dialog(filetypes, true);
-            if (!fileName.empty())
+            _captureRequested = true;
+        }
+    }
+
+    // Render a wedge for the current material.
+    if (key == GLFW_KEY_W && action == GLFW_PRESS)
+    {
+        _wedgeFilename = ng::file_dialog({ { mx::ImageLoader::TGA_EXTENSION, mx::ImageLoader::TGA_EXTENSION } }, true);
+        if (!_wedgeFilename.isEmpty())
+        {
+            if (_wedgeFilename.getExtension() != mx::ImageLoader::TGA_EXTENSION)
             {
-                std::string fileExtension = mx::FilePath(fileName).getExtension();
-                if (extensions.count(fileExtension) == 0)
-                {
-                    fileName += "." + *extensions.begin();
-                }
-                _captureFrameFileName = fileName;
-                _captureFrame = true;
+                _wedgeFilename.addExtension(mx::ImageLoader::TGA_EXTENSION);
             }
+            _wedgeRequested = true;
         }
     }
 
@@ -1356,37 +1510,49 @@ bool Viewer::keyboardEvent(int key, int scancode, int action, int modifiers)
         return true;
     }
 
-    if ((key == GLFW_KEY_U) && (action == GLFW_PRESS))
-    {
-        _drawUVGeometry = !_drawUVGeometry;
-        return true;
-    }
-
     return false;
 }
 
-void Viewer::drawScene3D()
+void Viewer::renderFrame()
 {
-    mx::Matrix44 world, view, proj;
-    computeCameraMatrices(world, view, proj);
-
+    // Initialize OpenGL state
+    glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDisable(GL_CULL_FACE);
+    glDisable(GL_FRAMEBUFFER_SRGB);
+
+    // Update shadow state
+    ShadowState shadowState;
+    shadowState.ambientOcclusionGain = _ambientOcclusionGain;
+    mx::NodePtr dirLight = _lightHandler->getFirstLightOfCategory(DIR_LIGHT_NODE_CATEGORY);
+    if (_genContext.getOptions().hwShadowMap && dirLight)
+    {
+        updateShadowMap();
+        shadowState.shadowMap = _shadowMap;
+        shadowState.shadowMatrix = _cameraViewHandler->worldMatrix.getInverse() *
+            _shadowViewHandler->worldMatrix *
+            _shadowViewHandler->viewMatrix *
+            _shadowViewHandler->projectionMatrix;
+    }
+
+    const mx::Matrix44& world = _cameraViewHandler->worldMatrix;
+    const mx::Matrix44& view = _cameraViewHandler->viewMatrix;
+    const mx::Matrix44& proj = _cameraViewHandler->projectionMatrix;
+
     glEnable(GL_FRAMEBUFFER_SRGB);
 
     // Environment background
     if (_drawEnvironment && _envMaterial)
     {
-        GLShaderPtr envShader = _envMaterial->getShader();
         auto meshes = _envGeometryHandler->getMeshes();
         auto envPart = !meshes.empty() ? meshes[0]->getPartition(0) : nullptr;
-        if (envShader && envPart)
+        if (_envMaterial && envPart)
         {
             glEnable(GL_CULL_FACE);
             glCullFace(GL_FRONT);
-            envShader->bind();
+            _envMaterial->bindShader();
             _envMaterial->bindViewInformation(_envMatrix, view, proj);
             _envMaterial->bindImages(_imageHandler, _searchPath);
             _envMaterial->drawPartition(envPart);
@@ -1396,11 +1562,11 @@ void Viewer::drawScene3D()
     }
 
     // Opaque pass
-    glDisable(GL_BLEND);
     for (const auto& assignment : _materialAssignments)
     {
         mx::MeshPartitionPtr geom = assignment.first;
         MaterialPtr material = assignment.second;
+        shadowState.ambientOcclusionMap = getAmbientOcclusionImage(material);
         if (!material || material->hasTransparency())
         {
             continue;
@@ -1409,9 +1575,8 @@ void Viewer::drawScene3D()
         material->bindShader();
         material->bindViewInformation(world, view, proj);
         material->bindLights(_lightHandler, _imageHandler,
-                             _directLighting, _indirectLighting,
-                             getAmbientOcclusionImage(material), _ambientOcclusionGain,
-                             _specularEnvironmentMethod, _envSamples);
+            _directLighting, _indirectLighting, shadowState,
+            _specularEnvironmentMethod, _envSamples);
         material->bindImages(_imageHandler, _searchPath);
         material->drawPartition(geom);
         material->unbindImages(_imageHandler);
@@ -1424,6 +1589,7 @@ void Viewer::drawScene3D()
     {
         mx::MeshPartitionPtr geom = assignment.first;
         MaterialPtr material = assignment.second;
+        shadowState.ambientOcclusionMap = getAmbientOcclusionImage(material);
         if (!material || !material->hasTransparency())
         {
             continue;
@@ -1432,181 +1598,107 @@ void Viewer::drawScene3D()
         material->bindShader();
         material->bindViewInformation(world, view, proj);
         material->bindLights(_lightHandler, _imageHandler,
-                             _directLighting, _indirectLighting,
-                             getAmbientOcclusionImage(material), _ambientOcclusionGain,
-                             _specularEnvironmentMethod, _envSamples);
+            _directLighting, _indirectLighting, ShadowState(),
+            _specularEnvironmentMethod, _envSamples);
         material->bindImages(_imageHandler, _searchPath);
         material->drawPartition(geom);
         material->unbindImages(_imageHandler);
     }
-    
+
     glDisable(GL_BLEND);
     glDisable(GL_FRAMEBUFFER_SRGB);
 
     // Wireframe pass
     if (_outlineSelection)
     {
-        GLShaderPtr shader = _wireMaterial->getShader();
-        if (shader && (_selectedGeom < _geometryList.size()))
-        {
-            auto activeGeom = _geometryList[_selectedGeom];
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            shader->bind();
-            _wireMaterial->bindViewInformation(world, view, proj);
-            _wireMaterial->drawPartition(activeGeom);
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
-    }
-
-    if (_captureFrame)
-    {
-        _captureFrame = false;
-
-        glFlush();
-        glPixelStorei(GL_PACK_ALIGNMENT, 1);
-        glReadBuffer(GL_COLOR_ATTACHMENT0);
-
-        // Create an image with dimensions adjusted for device DPI.
-        mx::ImagePtr image = mx::Image::create((unsigned int) (mSize.x() * mPixelRatio),
-                                               (unsigned int) (mSize.y() * mPixelRatio), 3);
-        image->createResourceBuffer();
-
-        // Read pixels into the image buffer.
-        glReadPixels(0, 0, image->getWidth(), image->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, image->getResourceBuffer());
-
-        // Save the image to disk.
-        bool saved = _imageHandler->saveImage(_captureFrameFileName, image, true);
-        if (!saved)
-        {
-            new ng::MessageDialog(this, ng::MessageDialog::Type::Information,
-                "Failed to save frame to disk: ", _captureFrameFileName.asString());
-        }
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        _wireMaterial->bindShader();
+        _wireMaterial->bindViewInformation(world, view, proj);
+        _wireMaterial->drawPartition(getSelectedGeometry());
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 }
 
-mx::MeshStreamPtr Viewer::createUvPositionStream(mx::MeshPtr mesh, 
-                                                 const std::string& uvStreamName, 
-                                                 unsigned int index,
-                                                 const std::string& positionStreamName)
+mx::ImagePtr Viewer::getFrameImage()
 {
-    // If there are no uvs to display then just return an empty 3d stream
-    mx::MeshStreamPtr uvStream2D = mesh->getStream(uvStreamName, index);
-    if (!uvStream2D)
-    {
-        return nullptr;
-    }
+    glFlush();
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
 
-    mx::MeshStreamPtr uvStream3D = mesh->getStream(positionStreamName);
-    if (!uvStream3D)
-    {
-        uvStream3D = mx::MeshStream::create(positionStreamName, mx::MeshStream::POSITION_ATTRIBUTE, 0);
-        mesh->addStream(uvStream3D);
+    // Create an image with dimensions adjusted for device DPI.
+    mx::ImagePtr image = mx::Image::create((unsigned int) (mSize.x() * mPixelRatio),
+                                           (unsigned int) (mSize.y() * mPixelRatio), 3);
+    image->createResourceBuffer();
 
-        mx::MeshFloatBuffer &uvPos2D = uvStream2D->getData();
-        mx::MeshFloatBuffer &uvPos3D = uvStream3D->getData();
-        size_t uvCount = uvPos2D.size() / 2;
-        uvPos3D.resize(uvCount * 3);
-        const float MAX_FLOAT = std::numeric_limits<float>::max();
-        mx::Vector3 boxMin = { MAX_FLOAT, MAX_FLOAT, 0.0f };
-        mx::Vector3 boxMax = { -MAX_FLOAT, -MAX_FLOAT, 0.0f };
-        for (size_t i = 0; i < uvCount; i++)
-        {
-            float u = uvPos2D[i * 2];
-            uvPos3D[i * 3] = u;
-            float v = uvPos2D[i * 2 + 1];
-            uvPos3D[i * 3 + 1] = v;
-            uvPos3D[i * 3 + 2] = 0.0f;
+    // Read pixels into the image buffer.
+    glReadPixels(0, 0, image->getWidth(), image->getHeight(), GL_RGB, GL_UNSIGNED_BYTE, image->getResourceBuffer());
 
-            boxMin[0] = std::min(u, boxMin[0]);
-            boxMin[1] = std::min(v, boxMin[1]);
-            boxMax[0] = std::max(u, boxMax[0]);
-            boxMax[1] = std::max(v, boxMax[1]);
-        }
 
-        mx::Vector3 sphereCenter = (boxMax + boxMin) / 2.0;
-        float sphereRadius = (sphereCenter - boxMin).getMagnitude();
-        _uvScale[0] = 2.0f / sphereRadius;
-        _uvScale[1] = 2.0f / sphereRadius;
-        _uvScale[2] = 1.0f;
-        _uvTranslation[0] = -sphereCenter[0];
-        _uvTranslation[1] = -sphereCenter[1];
-        _uvTranslation[2] = 0.0f;
-    }
-
-    return uvStream3D;
+    return image;
 }
 
-void Viewer::drawScene2D()
+mx::ImagePtr Viewer::renderWedge()
 {
-    // Create uv shader if it does not exist
-    if (!_wireMaterialUV)
+    MaterialPtr material = getSelectedMaterial();
+    mx::ShaderPort* uniform = material ? material->findUniform(_wedgePropertyName) : nullptr;
+    float origPropertyValue = uniform && uniform->getValue()->isA<float>() ? uniform->getValue()->asA<float>() : 0.0f;
+
+    std::vector<mx::ImagePtr> imageVec;
+    float wedgePropertyStep = (_wedgePropertyMax - _wedgePropertyMin) / (_wedgeImageCount - 1);
+    for (unsigned int i = 0; i < _wedgeImageCount; i++)
     {
-        const std::string shaderName("__UV_WIRE_SHADER_NAME__");
-        const mx::Color3 color(1.0f);
-        _wireMaterialUV = Material::create();
-        try
+        if (material)
         {
-            _wireMaterialUV->generateConstantShader(_genContext, _stdLib, shaderName, color);
+            float propertyValue = (i == _wedgeImageCount - 1) ? _wedgePropertyMax : _wedgePropertyMin + wedgePropertyStep * i;
+            material->setUniformFloat(_wedgePropertyName, propertyValue);
         }
-        catch (std::exception& e)
-        {
-            _wireMaterialUV = nullptr;
-            std::cerr << "Failed to generate uv wire shader: " << e.what();
-            return;
-        }
+        renderFrame();
+        imageVec.push_back(getFrameImage());
     }
 
-    GLShaderPtr shader = _wireMaterialUV->getShader();
-    if (!shader || _geometryList.empty())
+    if (material)
     {
-        return;
+        material->setUniformFloat(_wedgePropertyName, origPropertyValue);
     }
-    if (shader->attrib("i_position") == -1)
+
+    return mx::createImageStrip(imageVec);
+}
+
+void Viewer::bakeTextures()
+{
+    MaterialPtr material = getSelectedMaterial();
+    mx::ShaderRefPtr shaderRef = material->getElement()->asA<mx::ShaderRef>();
+    mx::FileSearchPath searchPath = _searchPath;
+    if (material->getDocument())
     {
-        return;
+        mx::FilePath documentFilename = material->getDocument()->getSourceUri();
+        searchPath.append(documentFilename.getParentPath());
     }
 
-    // Create and bind uvs as input positions
-    mx::MeshPtr mesh = _geometryHandler->getMeshes()[0];
-    const std::string uvStream3DName(mx::MeshStream::TEXCOORD_ATTRIBUTE + "_3D");
-    mx::MeshStreamPtr uvStream3D = createUvPositionStream(mesh, 
-                                                          mx::MeshStream::TEXCOORD_ATTRIBUTE, 0,
-                                                          uvStream3DName);
-    if (!uvStream3D)
+    mx::ImageHandlerPtr imageHandler = mx::GLTextureHandler::create(mx::StbImageLoader::create());
+    imageHandler->setSearchPath(searchPath);
+    if (!material->getUdim().empty())
     {
-        return;
+        mx::StringResolverPtr resolver = mx::StringResolver::create();
+        resolver->setUdimString(material->getUdim());
+        imageHandler->setFilenameResolver(resolver);
     }
-    mx::MeshFloatBuffer &buffer = uvStream3D->getData();
-    Eigen::Map<const ng::MatrixXf> positions(&buffer[0], uvStream3D->getStride(), buffer.size() / uvStream3D->getStride());
 
-    shader->bind();
-    shader->uploadAttrib("i_position", positions);
-
-    // Compute matrices
-    mx::Matrix44 world, view, proj;
-    float fH = std::tan(_viewAngle / 360.0f * PI) * _nearDist;
-    float fW = fH * (float)mSize.x() / (float)mSize.y();
-    view = createViewMatrix(_eye, _center, _up);
-    proj = createPerspectiveMatrix(-fW, fW, -fH, fH, _nearDist, _farDist);
-    world = mx::Matrix44::createScale(_uvScale * _uvZoom);
-    world *= mx::Matrix44::createTranslation(_uvTranslation).getTranspose();
-
-    _wireMaterialUV->bindViewInformation(world, view, proj);
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    if (_outlineSelection && (_selectedGeom < _geometryList.size()))
+    try
     {
-        mx::MeshPartitionPtr activeGeom = _geometryList[_selectedGeom];
-        _wireMaterialUV->drawPartition(activeGeom);
+        mx::TextureBakerPtr baker = mx::TextureBaker::create();
+        baker->setImageHandler(imageHandler);
+        baker->bakeShaderInputs(shaderRef, _genContext, _bakeFilename.getParentPath());
+        baker->writeBakedDocument(shaderRef, _bakeFilename);
     }
-    else
+    catch (mx::Exception& e)
     {
-        for (mx::MeshPartitionPtr geom : _geometryList)
-        {
-            _wireMaterialUV->drawPartition(geom);
-        }
+        new ng::MessageDialog(this, ng::MessageDialog::Type::Warning, "Failed to bake textures", e.what());
     }
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    glfwMakeContextCurrent(mGLFWWindow);
+    glfwGetFramebufferSize(mGLFWWindow, &mFBSize[0], &mFBSize[1]);
+    glViewport(0, 0, mFBSize[0], mFBSize[1]);
 }
 
 void Viewer::drawContents()
@@ -1615,28 +1707,53 @@ void Viewer::drawContents()
     {
         return;
     }
-    if (_drawUVGeometry)
+
+    updateViewHandlers();
+
+    checkGlErrors("before viewer render");
+
+    // Render a wedge for the current material.
+    if (_wedgeRequested)
     {
-        drawScene2D();
+        _wedgeRequested = false;
+        mx::ImagePtr wedgeImage = renderWedge();
+        if (!wedgeImage || !_imageHandler->saveImage(_wedgeFilename, wedgeImage, true))
+        {
+            new ng::MessageDialog(this, ng::MessageDialog::Type::Information,
+                "Failed to save wedge to disk: ", _wedgeFilename.asString());
+        }
     }
-    else
+
+    // Render the current frame.
+    renderFrame();
+
+    // Capture the current frame.
+    if (_captureRequested)
     {
-        drawScene3D();
+        _captureRequested = false;
+        mx::ImagePtr frameImage = getFrameImage();
+        if (!frameImage || !_imageHandler->saveImage(_captureFilename, frameImage, true))
+        {
+            new ng::MessageDialog(this, ng::MessageDialog::Type::Information,
+                "Failed to save frame to disk: ", _captureFilename.asString());
+        }
     }
+
+    // Bake textures for the current material.
+    if (_bakeRequested)
+    {
+        _bakeRequested = false;
+        bakeTextures();
+    }
+
+    checkGlErrors("after viewer render");
 }
 
 bool Viewer::scrollEvent(const ng::Vector2i& p, const ng::Vector2f& rel)
 {
     if (!Screen::scrollEvent(p, rel))
     {
-        if (_drawUVGeometry)
-        {
-            _uvZoom = std::max(0.1f, _uvZoom * ((rel.y() > 0) ? 1.1f : 0.9f));
-        }
-        else
-        {
-            _zoom = std::max(0.1f, _zoom * ((rel.y() > 0) ? 1.1f : 0.9f));;
-        }
+        _userZoom = std::max(0.1f, _userZoom * ((rel.y() > 0) ? 1.1f : 0.9f));
     }
     return true;
 }
@@ -1651,45 +1768,42 @@ bool Viewer::mouseMotionEvent(const ng::Vector2i& p,
         return true;
     }
 
-    if (_drawUVGeometry)
-    {
-        return true;
-    }
-
     if (_arcball.motion(p))
     {
         return true;
     }
 
-    if (_translationActive)
+    if (_userTranslationActive)
     {
-        mx::Matrix44 world, view, proj;
-        computeCameraMatrices(world, view, proj);
-        mx::Matrix44 worldView = view * world;
+        updateViewHandlers();
+        const mx::Matrix44& world = _cameraViewHandler->worldMatrix;
+        const mx::Matrix44& view = _cameraViewHandler->viewMatrix;
+        const mx::Matrix44& proj = _cameraViewHandler->projectionMatrix;
+        mx::Matrix44 worldView = world * view;;
 
         mx::MeshPtr mesh = _geometryHandler->getMeshes()[0];
         mx::Vector3 boxMin = mesh->getMinimumBounds();
         mx::Vector3 boxMax = mesh->getMaximumBounds();
-        mx::Vector3 sphereCenter = (boxMax + boxMin) / 2.0;
+        mx::Vector3 sphereCenter = (boxMax + boxMin) / 2.0f;
 
         float zval = ng::project(ng::Vector3f(sphereCenter.data()),
-                                 ng::Matrix4f(worldView.getTranspose().data()),
-                                 ng::Matrix4f(proj.getTranspose().data()),
+                                 ng::Matrix4f(worldView.data()),
+                                 ng::Matrix4f(proj.data()),
                                  mSize).z();
         ng::Vector3f pos1 = ng::unproject(ng::Vector3f((float) p.x(),
                                                        (float) (mSize.y() - p.y()),
                                                        (float) zval),
-                                          ng::Matrix4f(worldView.getTranspose().data()),
-                                          ng::Matrix4f(proj.getTranspose().data()),
+                                          ng::Matrix4f(worldView.data()),
+                                          ng::Matrix4f(proj.data()),
                                           mSize);
-        ng::Vector3f pos0 = ng::unproject(ng::Vector3f((float) _translationStart.x(),
-                                                       (float) (mSize.y() - _translationStart.y()),
+        ng::Vector3f pos0 = ng::unproject(ng::Vector3f((float) _userTranslationPixel.x(),
+                                                       (float) (mSize.y() - _userTranslationPixel.y()),
                                                        (float) zval),
-                                          ng::Matrix4f(worldView.getTranspose().data()),
-                                          ng::Matrix4f(proj.getTranspose().data()),
+                                          ng::Matrix4f(worldView.data()),
+                                          ng::Matrix4f(proj.data()),
                                           mSize);
         ng::Vector3f delta = pos1 - pos0;
-        _modelTranslation = _modelTranslationStart +
+        _userTranslation = _userTranslationStart +
                             mx::Vector3(delta.data(), delta.data() + delta.size());
 
         return true;
@@ -1705,11 +1819,6 @@ bool Viewer::mouseButtonEvent(const ng::Vector2i& p, int button, bool down, int 
         return true;
     }
 
-    if (_drawUVGeometry)
-    {
-        return true;
-    }
-
     if (button == GLFW_MOUSE_BUTTON_1 && !modifiers)
     {
         _arcball.button(p, down);
@@ -1717,9 +1826,9 @@ bool Viewer::mouseButtonEvent(const ng::Vector2i& p, int button, bool down, int 
     else if (button == GLFW_MOUSE_BUTTON_2 ||
             (button == GLFW_MOUSE_BUTTON_1 && modifiers == GLFW_MOD_SHIFT))
     {
-        _modelTranslationStart = _modelTranslation;
-        _translationActive = true;
-        _translationStart = p;
+        _userTranslationStart = _userTranslation;
+        _userTranslationActive = true;
+        _userTranslationPixel = p;
     }
     if (button == GLFW_MOUSE_BUTTON_1 && !down)
     {
@@ -1727,7 +1836,7 @@ bool Viewer::mouseButtonEvent(const ng::Vector2i& p, int button, bool down, int 
     }
     if (!down)
     {
-        _translationActive = false;
+        _userTranslationActive = false;
     }
     return true;
 }
@@ -1745,26 +1854,43 @@ void Viewer::initCamera()
 
     mx::Vector3 boxMin = mesh->getMinimumBounds();
     mx::Vector3 boxMax = mesh->getMaximumBounds();
-    mx::Vector3 sphereCenter = (boxMax + boxMin) / 2.0;
+    mx::Vector3 sphereCenter = (boxMax + boxMin) / 2.0f;
     float sphereRadius = (sphereCenter - boxMin).getMagnitude();
-    _modelZoom = 2.0f / sphereRadius;
+    _modelZoom = MODEL_SPHERE_RADIUS / sphereRadius;
     _modelTranslation = sphereCenter * -1.0f;
 }
 
-void Viewer::computeCameraMatrices(mx::Matrix44& world,
-                                   mx::Matrix44& view,
-                                   mx::Matrix44& proj)
+void Viewer::updateViewHandlers()
 {
     float fH = std::tan(_viewAngle / 360.0f * PI) * _nearDist;
     float fW = fH * (float) mSize.x() / (float) mSize.y();
 
+    mx::Matrix44 cameraYaw = mx::Matrix44::createRotationY(_cameraYaw / 180.0f * PI);
+    mx::Matrix44 modelYaw = mx::Matrix44::createRotationY(_modelYaw / 180.0f * PI);
     ng::Matrix4f ngArcball = _arcball.matrix();
-    mx::Matrix44 arcball = mx::Matrix44(ngArcball.data(), ngArcball.data() + ngArcball.size()).getTranspose();
+    mx::Matrix44 arcball = mx::Matrix44(ngArcball.data(), ngArcball.data() + ngArcball.size());
 
-    view = createViewMatrix(_eye, _center, _up) * arcball;
-    proj = createPerspectiveMatrix(-fW, fW, -fH, fH, _nearDist, _farDist);
-    world = mx::Matrix44::createScale(mx::Vector3(_zoom * _modelZoom));
-    world *= mx::Matrix44::createTranslation(_modelTranslation).getTranspose();
+    _cameraViewHandler->worldMatrix = modelYaw *
+                                      mx::Matrix44::createTranslation(_modelTranslation + _userTranslation) *
+                                      mx::Matrix44::createScale(mx::Vector3(_modelZoom * _userZoom));
+    _cameraViewHandler->viewMatrix = cameraYaw * arcball * mx::ViewHandler::createViewMatrix(_eye, _center, _up);
+    _cameraViewHandler->projectionMatrix = mx::ViewHandler::createPerspectiveMatrix(-fW, fW, -fH, fH, _nearDist, _farDist);
+
+    mx::NodePtr dirLight = _lightHandler->getFirstLightOfCategory(DIR_LIGHT_NODE_CATEGORY);
+    if (dirLight)
+    {
+        const float r = MODEL_SPHERE_RADIUS;
+        _shadowViewHandler->worldMatrix = modelYaw *
+                                          mx::Matrix44::createTranslation(_modelTranslation) *
+                                          mx::Matrix44::createScale(mx::Vector3(_modelZoom));
+        _shadowViewHandler->projectionMatrix = mx::ViewHandler::createOrthographicMatrix(-r, r, -r, r, 0.0f, r * 2.0f);
+        mx::ValuePtr dir = dirLight->getInputValue("direction");
+        if (dir->isA<mx::Vector3>())
+        {
+            _shadowViewHandler->viewMatrix = mx::ViewHandler::createViewMatrix(
+                dir->asA<mx::Vector3>() * -r, mx::Vector3(0.0f), _up);
+        }
+    }
 }
 
 void Viewer::updateDisplayedProperties()
@@ -1785,9 +1911,96 @@ mx::ImagePtr Viewer::getAmbientOcclusionImage(MaterialPtr material)
     }
 
     std::string aoSuffix = material->getUdim().empty() ? AO_FILENAME_SUFFIX : AO_FILENAME_SUFFIX + "_" + material->getUdim();
-    mx::FilePath aoFilePath = _meshFilename.getParentPath();
-    std::string aoFilename = mx::removeExtension(_meshFilename.getBaseName()) + aoSuffix + "." + AO_FILENAME_EXTENSION;
+    mx::FilePath aoFilename = mx::removeExtension(_meshFilename).asString() + aoSuffix + "." + AO_FILENAME_EXTENSION;
 
-    _imageHandler->setSearchPath(_searchPath);
-    return _imageHandler->acquireImage(aoFilePath / aoFilename, true, &AO_FALLBACK_COLOR);
+    return _imageHandler->acquireImage(aoFilename, true, &AO_FALLBACK_COLOR);
+}
+
+void Viewer::splitDirectLight(mx::ImagePtr envRadianceMap, mx::ImagePtr& indirectMap, mx::DocumentPtr& dirLightDoc)
+{
+    mx::Vector3 lightDir;
+    mx::Color3 lightColor;
+    mx::ImagePair imagePair = envRadianceMap->splitByLuminance(ENV_MAP_SPLIT_RADIANCE);
+
+    mx::computeDominantLight(imagePair.second, lightDir, lightColor);
+    float lightIntensity = std::max(std::max(lightColor[0], lightColor[1]), lightColor[2]);
+    lightColor /= lightIntensity;
+
+    dirLightDoc = mx::createDocument();
+    mx::NodePtr dirLightNode = dirLightDoc->addNode(DIR_LIGHT_NODE_CATEGORY, "dir_light", mx::LIGHT_SHADER_TYPE_STRING);
+    dirLightNode->setInputValue("direction", lightDir);
+    dirLightNode->setInputValue("color", lightColor);
+    dirLightNode->setInputValue("intensity", lightIntensity);
+    indirectMap = imagePair.first;
+}
+
+void Viewer::updateShadowMap()
+{
+    if (_shadowMap || !_shadowMaterial)
+    {
+        return;
+    }
+
+    if (!_shadowFramebuffer)
+    {
+        _shadowFramebuffer = mx::GLFramebuffer::create(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 2, mx::Image::BaseType::FLOAT);
+    }
+
+    const mx::Matrix44& world = _shadowViewHandler->worldMatrix;
+    const mx::Matrix44& view = _shadowViewHandler->viewMatrix;
+    const mx::Matrix44& proj = _shadowViewHandler->projectionMatrix;
+
+    mx::ImageSamplingProperties blurSamplingProperties;
+    blurSamplingProperties.uaddressMode = mx::ImageSamplingProperties::AddressMode::CLAMP;
+    blurSamplingProperties.vaddressMode = mx::ImageSamplingProperties::AddressMode::CLAMP;
+    blurSamplingProperties.filterType = mx::ImageSamplingProperties::FilterType::CLOSEST;
+
+    // Clear shadow framebuffer.
+    _shadowFramebuffer->bind();
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    // Render shadow geometry.
+    _shadowMaterial->bindShader();
+    _shadowMaterial->bindViewInformation(world, view, proj);
+    mx::MeshPtr mesh = _geometryHandler->getMeshes()[0];
+    for (size_t i = 0; i < mesh->getPartitionCount(); i++)
+    {
+        mx::MeshPartitionPtr geom = mesh->getPartition(i);
+        _shadowMaterial->drawPartition(geom);
+    }
+    _shadowMap = _shadowFramebuffer->createColorImage();
+
+    // Apply Gaussian blurring.
+    for (unsigned int i = 0; i < _shadowSoftness; i++)
+    {
+        _shadowFramebuffer->bind();
+        _shadowBlurMaterial->bindShader();
+        if (_imageHandler->bindImage(_shadowMap, blurSamplingProperties))
+        {
+            mx::GLTextureHandlerPtr textureHandler = std::static_pointer_cast<mx::GLTextureHandler>(_imageHandler);
+            int textureLocation = textureHandler->getBoundTextureLocation(_shadowMap->getResourceId());
+            if (textureLocation >= 0)
+            {
+                _shadowBlurMaterial->getShader()->setUniform("image_file", textureLocation);
+            }
+        }
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        mx::GlslRenderer::drawScreenSpaceQuad();
+        _imageHandler->releaseRenderResources(_shadowMap);
+        _shadowMap = _shadowFramebuffer->createColorImage();
+    }
+
+    // Restore state for scene rendering.
+    glViewport(0, 0, mFBSize[0], mFBSize[1]);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glDrawBuffer(GL_BACK);
+}
+
+void Viewer::checkGlErrors(const std::string& context)
+{
+    for (GLenum error = glGetError(); error; error = glGetError())
+    {
+        std::cerr << "OpenGL error " << context << ": " << std::to_string(error) << std::endl;
+    }
 }

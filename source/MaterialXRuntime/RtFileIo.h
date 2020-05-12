@@ -27,19 +27,8 @@ class RtReadOptions
     using ReadFilter = std::function<bool(const ElementPtr& elem)>;
 
   public:
-    RtReadOptions() :
-        skipConflictingElements(true),
-        readFilter(nullptr),
-        readLookInformation(false),
-        desiredMajorVersion(1),
-        desiredMinorVersion(38)
-    {
-    }
+    RtReadOptions();
     ~RtReadOptions() { }
-
-    /// If true, duplicate elements with non-identical content will be skipped;
-    /// otherwise they will trigger an exception.  Defaults to false.
-    bool skipConflictingElements;
 
     /// Filter function type used for filtering elements during read.
     /// If the filter returns false the element will not be read.
@@ -48,10 +37,8 @@ class RtReadOptions
     /// Read look information
     bool readLookInformation;
 
-    ///
-    unsigned int desiredMajorVersion;
-
-    unsigned int desiredMinorVersion;
+    /// Apply latest updates
+    bool applyFutureUpdates;
 };
     
 /// @class RtWriteOptions
@@ -62,12 +49,7 @@ class RtWriteOptions
     using WriteFilter = std::function<bool(const RtObject& obj)>;
 
   public:
-     RtWriteOptions() :
-          writeIncludes(true),
-          writeFilter(nullptr),
-          materialWriteOp(NONE)
-    {
-    }
+    RtWriteOptions();
     ~RtWriteOptions() { }
 
     /// If true, elements with source file markings will be written as
@@ -82,25 +64,28 @@ class RtWriteOptions
     ///
     /// NONE: don't generate material elements or material nodes
     ///
-    /// ADD_MATERIAL_NODES_FOR_SHADERS: generate material nodes from
-    /// shaders
-    ///
     /// WRITE_MATERIALS_AS_ELEMENTS: writes out equivalent material
     /// elements for the material nodes present in a MaterialX
     /// document. If not set, writes out just the material nodes.
     ///
-    /// DELETE: delete source surface shaders
+    /// CREATE_LOOKS: generate a look for the material elements (implies
+    ///               WRITE_LOOKS)
     ///
-    /// LOOK: generate a look for the material element
+    /// WRITE_LOOKS: Write equivalent of RtReadOptions::readLookInformation
     ///
     /// TODO: Look into removing this once Material nodes are supported
     enum MaterialWriteOp{ NONE                           = 0,
-                          ADD_MATERIAL_NODES_FOR_SHADERS = 1 << 0,
-                          WRITE_MATERIALS_AS_ELEMENTS    = 1 << 1,
-                          DELETE                         = 1 << 2,
-                          LOOK                           = 1 << 3 };
+                          WRITE_MATERIALS_AS_ELEMENTS    = 1 << 0,
+                          CREATE_LOOKS                   = 1 << 1,
+                          WRITE_LOOKS                    = 1 << 2 };
 
     int materialWriteOp;
+
+    /// The desired major version
+    unsigned int desiredMajorVersion;
+
+    /// The desired minor version
+    unsigned int desiredMinorVersion;
 };
 
 /// API for read and write of data from MaterialX files
@@ -143,7 +128,7 @@ public:
 protected:
     /// Read all contents from one or more libraries.
     /// All MaterialX files found inside the given libraries will be read.
-    void readLibraries(const StringVec& libraryPaths, const FileSearchPath& searchPaths);
+    void readLibraries(const FilePathVec& libraryPaths, const FileSearchPath& searchPaths);
     friend class PvtApi;
 
 private:

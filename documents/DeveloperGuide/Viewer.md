@@ -4,11 +4,25 @@ The MaterialX Viewer leverages shader generation to build GLSL shaders from Mate
 
 ### Example Images
 
-**Figure 1:** Standard Surface Shader with procedural and uniform materials
-<p><img src="/documents/Images/MaterialXView_StandardSurface_01.png" width="1024"></p>
+**Figure 1:** Procedural and uniform materials in the MaterialX viewer
+<p float="left">
+  <img src="/documents/Images/MaterialXView_Marble.png" width="213" />
+  <img src="/documents/Images/MaterialXView_Copper.png" width="213" /> 
+  <img src="/documents/Images/MaterialXView_Plastic.png" width="213" /> 
+  <img src="/documents/Images/MaterialXView_Carpaint.png" width="213" /> 
+</p>
 
-**Figure 2:** Standard Surface Shader with textured, color-space-managed materials
-<p><img src="/documents/Images/MaterialXView_StandardSurface_02.png" width="640"></p>
+**Figure 2:** Textured, color-space-managed materials in the MaterialX viewer
+<p float="left">
+  <img src="/documents/Images/MaterialXView_TiledBrass.png" width="430" />
+  <img src="/documents/Images/MaterialXView_TiledWood.png" width="430" /> 
+</p>
+
+**Figure 3:** Droid character materials in the MaterialX viewer. © & TM Lucasfilm Ltd. Used with permission.
+<p float="left">
+  <img src="/documents/Images/MaterialXView_BB8.png" width="430" />
+  <img src="/documents/Images/MaterialXView_R2D2.png" width="430" /> 
+</p>
 
 ## Building The MaterialX Viewer
 Select the `MATERIALX_BUILD_VIEWER` option in CMake to build the MaterialX Viewer.  Installation will copy the **MaterialXView** executable to a `/bin` directory within the selected install folder.
@@ -39,11 +53,9 @@ If a material document containing `look` elements is loaded into the viewer, the
 
 ### Lighting
 
-The default lighting environment for the viewer is the San Giuseppe Bridge environment from HDRI Haven.  To load another environment into the viewer, click `Load Environment` and navigate to the [Environments](../../resources/Images/Environments) folder, or load any HDR environment in the latitude-longitude format.  If the HDR file on disk has a companion image with the `_diffuse` suffix, then this file will be loaded as the diffuse convolution of the environment; otherwise, a diffuse convolution will be generated at load-time using spherical harmonics.
+The default lighting environment for the viewer is the San Giuseppe Bridge environment from HDRI Haven.  To load another environment into the viewer, click `Load Environment` and navigate to the [Lights](../../resources/Lights) folder, or load any HDR environment in the latitude-longitude format.  If the HDR file on disk has a companion MaterialX document with a matching name, then this document will be loaded as the direct lighting rig for the environment; otherwise only indirect lighting will be rendered.  If the HDR file on disk has a companion image in an `irradiance` subfolder, then this image will be loaded as the diffuse convolution of the environment; otherwise, a diffuse convolution will be generated at load-time using spherical harmonics.
 
-The fidelity of environment lighting can be improved by increasing the `Environment Samples` option under `Advanced Settings`, though this improved quality requires additional GPU resources and can affect the interactivity of the viewer.
-
-Additional direct lights may be enabled through the `Lighting Options` section of `Advanced Settings`, though these lights are not yet editable in the viewer at run-time.
+Shadow maps from the primary directional light may be enabled with the `Shadow Map` option under `Advanced Settings`.  Ambient occlusion, if available for the given geometry, may be enabled with the `Ambient Occlusion` option.  The fidelity of environment lighting may be improved by increasing the value of `Environment Samples`, though this requires additional GPU resources and can affect the interactivity of the viewer.
 
 ### Images
 
@@ -62,6 +74,7 @@ By default, the MaterialX viewer loads and saves image files using `stb_image`, 
 The following are common command-line options for MaterialXView, and a complete list can be displayed with the `--help` option.
 - `--material [FILENAME]`: Specify the displayed material
 - `--mesh [FILENAME]`: Specify the displayed geometry
-- `--library [FILEPATH]`: Specify an additional library folder
-- `--path [FILEPATH]`: Specify an additional search-path folder
+- `--envRad [FILENAME]`: Specify the displayed environment light, stored as HDR environment radiance in the latitude-longitude format
+- `--path [FILEPATH]`: Specify an additional absolute search path location
+- `--library [FILEPATH]`: Specify an additional relative path to a custom data library folder
 - `--help`: Display the complete list of command-line options

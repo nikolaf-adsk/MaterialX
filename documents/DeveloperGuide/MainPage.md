@@ -24,7 +24,6 @@ The MaterialX C++ libraries are automatically included when building MaterialX t
 
 Additional options for the generation of MaterialX C++ include the following:
 
-- `MATERIALX_TEST_RENDER`: Requests that rendering functionality be included in the MaterialXTest unit-test suite.  When this option is enabled, GPU support will be required when MaterialXTest is run.
 - `MATERIALX_BUILD_OIIO`: Requests that MaterialXRender be built with OpenImageIO instead of stb_image, extending the set of supported image formats.
 - `MATERIALX_OIIO_DIR`: Path to the root folder of an OpenImageIO installation.  If the MATERIALX_BUILD_OIIO option has been enabled, then this path is required.
 
@@ -38,7 +37,7 @@ By default, the `MATERIALX_BUILD_PYTHON` option will use the active version of P
 Additional options for the generation of MaterialX Python include the following:
 
 - `MATERIALX_PYTHON_OCIO_DIR`: Path to a folder containing the default OCIO configuration to be packaged with MaterialX Python. The recommended OpenColorIO configuration for MaterialX is [ACES 1.0.3](https://github.com/imageworks/OpenColorIO-Configs/tree/master/aces_1.0.3).
-- `MATERIALX_PYTHON_PYBIND11_DIR`: Path to a folder containing the PyBind11 source. Defaults to the included PyBind11 source, which has been extended to support Python 2.6.
+- `MATERIALX_PYTHON_PYBIND11_DIR`: Path to a folder containing the PyBind11 source to be used in building MaterialX Python. Defaults to the included PyBind11 source.
 
 ### Building The MaterialX Viewer
 

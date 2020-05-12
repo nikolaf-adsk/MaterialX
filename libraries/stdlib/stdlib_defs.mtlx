@@ -64,8 +64,8 @@
 
   <unittypedef name="angle"/>
   <unitdef name="UD_stdlib_angle" unittype="angle">
-    <unit name="degrees" scale="1.0" />
-    <unit name="radians" scale="57.295779513" />
+    <unit name="degree" scale="1.0" />
+    <unit name="radian" scale="57.295779513" />
   </unitdef>
 
   <!-- ======================================================================== -->
@@ -1164,52 +1164,6 @@
   </nodedef>
 
   <!--
-    Node: <geomattrvalue>
-    The value of the specified geomattr for the current geometry.
-    (This will be replaced by <geompropvalue> in 1.37)
-  -->
-  <nodedef name="ND_geomattrvalue_integer" node="geomattrvalue" nodegroup="geometric">
-    <parameter name="attrname" type="string" value=""/>
-    <output name="out" type="integer" default="0"/>
-  </nodedef>
-  <nodedef name="ND_geomattrvalue_boolean" node="geomattrvalue" nodegroup="geometric">
-    <parameter name="attrname" type="string" value=""/>
-    <output name="out" type="boolean" default="false"/>
-  </nodedef>
-  <nodedef name="ND_geomattrvalue_string" node="geomattrvalue" nodegroup="geometric">
-    <parameter name="attrname" type="string" value=""/>
-    <output name="out" type="string" default=""/>
-  </nodedef>
-  <nodedef name="ND_geomattrvalue_float" node="geomattrvalue" nodegroup="geometric">
-    <parameter name="attrname" type="string" value=""/>
-    <output name="out" type="float" default="0.0"/>
-  </nodedef>
-  <nodedef name="ND_geomattrvalue_color2" node="geomattrvalue" nodegroup="geometric">
-    <parameter name="attrname" type="string" value=""/>
-    <output name="out" type="color2" default="0.0, 0.0"/>
-  </nodedef>
-  <nodedef name="ND_geomattrvalue_color3" node="geomattrvalue" nodegroup="geometric">
-    <parameter name="attrname" type="string" value=""/>
-    <output name="out" type="color3" default="0.0, 0.0, 0.0"/>
-  </nodedef>
-  <nodedef name="ND_geomattrvalue_color4" node="geomattrvalue" nodegroup="geometric">
-    <parameter name="attrname" type="string" value=""/>
-    <output name="out" type="color4" default="0.0, 0.0, 0.0, 0.0"/>
-  </nodedef>
-  <nodedef name="ND_geomattrvalue_vector2" node="geomattrvalue" nodegroup="geometric">
-    <parameter name="attrname" type="string" value=""/>
-    <output name="out" type="vector2" default="0.0, 0.0"/>
-  </nodedef>
-  <nodedef name="ND_geomattrvalue_vector3" node="geomattrvalue" nodegroup="geometric">
-    <parameter name="attrname" type="string" value=""/>
-    <output name="out" type="vector3" default="0.0, 0.0, 0.0"/>
-  </nodedef>
-  <nodedef name="ND_geomattrvalue_vector4" node="geomattrvalue" nodegroup="geometric">
-    <parameter name="attrname" type="string" value=""/>
-    <output name="out" type="vector4" default="0.0, 0.0, 0.0, 0.0"/>
-  </nodedef>
-
-  <!--
     Node: <geompropvalue>
     The value of the specified geometric property for the current geometry.
   -->
@@ -1275,7 +1229,7 @@
     values represent greater accessibility to ambient light, 0 means "fully occluded".
   -->
   <nodedef name="ND_ambientocclusion_float" node="ambientocclusion" nodegroup="global">
-    <parameter name="coneangle" type="float" value="90.0" unittype="angle" unit="degrees"/>
+    <parameter name="coneangle" type="float" value="90.0" unittype="angle" unit="degree"/>
     <parameter name="maxdistance" type="float" value="1e38"/>
     <output name="out" type="float" default="1.0"/>
   </nodedef>
@@ -2562,7 +2516,7 @@
     <input name="scale" type="float" value="1.0"/>
     <input name="normal" type="vector3" defaultgeomprop="Nworld"/>
     <input name="tangent" type="vector3" defaultgeomprop="Tworld"/>
-    <output name="out" type="vector3" defaultinput="0.0, 1.0, 0.0"/>
+    <output name="out" type="vector3" default="0.0, 1.0, 0.0"/>
   </nodedef>
 
   <!--
@@ -2610,7 +2564,7 @@
   -->
   <nodedef name="ND_rotate2d_vector2" node="rotate2d" nodegroup="math">
     <input name="in" type="vector2" value="0.0, 0.0"/>
-    <input name="amount" type="float" value="0.0" unittype="angle" unit="degrees"/>
+    <input name="amount" type="float" value="0.0" unittype="angle" unit="degree"/>
     <output name="out" type="vector2" defaultinput="in"/>
   </nodedef>
 
@@ -2620,8 +2574,8 @@
   -->
   <nodedef name="ND_rotate3d_vector3" node="rotate3d" nodegroup="math">
     <input name="in" type="vector3" value="0.0, 0.0, 0.0"/>
-    <input name="amount" type="float" value="0.0" unittype="angle" unit="degrees"/>
-    <parameter name="axis" type="vector3" value="0.0, 1.0, 0.0"/>
+    <input name="amount" type="float" value="0.0" unittype="angle" unit="degree"/>
+    <input name="axis" type="vector3" value="0.0, 1.0, 0.0"/>
     <output name="out" type="vector3" defaultinput="in"/>
   </nodedef>
 
@@ -2633,7 +2587,7 @@
     <input name="texcoord" type="vector2" value="0.0, 0.0"/>
     <parameter name="pivot" type="vector2" value="0.0,0.0"/>
     <input name="scale" type="vector2" value="1.0,1.0"/>
-    <input name="rotate" type="float" value="0.0" unittype="angle" unit="degrees"/>
+    <input name="rotate" type="float" value="0.0" unittype="angle" unit="degree"/>
     <input name="offset" type="vector2" value="0.0,0.0"/>
     <output name="out" type="vector2" defaultinput="texcoord"/>
   </nodedef>

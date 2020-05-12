@@ -12,7 +12,7 @@
 #include <MaterialXGenGlsl/Nodes/BitangentNodeGlsl.h>
 #include <MaterialXGenGlsl/Nodes/TexCoordNodeGlsl.h>
 #include <MaterialXGenGlsl/Nodes/GeomColorNodeGlsl.h>
-#include <MaterialXGenGlsl/Nodes/GeomAttrValueNodeGlsl.h>
+#include <MaterialXGenGlsl/Nodes/GeomPropValueNodeGlsl.h>
 #include <MaterialXGenGlsl/Nodes/FrameNodeGlsl.h>
 #include <MaterialXGenGlsl/Nodes/TimeNodeGlsl.h>
 #include <MaterialXGenGlsl/Nodes/ViewDirectionNodeGlsl.h>
@@ -216,17 +216,17 @@ GlslShaderGenerator::GlslShaderGenerator() :
     registerImplementation("IM_geomcolor_color2_" + GlslShaderGenerator::LANGUAGE, GeomColorNodeGlsl::create);
     registerImplementation("IM_geomcolor_color3_" + GlslShaderGenerator::LANGUAGE, GeomColorNodeGlsl::create);
     registerImplementation("IM_geomcolor_color4_" + GlslShaderGenerator::LANGUAGE, GeomColorNodeGlsl::create);
-    // <!-- <geomattrvalue> -->
-    registerImplementation("IM_geomattrvalue_integer_" + GlslShaderGenerator::LANGUAGE, GeomAttrValueNodeGlsl::create);
-    registerImplementation("IM_geomattrvalue_boolean_" + GlslShaderGenerator::LANGUAGE, GeomAttrValueNodeGlsl::create);
-    registerImplementation("IM_geomattrvalue_string_" + GlslShaderGenerator::LANGUAGE, GeomAttrValueNodeGlsl::create);
-    registerImplementation("IM_geomattrvalue_float_" + GlslShaderGenerator::LANGUAGE, GeomAttrValueNodeGlsl::create);
-    registerImplementation("IM_geomattrvalue_color2_" + GlslShaderGenerator::LANGUAGE, GeomAttrValueNodeGlsl::create);
-    registerImplementation("IM_geomattrvalue_color3_" + GlslShaderGenerator::LANGUAGE, GeomAttrValueNodeGlsl::create);
-    registerImplementation("IM_geomattrvalue_color4_" + GlslShaderGenerator::LANGUAGE, GeomAttrValueNodeGlsl::create);
-    registerImplementation("IM_geomattrvalue_vector2_" + GlslShaderGenerator::LANGUAGE, GeomAttrValueNodeGlsl::create);
-    registerImplementation("IM_geomattrvalue_vector3_" + GlslShaderGenerator::LANGUAGE, GeomAttrValueNodeGlsl::create);
-    registerImplementation("IM_geomattrvalue_vector4_" + GlslShaderGenerator::LANGUAGE, GeomAttrValueNodeGlsl::create);
+    // <!-- <geompropvalue> -->
+    registerImplementation("IM_geompropvalue_integer_" + GlslShaderGenerator::LANGUAGE, GeomPropValueNodeGlsl::create);
+    registerImplementation("IM_geompropvalue_boolean_" + GlslShaderGenerator::LANGUAGE, GeomPropValueNodeGlsl::create);
+    registerImplementation("IM_geompropvalue_string_" + GlslShaderGenerator::LANGUAGE, GeomPropValueNodeGlsl::create);
+    registerImplementation("IM_geompropvalue_float_" + GlslShaderGenerator::LANGUAGE, GeomPropValueNodeGlsl::create);
+    registerImplementation("IM_geompropvalue_color2_" + GlslShaderGenerator::LANGUAGE, GeomPropValueNodeGlsl::create);
+    registerImplementation("IM_geompropvalue_color3_" + GlslShaderGenerator::LANGUAGE, GeomPropValueNodeGlsl::create);
+    registerImplementation("IM_geompropvalue_color4_" + GlslShaderGenerator::LANGUAGE, GeomPropValueNodeGlsl::create);
+    registerImplementation("IM_geompropvalue_vector2_" + GlslShaderGenerator::LANGUAGE, GeomPropValueNodeGlsl::create);
+    registerImplementation("IM_geompropvalue_vector3_" + GlslShaderGenerator::LANGUAGE, GeomPropValueNodeGlsl::create);
+    registerImplementation("IM_geompropvalue_vector4_" + GlslShaderGenerator::LANGUAGE, GeomPropValueNodeGlsl::create);
 
     // <!-- <frame> -->
     registerImplementation("IM_frame_float_" + GlslShaderGenerator::LANGUAGE, FrameNodeGlsl::create);
@@ -313,7 +313,7 @@ void GlslShaderGenerator::emitVertexStage(const ShaderGraph& graph, GenContext& 
     const VariableBlock& constants = stage.getConstantBlock();
     if (!constants.empty())
     {
-        emitVariableDeclarations(constants, _syntax->getConstantQualifier(), SEMICOLON, context, stage);
+        emitVariableDeclarations(constants, _syntax->getConstantQualifier(), Syntax::SEMICOLON, context, stage);
         emitLineBreak(stage);
     }
 
@@ -324,7 +324,7 @@ void GlslShaderGenerator::emitVertexStage(const ShaderGraph& graph, GenContext& 
         if (!uniforms.empty())
         {
             emitComment("Uniform block: " + uniforms.getName(), stage);
-            emitVariableDeclarations(uniforms, _syntax->getUniformQualifier(), SEMICOLON, context, stage);
+            emitVariableDeclarations(uniforms, _syntax->getUniformQualifier(), Syntax::SEMICOLON, context, stage);
             emitLineBreak(stage);
         }
     }
@@ -334,7 +334,7 @@ void GlslShaderGenerator::emitVertexStage(const ShaderGraph& graph, GenContext& 
     if (!vertexInputs.empty())
     {
         emitComment("Inputs block: " + vertexInputs.getName(), stage);
-        emitVariableDeclarations(vertexInputs, _syntax->getInputQualifier(), SEMICOLON, context, stage, false);
+        emitVariableDeclarations(vertexInputs, _syntax->getInputQualifier(), Syntax::SEMICOLON, context, stage, false);
         emitLineBreak(stage);
     }
 
@@ -344,9 +344,9 @@ void GlslShaderGenerator::emitVertexStage(const ShaderGraph& graph, GenContext& 
     {
         emitLine("out " + vertexData.getName(), stage, false);
         emitScopeBegin(stage);
-        emitVariableDeclarations(vertexData, EMPTY_STRING, SEMICOLON, context, stage, false);
+        emitVariableDeclarations(vertexData, EMPTY_STRING, Syntax::SEMICOLON, context, stage, false);
         emitScopeEnd(stage, false, false);
-        emitString(" " + vertexData.getInstance() + SEMICOLON, stage);
+        emitString(" " + vertexData.getInstance() + Syntax::SEMICOLON, stage);
         emitLineBreak(stage);
         emitLineBreak(stage);
     }
@@ -394,16 +394,22 @@ void GlslShaderGenerator::emitPixelStage(const ShaderGraph& graph, GenContext& c
 
     // Add global constants and type definitions
     emitInclude("pbrlib/" + GlslShaderGenerator::LANGUAGE + "/lib/mx_defines.glsl", context, stage);
-    const unsigned int maxLights = std::max(1u, context.getOptions().hwMaxActiveLightSources);
-    emitLine("#define MAX_LIGHT_SOURCES " + std::to_string(maxLights), stage, false);
-    emitLineBreak(stage);
+
+    // Emit Light shader if required
+    if (context.getOptions().hwMaxActiveLightSources > 0)
+    {
+        const unsigned int maxLights = std::max(1u, context.getOptions().hwMaxActiveLightSources);
+        emitLine("#define MAX_LIGHT_SOURCES " + std::to_string(maxLights), stage, false);
+        emitLineBreak(stage);
+    }
+
     emitTypeDefinitions(context, stage);
 
     // Add all constants
     const VariableBlock& constants = stage.getConstantBlock();
     if (!constants.empty())
     {
-        emitVariableDeclarations(constants, _syntax->getConstantQualifier(), SEMICOLON, context, stage);
+        emitVariableDeclarations(constants, _syntax->getConstantQualifier(), Syntax::SEMICOLON, context, stage);
         emitLineBreak(stage);
     }
 
@@ -416,7 +422,7 @@ void GlslShaderGenerator::emitPixelStage(const ShaderGraph& graph, GenContext& c
         if (!uniforms.empty() && uniforms.getName() != HW::LIGHT_DATA)
         {
             emitComment("Uniform block: " + uniforms.getName(), stage);
-            emitVariableDeclarations(uniforms, _syntax->getUniformQualifier(), SEMICOLON, context, stage);
+            emitVariableDeclarations(uniforms, _syntax->getUniformQualifier(), Syntax::SEMICOLON, context, stage);
             emitLineBreak(stage);
         }
     }
@@ -425,12 +431,12 @@ void GlslShaderGenerator::emitPixelStage(const ShaderGraph& graph, GenContext& c
                     graph.hasClassification(ShaderNode::Classification::BSDF);
 
     // Add light data block if needed
-    if (lighting)
+    if (lighting && context.getOptions().hwMaxActiveLightSources > 0)
     {
         const VariableBlock& lightData = stage.getUniformBlock(HW::LIGHT_DATA);
         emitLine("struct " + lightData.getName(), stage, false);
         emitScopeBegin(stage);
-        emitVariableDeclarations(lightData, EMPTY_STRING, SEMICOLON, context, stage, false);
+        emitVariableDeclarations(lightData, EMPTY_STRING, Syntax::SEMICOLON, context, stage, false);
         emitScopeEnd(stage, true);
         emitLineBreak(stage);
         emitLine("uniform " + lightData.getName() + " " + lightData.getInstance() + "[MAX_LIGHT_SOURCES]", stage);
@@ -443,9 +449,9 @@ void GlslShaderGenerator::emitPixelStage(const ShaderGraph& graph, GenContext& c
     {
         emitLine("in " + vertexData.getName(), stage, false);
         emitScopeBegin(stage);
-        emitVariableDeclarations(vertexData, EMPTY_STRING, SEMICOLON, context, stage, false);
+        emitVariableDeclarations(vertexData, EMPTY_STRING, Syntax::SEMICOLON, context, stage, false);
         emitScopeEnd(stage, false, false);
-        emitString(" " + vertexData.getInstance() + SEMICOLON, stage);
+        emitString(" " + vertexData.getInstance() + Syntax::SEMICOLON, stage);
         emitLineBreak(stage);
         emitLineBreak(stage);
     }
@@ -454,17 +460,25 @@ void GlslShaderGenerator::emitPixelStage(const ShaderGraph& graph, GenContext& c
     // and upstream connection will be converted to vec4 if needed in emitFinalOutput()
     emitComment("Pixel shader outputs", stage);
     const VariableBlock& outputs = stage.getOutputBlock(HW::PIXEL_OUTPUTS);
-    emitVariableDeclarations(outputs, _syntax->getOutputQualifier(), SEMICOLON, context, stage, false);
+    emitVariableDeclarations(outputs, _syntax->getOutputQualifier(), Syntax::SEMICOLON, context, stage, false);
     emitLineBreak(stage);
 
     // Emit common math functions
     emitInclude("pbrlib/" + GlslShaderGenerator::LANGUAGE + "/lib/mx_math.glsl", context, stage);
     emitLineBreak(stage);
 
-    // Emit lighting functions
+    // Emit lighting and shadowing functions
     if (lighting)
     {
         emitSpecularEnvironment(context, stage);
+        if (context.getOptions().hwShadowMap)
+        {
+            emitInclude("pbrlib/" + GlslShaderGenerator::LANGUAGE + "/lib/mx_shadow.glsl", context, stage);
+        }
+    }
+    if (context.getOptions().hwWriteDepthMoments)
+    {
+        emitInclude("pbrlib/" + GlslShaderGenerator::LANGUAGE + "/lib/mx_shadow.glsl", context, stage);
     }
 
     // Emit sampling code if needed
@@ -508,6 +522,10 @@ void GlslShaderGenerator::emitPixelStage(const ShaderGraph& graph, GenContext& c
         // We don't support rendering closures without attaching 
         // to a surface shader, so just output black.
         emitLine(outputSocket->getVariable() + " = vec4(0.0, 0.0, 0.0, 1.0)", stage);
+    }
+    else if (context.getOptions().hwWriteDepthMoments)
+    {
+        emitLine(outputSocket->getVariable() + " = vec4(mx_compute_depth_moments(), 0.0, 1.0)", stage);
     }
     else
     {
@@ -572,22 +590,26 @@ void GlslShaderGenerator::emitFunctionDefinitions(const ShaderGraph& graph, GenC
 {
 BEGIN_SHADER_STAGE(stage, Stage::PIXEL)
 
-    // For surface shaders we need light shaders
-    if (graph.hasClassification(ShaderNode::Classification::SHADER | ShaderNode::Classification::SURFACE))
+    // Emit Light functions if requested
+    if (context.getOptions().hwMaxActiveLightSources > 0)
     {
-        // Emit functions for all bound light shaders
-        HwLightShadersPtr lightShaders = context.getUserData<HwLightShaders>(HW::USER_DATA_LIGHT_SHADERS);
-        if (lightShaders)
+        // For surface shaders we need light shaders
+        if (graph.hasClassification(ShaderNode::Classification::SHADER | ShaderNode::Classification::SURFACE))
         {
-            for (const auto& it : lightShaders->get())
+            // Emit functions for all bound light shaders
+            HwLightShadersPtr lightShaders = context.getUserData<HwLightShaders>(HW::USER_DATA_LIGHT_SHADERS);
+            if (lightShaders)
             {
-                emitFunctionDefinition(*it.second, context, stage);
+                for (const auto& it : lightShaders->get())
+                {
+                    emitFunctionDefinition(*it.second, context, stage);
+                }
             }
-        }
-        // Emit functions for light sampling
-        for (const auto& it : _lightSamplingNodes)
-        {
-            emitFunctionDefinition(*it, context, stage);
+            // Emit functions for light sampling
+            for (const auto& it : _lightSamplingNodes)
+            {
+                emitFunctionDefinition(*it, context, stage);
+            }
         }
     }
 END_SHADER_STAGE(stage, Stage::PIXEL)
@@ -677,7 +699,7 @@ void GlslShaderGenerator::emitVariableDeclaration(const ShaderPort* variable, co
         // If an array we need an array qualifier (suffix) for the variable name
         if (variable->getType()->isArray() && variable->getValue())
         {
-            str += _syntax->getArraySuffix(variable->getType(), *variable->getValue());
+            str += _syntax->getArrayVariableSuffix(variable->getType(), *variable->getValue());
         }
 
         if (!variable->getSemantic().empty())
@@ -711,45 +733,6 @@ ShaderNodeImplPtr GlslShaderGenerator::createCompoundImplementation(const NodeGr
     return HwShaderGenerator::createCompoundImplementation(impl);
 }
 
-bool GlslShaderGenerator::remapEnumeration(const ValueElement& input, const string& value, std::pair<const TypeDesc*, ValuePtr>& result) const
-{
-    // Early out if not an enum input.
-    const string& enumNames = input.getAttribute(ValueElement::ENUM_ATTRIBUTE);
-    if (enumNames.empty())
-    {
-        return false;
-    }
-
-    // Don't convert already supported types
-    // or filenames and arrays.
-    const TypeDesc* type = TypeDesc::get(input.getType());
-    if (_syntax->typeSupported(type) ||
-        type == Type::FILENAME || type->isArray())
-    {
-        return false;
-    }
-
-    // For GLSL we always convert to integer,
-    // with the integer value being an index into the enumeration.
-    result.first = Type::INTEGER;
-    result.second = nullptr;
-
-    // Try remapping to an enum value.
-    if (!value.empty())
-    {
-        StringVec valueElemEnumsVec = splitString(enumNames, ",");
-        auto pos = std::find(valueElemEnumsVec.begin(), valueElemEnumsVec.end(), value);
-        if (pos == valueElemEnumsVec.end())
-        {
-            throw ExceptionShaderGenError("Given value '" + value + "' is not a valid enum value for input '" + input.getNamePath() + "'");
-        }
-        const int index = static_cast<int>(std::distance(valueElemEnumsVec.begin(), pos));
-        result.second = Value::createValue<int>(index);
-    }
-
-    return true;
-}
-
 const string GlslImplementation::SPACE = "space";
 const string GlslImplementation::TO_SPACE = "tospace";
 const string GlslImplementation::FROM_SPACE = "fromspace";
@@ -757,7 +740,7 @@ const string GlslImplementation::WORLD = "world";
 const string GlslImplementation::OBJECT = "object";
 const string GlslImplementation::MODEL = "model";
 const string GlslImplementation::INDEX = "index";
-const string GlslImplementation::ATTRNAME = "attrname";
+const string GlslImplementation::GEOMPROP = "geomprop";
 
 namespace
 {

@@ -65,14 +65,13 @@ class PyShaderRenderer : public mx::ShaderRenderer
         );
     }
 
-    void save(const mx::FilePath& filePath, bool floatingPoint) override
+    void save(const mx::FilePath& filePath) override
     {
         PYBIND11_OVERLOAD_PURE(
             void,
             mx::ShaderRenderer,
             save,
-            filePath,
-            floatingPoint
+            filePath
         );
     }
 };
@@ -81,6 +80,7 @@ void bindPyShaderRenderer(py::module& mod)
 {
     py::class_<mx::ShaderRenderer, PyShaderRenderer, mx::ShaderRendererPtr>(mod, "ShaderRenderer")
         .def("initialize", &mx::ShaderRenderer::initialize)
+        .def("setSize", &mx::ShaderRenderer::setSize)
         .def("setImageHandler", &mx::ShaderRenderer::setImageHandler)
         .def("getImageHandler", &mx::ShaderRenderer::getImageHandler)
         .def("setLightHandler", &mx::ShaderRenderer::setLightHandler)

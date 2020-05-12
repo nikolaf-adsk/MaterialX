@@ -10,8 +10,8 @@
 namespace MaterialX
 {
 
-TextureBaker::TextureBaker(unsigned int res) :
-    GlslRenderer(res),
+TextureBaker::TextureBaker(unsigned int width, unsigned int height) :
+    GlslRenderer(width, height),
     _generator(GlslShaderGenerator::create()),
     _extension(ImageLoader::PNG_EXTENSION)
 {
@@ -63,13 +63,15 @@ void TextureBaker::bakeGraphOutput(OutputPtr output, GenContext& context, const 
     createProgram(shader);
 
     bool encodeSrgb = output->getType() == "color3" || output->getType() == "color4";
-    renderTextureSpace(encodeSrgb);
+    getFrameBuffer()->setEncodeSrgb(encodeSrgb);
+
+    renderTextureSpace();
 
     // TODO: Add support for graphs containing geometric nodes such as position and normal.
     //       Currently, the only supported geometric node is texcoord.
 
     FilePath filename = outputFolder / generateTextureFilename(output);
-    save(filename, false);
+    save(filename);
 }
 
 void TextureBaker::writeBakedDocument(ShaderRefPtr shaderRef, const FilePath& filename)
