@@ -4,10 +4,8 @@ mkdir ./_build
 cd ./_build
 
 emcmake cmake \
-    ../.. \
+    ../../../CMakeLists.txt \
     -G "Unix Makefiles" \
-    -DMATERIALX_BUILD_WASM=1 \
-    -DMATERIALX_BUILD_RENDER=OFF \
-    -DMATERIALX_BUILD_TESTS=OFF
+    -DMATERIALX_BUILD_WASM=ON
 
 emmake make
