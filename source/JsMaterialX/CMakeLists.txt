@@ -24,16 +24,13 @@ set(FORMAT_DEPS ${OUTPUT_FORMAT}JsXmlIo.cpp)
 
 set(LIB_DEPS ${OUTPUT_LIBS}MaterialXCore/libMaterialXCore.a ${OUTPUT_LIBS}MaterialXFormat/libMaterialXFormat.a)
 
-add_executable(jsBindings jsBindings.cpp)
+add_executable(MaterialXLib MaterialXLib.cpp)
 
-target_link_libraries(jsBindings ${CORE_DEPS} ${FORMAT_DEPS} ${LIB_DEPS})
+target_link_libraries(MaterialXLib ${CORE_DEPS} ${FORMAT_DEPS} ${LIB_DEPS})
 
 set(JS_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/../ -std=c++17 -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -s MODULARIZE=1 -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 ")
 
 string(APPEND JS_FLAGS "--post-js ${OUTPUT_CORE}JsTypes.js --post-js ${OUTPUT_CORE}JsGeom.js --post-js ${OUTPUT_CORE}JsDefinition.js --post-js ${OUTPUT_CORE}JsDocument.js --post-js ${OUTPUT_CORE}JsElement.js --post-js ${OUTPUT_CORE}JsInterface.js --post-js ${OUTPUT_CORE}JsLook.js --post-js ${OUTPUT_CORE}JsMaterial.js --post-js ${OUTPUT_CORE}JsNode.js --post-js ${OUTPUT_CORE}JsObserver.js --post-js ${OUTPUT_CORE}JsProperty.js --post-js ${OUTPUT_CORE}JsTraversal.js --post-js ${OUTPUT_CORE}JsUtil.js --post-js ${OUTPUT_CORE}JsValue.js --post-js ${OUTPUT_CORE}JsVariant.js --post-js ${OUTPUT_FORMAT}JsXmlIo.js --post-js ${CMAKE_CURRENT_SOURCE_DIR}/initMaterialX.js ")
 string(APPEND JS_FLAGS "-Os --bind ")
-message("${CMAKE_CURRENT_SOURCE_DIR}/MaterialXLib.js")
-string(APPEND JS_FLAGS "-o ${CMAKE_CURRENT_SOURCE_DIR}/MaterialXLib.js ")
 
-
-set_target_properties(jsBindings PROPERTIES LINK_FLAGS ${JS_FLAGS})
+set_target_properties(MaterialXLib PROPERTIES LINK_FLAGS ${JS_FLAGS})

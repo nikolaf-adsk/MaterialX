@@ -21,7 +21,7 @@ option(MATERIALX_BUILD_GEN_OGSXML "Build the OGSXML shader generator back-end." 
 option(MATERIALX_BUILD_GEN_OGSFX "Build the OGSFX shader generator back-end." ON)
 option(MATERIALX_BUILD_GEN_ARNOLD "Build the Arnold OSL shader generator back-end." ON)
 
-option(MATERIALX_BUILD_WASM "Build the MaterialX WASM package from C++ bindings." OFF)
+option(MATERIALX_BUILD_JS "Build the MaterialX WASM package from C++ bindings." OFF)
 option(MATERIALX_BUILD_PYTHON "Build the MaterialX Python package from C++ bindings. Requires Python 2.7 or greater." OFF)
 option(MATERIALX_BUILD_RUNTIME "Build the MaterialX Runtime data model library." OFF)
 option(MATERIALX_BUILD_RENDER "Build the MaterialX Render modules." ON)
@@ -46,8 +46,7 @@ if (NOT MATERIALX_BUILD_PYTHON)
     set(MATERIALX_INSTALL_PYTHON OFF)
 endif()
 
-if(MATERIALX_BUILD_WASM)
-    message("MATERIALX_BUILD_WASM turned on.")
+if(MATERIALX_BUILD_JS)
     set(MATERIALX_BUILD_RENDER OFF)
     set(MATERIALX_BUILD_TESTS OFF)
 endif()
@@ -274,7 +273,7 @@ if(MATERIALX_BUILD_PYTHON)
     add_subdirectory(python)
 endif()
 
-if(MATERIALX_BUILD_WASM)
+if(MATERIALX_BUILD_JS)
     add_subdirectory(source/JsMaterialX)
 endif()
 
