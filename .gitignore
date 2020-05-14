@@ -21,9 +21,3 @@ deploy
 
 # Ignore local editor settings
 .vscode/*
-
-# Ignore the build wasm folder
-wasm/_build/*
-
-# Ignore the emscripten output
-source/JsMaterialX/MaterialXLib.*
