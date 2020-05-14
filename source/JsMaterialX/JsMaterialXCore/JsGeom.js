@@ -6,8 +6,8 @@ addWrapper(function(Module, api) {
     /** Setup the GeomInfo class */
     api.GeomInfo = wrapperFactory(Module.GeomInfo);
 
-    /** Setup the GeomAttr class */
-    api.GeomAttr = wrapperFactory(Module.GeomAttr);
+    /** Setup the GeomProp class */
+    api.GeomProp = wrapperFactory(Module.GeomProp);
 
     /** Setup the GeomPropDef class */
     api.GeomPropDef = wrapperFactory(Module.GeomPropDef);
