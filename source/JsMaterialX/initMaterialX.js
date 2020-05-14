@@ -1,13 +1,18 @@
 /**
  * Creates a js array from the passed in vector instance
  * @param {Vector} vec - Wasm vector
+ * @param {Boolean} [needDelete=true] - deletes the vector after generating the array.
  * @return {Array} - Array representing the wasm vector
  */
-function vecToArray(vec) {
+function vecToArray(vec, needDelete=true) {
     var size = vec.size();
     var result = [];
     for (var i = 0; i < size; i++) {
         result.push(vec.get(i));
+    }
+    if(needDelete) {
+        // avoid memory leak
+        vec.delete();
     }
     return result;
 }
@@ -59,8 +64,18 @@ function catchPtrError(func, handle, args, defaultArgs) {
     }
 }
 
+/**
+ * This variable is used to specify that a function's parameter is required.
+ */
 var REQUIRED = 'requiredArgument';
 
+/**
+ * Wrap the Module's function to catch any uncaught pointers.
+ * If the module's function 
+ * @param {Function} func - Module function 
+ * @param {*} defaultArgs 
+ * @returns {*}
+ */
 function wrapperFunction(func, defaultArgs = []) {
     return function() {
         var ret = catchPtrError(func, this, arguments, defaultArgs);
@@ -74,7 +89,10 @@ function wrapperFunction(func, defaultArgs = []) {
 
 /**
  * Wraps the class prototype functions to catch ptr errors.
- * @param {*} klass
+ * @param {Object} klass - Module Class
+ * @param {Object} [funcArgOverride={}] - An object that consists of the name of a function in the prototype as the key
+ *                                        and an array of parameters for the function. This is used to specify which parameters should be optional and default.
+ * @returns {Object} - the wrapped class.
  */
 function wrapperFactory(klass, funcArgOverride = {}) {
     var proto = klass.prototype;
