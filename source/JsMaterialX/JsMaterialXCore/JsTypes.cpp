@@ -65,7 +65,7 @@ extern "C"
             .constructor<>()
             .constructor<float, float, float>()
                 BIND_VECTOR_SUBCLASS(Vector3)
-            .function("cross", &Vector2::cross);
+            .function("cross", &Vector3::cross);
 
         class_<Vector4, base<VectorBase>>("Vector4")
             .constructor<>()
@@ -93,7 +93,6 @@ extern "C"
                 BIND_MATRIX_SUBCLASS(Matrix33)
             .function("createScale", optional_override([](const Matrix33 &self, const Vector2 &v) { return self.Matrix33::createScale(v); }))
             .function("createTranslation", optional_override([](const Matrix33 &self, const Vector2 &v) { return self.Matrix33::createTranslation(v); }))
-            .function("multiply", &Matrix33::multiply)
             .function("transformPoint", &Matrix33::transformPoint)
             .function("transformVector", &Matrix33::transformVector)
             .function("transformNormal", &Matrix33::transformNormal)
@@ -106,7 +105,6 @@ extern "C"
                 BIND_MATRIX_SUBCLASS(Matrix44)
             .function("createScale", optional_override([](const Matrix44 &self, const Vector3 &v) { return self.Matrix44::createScale(v); }))
             .function("createTranslation", optional_override([](const Matrix44 &self, const Vector3 &v) { return self.Matrix44::createTranslation(v); }))
-            .function("multiply", &Matrix44::multiply)
             .function("transformPoint", &Matrix44::transformPoint)
             .function("transformVector", &Matrix44::transformVector)
             .function("transformNormal", &Matrix44::transformNormal)

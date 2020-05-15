@@ -1,0 +1,27 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "t": "node ./node_modules/copy/bin/cli.js",
+    "pretest": "node ./node_modules/copy/bin/cli.js ../_build/source/JsMaterialX/MaterialXLib.* ./_build/",
+    "test": "mocha '*.spec.js' --require @babel/register",
+    "test2": "mocha '*spec.js' --require babel-register",
+    "start": "nodemon --exec babel-node ./index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/register": "^7.9.0",
+    "chai": "^4.2.0",
+    "copy": "^0.3.2",
+    "mocha": "^7.1.2",
+    "regenerator-runtime": "^0.13.5"
+  }
+}

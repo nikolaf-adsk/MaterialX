@@ -23,7 +23,6 @@ extern "C"
     EMSCRIPTEN_BINDINGS(value)
     {
         class_<Value>("Value")
-            // .constructor<>()
             .smart_ptr<std::shared_ptr<Value>>("Value")
             .smart_ptr<std::shared_ptr<const Value>>("Value")
             .function("getValueString", &Value::getValueString)
