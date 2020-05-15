@@ -1,5 +1,5 @@
 // jsElement
-addWrapper(function(Module, api) {
+addWrapper(function (Module, api) {
     /** Setup the CopyOptions class */
     api.CopyOptions = Module.CopyOptions;
 
@@ -11,7 +11,8 @@ addWrapper(function(Module, api) {
         getUpstreamEdge: [null, 0],
         getUpstreamElement: [null, 0],
         validate: [''],
-        createStringResolver: ['', null, '', '']
+        createStringResolver: ['', null, '', ''],
+        traverseGraph: [null],
     });
 
     /** Setup the TypedElement class */
@@ -33,11 +34,11 @@ addWrapper(function(Module, api) {
         'setValueintegerarray',
         'setValuebooleanarray',
         'setValuefloatarray',
-        'setValuestringarray'
+        'setValuestringarray',
     ];
 
     var defaultArgs = {
-        getResolvedValueString: [null]
+        getResolvedValueString: [null],
     };
 
     for (var i = 0; i < funcs.length; i++) {
