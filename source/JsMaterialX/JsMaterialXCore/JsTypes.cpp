@@ -93,10 +93,10 @@ extern "C"
                 BIND_MATRIX_SUBCLASS(Matrix33)
             .function("createScale", optional_override([](const Matrix33 &self, const Vector2 &v) { return self.Matrix33::createScale(v); }))
             .function("createTranslation", optional_override([](const Matrix33 &self, const Vector2 &v) { return self.Matrix33::createTranslation(v); }))
-            .function("transformPoint", &Matrix33::transformPoint)
-            .function("transformVector", &Matrix33::transformVector)
-            .function("transformNormal", &Matrix33::transformNormal)
-            .function("createRotation", &Matrix33::createRotation)
+            .function("transformPoint", optional_override([](const Matrix33 &self, const Vector2 &v) { return self.Matrix33::transformPoint(v); }))
+            .function("transformVector", optional_override([](const Matrix33 &self, const Vector2 &v) { return self.Matrix33::transformVector(v); }))
+            .function("transformNormal", optional_override([](const Matrix33 &self, const Vector3 &v) { return self.Matrix33::transformNormal(v); }))
+            .function("createRotation", optional_override([](const Matrix33 &self, float angle) { return self.Matrix33::createRotation(angle); }))
             .class_property("IDENTITY", &Matrix33::IDENTITY);
 
         class_<Matrix44, base<MatrixBase>>("Matrix44")
@@ -105,12 +105,12 @@ extern "C"
                 BIND_MATRIX_SUBCLASS(Matrix44)
             .function("createScale", optional_override([](const Matrix44 &self, const Vector3 &v) { return self.Matrix44::createScale(v); }))
             .function("createTranslation", optional_override([](const Matrix44 &self, const Vector3 &v) { return self.Matrix44::createTranslation(v); }))
-            .function("transformPoint", &Matrix44::transformPoint)
-            .function("transformVector", &Matrix44::transformVector)
-            .function("transformNormal", &Matrix44::transformNormal)
-            .function("createRotationX", &Matrix44::createRotationX)
-            .function("createRotationY", &Matrix44::createRotationY)
-            .function("createRotationZ", &Matrix44::createRotationZ)
+            .function("transformPoint", optional_override([](const Matrix44 &self, const Vector3 &v) { return self.Matrix44::transformPoint(v); }))
+            .function("transformVector", optional_override([](const Matrix44 &self, const Vector3 &v) { return self.Matrix44::transformVector(v); }))
+            .function("transformNormal", optional_override([](const Matrix44 &self, const Vector3 &v) { return self.Matrix44::transformNormal(v); }))
+            .function("createRotationX", optional_override([](const Matrix44 &self, float angle) { return self.Matrix44::createRotationX(angle); }))
+            .function("createRotationY", optional_override([](const Matrix44 &self, float angle) { return self.Matrix44::createRotationY(angle); }))
+            .function("createRotationZ", optional_override([](const Matrix44 &self, float angle) { return self.Matrix44::createRotationZ(angle); }))
             .class_property("IDENTITY", &Matrix44::IDENTITY);
 
         function("DEFAULT_TYPE_STRING", optional_override([]() {

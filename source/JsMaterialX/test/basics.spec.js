@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import regeneratorRuntime from 'regenerator-runtime';
+import regeneratorRuntime from 'regenerator-runtime'; // This is required for the async/awaits
 import Module from './_build/MaterialXLib.js';
 
 function initMaterialX() {
@@ -99,24 +99,27 @@ describe('Basics', () => {
     });
 
     function multiplyMatrix(matrix, val) {
-        for (let i = 0; i < matrix.numRows(); ++i) {
-            for (let k = 0; k < matrix.numColumns(); ++k) {
-                const v = matrix.getItem(i, k);
-                matrix.setItem(i, k, v * val);
+        const clonedMatrix = matrix.copy();
+        for (let i = 0; i < clonedMatrix.numRows(); ++i) {
+            for (let k = 0; k < clonedMatrix.numColumns(); ++k) {
+                const v = clonedMatrix.getItem(i, k);
+                clonedMatrix.setItem(i, k, v * val);
             }
         }
-        return matrix;
+        return clonedMatrix;
     }
 
     function divideMatrix(matrix, val) {
-        for (let i = 0; i < matrix.numRows(); ++i) {
-            for (let k = 0; k < matrix.numColumns(); ++k) {
-                const v = matrix.getItem(i, k);
-                matrix.setItem(i, k, v / val);
+        const clonedMatrix = matrix.copy();
+        for (let i = 0; i < clonedMatrix.numRows(); ++i) {
+            for (let k = 0; k < clonedMatrix.numColumns(); ++k) {
+                const v = clonedMatrix.getItem(i, k);
+                clonedMatrix.setItem(i, k, v / val);
             }
         }
-        return matrix;
+        return clonedMatrix;
     }
+
     it('Matrices', () => {
         // Translation and scale
         const trans = new mx.Matrix44().createTranslation(new mx.Vector3(1, 2, 3));
@@ -155,98 +158,29 @@ describe('Basics', () => {
         let quot4 = quot1;
         quot4 = quot4.divide(trans);
         expect(quot1.equals(trans)).to.be.true;
-        // debugger;
-        // expect(quot2.equals(scale)).to.be.true;
-        // expect(quot3.equals(trans)).to.be.true;
-        // debugger;
-        // expect(quot4 == mx.Matrix44.IDENTITY)
+        expect(quot2.equals(scale)).to.be.true;
+        expect(quot3.equals(trans)).to.be.true;
 
-        // // 2D rotation
-        // rot1 = mx.Matrix33.createRotation(math.pi / 2)
-        // rot2 = mx.Matrix33.createRotation(math.pi)
-        // expect((rot1 * rot1).isEquivalent(rot2, _epsilon))
-        // expect(rot2.isEquivalent(
-        //     mx.Matrix33.createScale(mx.Vector2(-1)), _epsilon))
-        // expect((rot2 * rot2).isEquivalent(mx.Matrix33.IDENTITY, _epsilon))
+        // 2D rotation
+        const _epsilon = 1e-4;
+        const rot1 = new mx.Matrix33().createRotation(Math.PI / 2);
+        const rot2 = new mx.Matrix33().createRotation(Math.PI);
+        expect(rot1.multiply(rot1).isEquivalent(rot2, _epsilon));
+        expect(rot2.isEquivalent(new mx.Matrix33().createScale(new mx.Vector2(-1, -1)), _epsilon));
+        expect(rot2.multiply(rot2).isEquivalent(mx.Matrix33.IDENTITY, _epsilon));
 
-        // // 3D rotation
-        // rotX = mx.Matrix44.createRotationX(math.pi)
-        // rotY = mx.Matrix44.createRotationY(math.pi)
-        // rotZ = mx.Matrix44.createRotationZ(math.pi)
-        // expect((rotX * rotY).isEquivalent(
-        //     mx.Matrix44.createScale(mx.Vector3(-1, -1, 1)), _epsilon))
-        // expect((rotX * rotZ).isEquivalent(
-        //     mx.Matrix44.createScale(mx.Vector3(-1, 1, -1)), _epsilon))
-        // expect((rotY * rotZ).isEquivalent(
-        //     mx.Matrix44.createScale(mx.Vector3(1, -1, -1)), _epsilon))
+        // 3D rotation
+        const rotX = new mx.Matrix44().createRotationX(Math.PI);
+        const rotY = new mx.Matrix44().createRotationY(Math.PI);
+        const rotZ = new mx.Matrix44().createRotationZ(Math.PI);
+        expect(rotX.multiply(rotY).isEquivalent(new mx.Matrix44().createScale(new mx.Vector3(-1, -1, 1)), _epsilon));
+        expect(rotX.multiply(rotZ).isEquivalent(new mx.Matrix44().createScale(new mx.Vector3(-1, 1, -1)), _epsilon));
+        expect(rotY.multiply(rotZ).isEquivalent(new mx.Matrix44().createScale(new mx.Vector3(1, -1, -1)), _epsilon));
 
-        // // Matrix copy
-        // trans2 = trans.copy()
-        // expect(trans2 == trans)
-        // trans2[0, 0] += 1;
-        // expect(trans2 != trans)
+        // Matrix copy
+        const trans2 = trans.copy();
+        expect(trans2.equals(trans)).to.be.true;
+        trans2.setItem(0, 0, trans2.getItem(0, 0) + 1);
+        expect(trans2.not_equals(trans)).to.be.true;
     });
-
-    // it('should say Hello guys!', async () => {
-
-    //     // Create a document.
-    //     var doc = mx.createDocument();
-
-    //     // Create elements
-    //     const elem1 = doc.addChildOfCategory("generic");
-    //     const elem2 = doc.addChildOfCategory("generic");
-
-    //     expect(elem1.getParent()).to.eql(doc);
-    //     expect(elem2.getParent()).to.eql(doc);
-    //     expect(elem1.getRoot()).to.eql(doc);
-    //     expect(elem2.getRoot()).to.eql(doc);
-    //     expect(doc.getChildren()[0]).to.eql(elem1);
-    //     expect(doc.getChildren()[1]).to.eql(elem2);
-
-    //     // Set hierarchical properties
-    //     doc.setFilePrefix("folder/");
-    //     doc.setColorSpace("lin_rec709");
-
-    //     expect(elem1.getActiveFilePrefix()).to.equal(doc.getFilePrefix());
-    //     expect(elem2.getActiveColorSpace()).to.equal(doc.getColorSpace());
-
-    //     debugger;
-    //     // Set typed attributes.
-    //     // expect(elem1.getTypedAttribute<bool>("customFlag") == false);
-    //     // expect(elem1.getTypedAttribute<mx::Color3>("customColor") == mx::Color3(0.0f));
-    //     // elem1.setTypedAttribute<bool>("customFlag", true);
-    //     // elem1.setTypedAttribute<mx::Color3>("customColor", mx::Color3(1.0f));
-    //     // expect(elem1.getTypedAttribute<bool>("customFlag") == true);
-    //     // expect(elem1.getTypedAttribute<mx::Color3>("customColor") == mx::Color3(1.0f));
-    //     // expect(elem1.getTypedAttribute<bool>("customColor") == false);
-    //     // expect(elem1.getTypedAttribute<mx::Color3>("customFlag") == mx::Color3(0.0f));
-
-    //     // // Modify element names.
-    //     // elem1.setName("elem1");
-    //     // elem2.setName("elem2");
-    //     // expect(elem1.getName() == "elem1");
-    //     // expect(elem2.getName() == "elem2");
-    //     // expect_THROWS_AS(elem2.setName("elem1"), mx::Exception&);
-
-    //     // // Modify element order.
-    //     // mx::DocumentPtr doc2 = doc.copy();
-    //     // expect(*doc2 == *doc);
-    //     // doc2->setChildIndex("elem1", doc2->getChildIndex("elem2"));
-    //     // expect(*doc2 != *doc);
-    //     // doc2->setChildIndex("elem1", doc2->getChildIndex("elem2"));
-    //     // expect(*doc2 == *doc);
-    //     // expect_THROWS_AS(doc2->setChildIndex("elem1", 100), mx::Exception&);
-    //     // expect(*doc2 == *doc);
-
-    //     // // Create and test an orphaned element.
-    //     // mx::ElementPtr orphan;
-    //     // {
-    //     //     mx::DocumentPtr doc3 = doc.copy();
-    //     //     orphan = doc3->getChild("elem1");
-    //     //     expect(orphan);
-    //     // }
-    //     // expect_THROWS_AS(orphan->getDocument(), mx::ExceptionOrphanedElement&);
-
-    //     expect(true).to.be.true
-    // });
 });
