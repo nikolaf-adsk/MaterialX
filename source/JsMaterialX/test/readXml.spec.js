@@ -1,7 +1,5 @@
 import { expect } from 'chai';
-import { traverse, initMaterialX } from './testHelpers';
-var fs = require('fs');
-var path = require('path');
+import { traverse, initMaterialX, getMtlxStrings } from './testHelpers';
 
 const _libraryFilenames = ['stdlib_defs.mtlx', 'stdlib_ng.mtlx', 'osl/stdlib_osl_impl.mtlx'];
 const _exampleFilenames = [
@@ -14,16 +12,6 @@ const _exampleFilenames = [
     // 'PostShaderComposite.mtlx', // <xi:include> is not yet supported
     'PreShaderComposite.mtlx',
 ];
-
-function getMtlxStrings(fileNames, subPath) {
-    const mtlxStrs = [];
-    for (let i = 0; i < fileNames.length; i++) {
-        const p = path.resolve(subPath, fileNames[i]);
-        const t = fs.readFileSync(p, 'utf8');
-        mtlxStrs.push(t);
-    }
-    return mtlxStrs;
-}
 
 describe('Build Document', () => {
     let mx;
