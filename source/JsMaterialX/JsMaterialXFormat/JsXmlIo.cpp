@@ -17,7 +17,7 @@ extern "C"
     {
         class_<XmlReadOptions, base<CopyOptions>>("XmlReadOptions")
             .constructor<>()
-            .property("readXIncludeFunction", &XmlReadOptions::parentXIncludes)
+            .property("readXIncludeFunction", &XmlReadOptions::readXIncludeFunction)
             .property("parentXIncludes", &XmlReadOptions::parentXIncludes);
         class_<XmlWriteOptions>("XmlWriteOptions")
             .constructor<>()

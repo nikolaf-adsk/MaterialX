@@ -1,11 +1,19 @@
 #!/bin/bash
 echo "Generating Wasm Library"
-mkdir ./_build
-cd ./_build
+# Enable the emsdk environment
+source ../../../../emsdk/emsdk_env.sh
+
+MAIN=`pwd`
+BUILD=$MAIN/_build
+mkdir -p $BUILD
+
+cd $BUILD
+
 
 emcmake cmake \
     ../../.. \
     -G "Unix Makefiles" \
-    -DMATERIALX_BUILD_JS=ON
+    -DMATERIALX_BUILD_JS=ON \
+    -DBUILD_TYPE=$1
 
 emmake make

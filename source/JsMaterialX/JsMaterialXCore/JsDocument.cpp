@@ -20,7 +20,7 @@ extern "C"
             .smart_ptr<std::shared_ptr<const Document>>("Document")
             .function("initialize", &Document::initialize)
             .function("copy", &Document::copy)
-            .function("importLibrary", optional_override([](Document &self, const ConstDocumentPtr &library, CopyOptions copyOptions) {
+            .function("importLibrary", optional_override([](Document &self, const ConstDocumentPtr &library, CopyOptions copyOptions = CopyOptions()) {
                           const CopyOptions *co = &copyOptions;
                           return self.Document::importLibrary(library, co);
                       }))

@@ -1,16 +1,5 @@
 import { expect } from 'chai';
-import regeneratorRuntime from 'regenerator-runtime'; // This is required for the async/awaits
-import Module from './_build/MaterialXLib.js';
-
-function initMaterialX() {
-    return new Promise(function (resolve) {
-        // Note: Module is not a promise.
-        // The then function is defined by emscripten.
-        Module().then((module) => {
-            resolve(module.getMaterialX());
-        });
-    });
-}
+import { initMaterialX } from './testHelpers';
 
 describe('Build Document', () => {
     let mx, doc;
