@@ -21,7 +21,7 @@ option(MATERIALX_BUILD_GEN_OGSXML "Build the OGSXML shader generator back-end." 
 option(MATERIALX_BUILD_GEN_OGSFX "Build the OGSFX shader generator back-end." ON)
 option(MATERIALX_BUILD_GEN_ARNOLD "Build the Arnold OSL shader generator back-end." ON)
 
-option(MATERIALX_BUILD_JS "Build the MaterialX WASM package from C++ bindings." OFF)
+option(MATERIALX_BUILD_JS "Build the MaterialX WASM package from C++ bindings. Requires the emscripten environment." OFF)
 option(MATERIALX_BUILD_PYTHON "Build the MaterialX Python package from C++ bindings. Requires Python 2.7 or greater." OFF)
 option(MATERIALX_BUILD_RUNTIME "Build the MaterialX Runtime data model library." OFF)
 option(MATERIALX_BUILD_RENDER "Build the MaterialX Render modules." ON)

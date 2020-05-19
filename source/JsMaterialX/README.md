@@ -46,8 +46,8 @@ cd ./_build
 3. Run cmake and make
 ```sh
 # This will generate the release library
-# To build the non minified debug version replace -DBUILD_TYPE=RELEASE with -DBUILD_TYPE=DEBUG
-emcmake cmake ../../.. -DMATERIALX_BUILD_JS=ON -DBUILD_TYPE=RELEASE
+# To build the non minified debug version replace -DMATERIALX_JS_BUILD_TYPE=RELEASE with -DMATERIALX_JS_BUILD_TYPE=DEBUG
+emcmake cmake ../../.. -DMATERIALX_BUILD_JS=ON -DMATERIALX_JS_BUILD_TYPE=RELEASE
 emmake make
 ```
 

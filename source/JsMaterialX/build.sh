@@ -9,5 +9,5 @@ mkdir -p $BUILD
 
 cd $BUILD
 
-emcmake cmake ../../.. -DMATERIALX_BUILD_JS=ON -DBUILD_TYPE=$1
+emcmake cmake ../../.. -DMATERIALX_BUILD_JS=ON -DMATERIALX_JS_BUILD_TYPE=$1
 emmake make

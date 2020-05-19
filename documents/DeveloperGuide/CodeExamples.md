@@ -72,37 +72,44 @@ bindParam.setValue(0.5)
 print str(roughness.getBoundValue(material))
 ~~~
 
-#### Javascript
+#### JavaScript
 
 ~~~{.js}
-var mx = MaterialX;
+import Module from './MaterialXLib.js';
 
-// Create a document.
-var doc = mx.createDocument();
+Module().then((_module) => {
+    // Get the MaterialX namespace.
+    const mx = _module.getMaterialX();
 
-// Create a node graph with a single image node and output.
-var nodeGraph = doc.addNodeGraph();
-var image = nodeGraph.addNode('image');
-image.setParameterValuestring('file', 'image1.tif', 'filename');
-var output = nodeGraph.addOutput();
-output.setConnectedNode(image);
+    // Create a document.
+    const doc = mx.createDocument();
 
-// Create a simple shader interface.
-var simpleSrf = doc.addNodeDef('ND_simpleSrf', 'surfaceshader', 'simpleSrf');
-var diffColor = simpleSrf.setInputValuecolor3('diffColor', new mx.Color3(1.0, 1.0, 1.0));
-var specColor = simpleSrf.setInputValuecolor3('specColor', new mx.Color3(0.0, 0.0, 0.0));
-var roughness = simpleSrf.setParameterValuefloat('roughness', 0.25);
+    // Create a node graph with a single image node and output.
+    const nodeGraph = doc.addNodeGraph();
+    const image = nodeGraph.addNode('image');
+    image.setParameterValuestring('file', 'image1.tif', 'filename');
+    const output = nodeGraph.addOutput();
+    output.setConnectedNode(image);
 
-// Create a material that instantiates the shader.
-var material = doc.addMaterial();
-var refSimpleSrf = material.addShaderRef('SR_simpleSrf', 'simpleSrf');
+    // Create a simple shader interface.
+    const simpleSrf = doc.addNodeDef('ND_simpleSrf', 'surfaceshader', 'simpleSrf');
+    const diffColor = simpleSrf.setInputValuecolor3('diffColor', new mx.Color3(1.0, 1.0, 1.0));
+    const specColor = simpleSrf.setInputValuecolor3('specColor', new mx.Color3(0.0, 0.0, 0.0));
+    const roughness = simpleSrf.setParameterValuefloat('roughness', 0.25);
 
-// Bind roughness to a new value within this material.
-var bindParam = refSimpleSrf.addBindParam('roughness');
-bindParam.setValuefloat(0.5);
+    // Create a material that instantiates the shader.
+    const material = doc.addMaterial();
+    const refSimpleSrf = material.addShaderRef('SR_simpleSrf', 'simpleSrf');
 
-// Display the value of roughness in the context of this material.
-console.log(roughness.getBoundValue(material).getValueString());
+    // Bind roughness to a new value within this material.
+    const bindParam = refSimpleSrf.addBindParam('roughness');
+    bindParam.setValuefloat(0.5);
+
+    // Display the value of roughness in the context of this material.
+    console.log(roughness.getBoundValue(material).getValueString());
+
+});
+
 ~~~
 
 ### Traversing a Document Tree:
@@ -155,28 +162,34 @@ for elem in doc.traverseTree():
             print 'Image node', elem.getName(), 'references', filename
 ~~~
 
-#### Javascript
+#### JavaScript
 
 ~~~{.js}
-var mx = MaterialX;
+import Module from './MaterialXLib.js';
 
-// Read a document from disk.
-var doc = mx.createDocument();
-mx.readFromXmlString(doc, xmlStr);
+Module().then((_module) => {
+    // Get the MaterialX namespace.
+    const mx = _module.getMaterialX();
 
-// Traverse the document tree in depth-first order.
-var elements = doc.traverseTree();
-var elem = elements.next();
-while(elem) {                
-    // Display the filename of each image node.
-    if (elem instanceof mx.Node) {
-        var param = elem.getParameter('file');
-        if (param) {
-            filename = param.getValueString();
-            console.log('Image node ' + elem.getName() + ' references ' + filename);
+    // Read a document from disk.
+    const doc = mx.createDocument();
+    // Note: The xmlStr should be defined.
+    mx.readFromXmlString(doc, xmlStr);
+
+    // Traverse the document tree in depth-first order.
+    const elements = doc.traverseTree();
+    let elem = elements.next();
+    while(elem) {                
+        // Display the filename of each image node.
+        if (elem instanceof mx.Node) {
+            const param = elem.getParameter('file');
+            if (param) {
+                filename = param.getValueString();
+                console.log('Image node ' + elem.getName() + ' references ' + filename);
+            }
         }
+        elem = elements.next();
     }
-    elem = elements.next();
 }
 ~~~
 
@@ -246,4 +259,45 @@ for material in doc.getMaterials():
             elem = edge.getUpstreamElement(material)
             if elem.isA(mx.Node, 'image'):
                 print 'Input', input.getName(), 'has upstream image node', elem.getName()
+~~~
+
+#### JavaScript
+
+~~~{.js}
+import Module from './MaterialXLib.js';
+
+Module().then((_module) => {
+    // Get the MaterialX namespace.
+    const mx = _module.getMaterialX();
+
+    // Read a document from disk.
+    const doc = mx.createDocument();
+    // Note: The xmlStr should be defined.
+    mx.readFromXmlString(doc, xmlStr);
+
+    // Iterate through materials.
+    const materials = doc.getMaterials();
+    materials.forEach((material) => {
+        // For each shader parameter, compute its value in the context of this material.
+        const primaryShaderParams = material.getPrimaryShaderParameters();
+        primaryShaderParams.forEach((param) => {
+            const value = param.getBoundValue(material);
+            console.log('Parameter', param.getName(), 'has value', value.getData());
+        });
+
+        // For each shader input, find all upstream images in the dataflow graph.
+        const primaryShaderInputs = material.getPrimaryShaderInputs();
+        primaryShaderInputs.forEach((input) => {
+            const graphIter = input.traverseGraph(material);
+            let edge = graphIter.next();
+            while (edge) {
+                const elem = edge.getUpstreamElement(material)
+                if (elem instanceof mx.Node) {
+                    console.log('Input', input.getName(), 'has upstream image node', elem.getName());
+                }
+                edge = graphIter.next();
+            }
+        });
+    });
+}
 ~~~
