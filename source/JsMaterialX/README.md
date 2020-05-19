@@ -2,58 +2,87 @@
 
 A Javascript package is created from the following modules.
 
-- [WasmMaterialXCore](WasmMaterialXCore): Wasm/Javascript module for MaterialX core
+- [JsMaterialXCore](JsMaterialXCore): Contains all of the core classes and util functions.
+- [JsMaterialXFormat](JsMaterialXFormat): Contains the `readFromXmlString` function to read a MaterialX string.
 
 ## Generating JS/WASM
 
 ### Prerequisites
 
 Make sure to clone the [emsdk repository](https://github.com/emscripten-core/emsdk), install and enable the latest emsdk environment.
+```sh
+# Get the emsdk repo
+git clone https://github.com/emscripten-core/emsdk.git
+
+# Enter that directory
+cd emsdk
+
+# Download and install the latest SDK tools.
+./emsdk install latest
+
+# Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
+./emsdk activate latest
+```
+
 For more information follow the steps described in the [emscripten documentation](https://emscripten.org/docs/getting_started/downloads.html). 
 
-### Steps
+### Build
 In the root of directory of this repository run the following:
 
-1. cd into the new folder.
+#### CMake
+The JavasScript library can be built using cmake and make.
 
+1. Activate the emscripten environment
 ```sh
-cd ./wasm
+source ../../../../emsdk/emsdk_env.sh
 ```
 
-2. Generate the MaterialX libraries that will be used for the js bindings. 
-
+2. Create the `_build` folder
 ```sh
-./generate_lib.sh
+mkdir -p ./_build
+cd ./_build
 ```
 
-3. cd into the javascript bindings directory. 
-
+3. Run cmake and make
 ```sh
-cd ../source/JsMaterialX
+# This will generate the release library
+# To build the non minified debug version replace -DBUILD_TYPE=RELEASE with -DBUILD_TYPE=DEBUG
+emcmake cmake ../../.. -DMATERIALX_BUILD_JS=ON -DBUILD_TYPE=RELEASE
+emmake make
 ```
 
-4. Generate the wasm and javascript files for the bindings.
+#### build.sh
+There is a helper script called `build.sh` that will do the above steps.
+
+1. Build the release WebAssembly binary and the JavaScript library.
 
 ```sh
-./generate_bindings.sh
+./build.sh
 ```
 
-To debug the em++ command append `EMCC_DEBUG=1` to the shell command in `generate_bindings.sh`.
-
+To build the debug version call:
 ```sh
-EMCC_DEBUG=1 em++ ...
+./build.sh DEBUG
 ```
 
+### Output
+After building the project the `MaterialXLib.wasm` and `MaterialXLib.js` files can be found in `./_build/source/JsMaterialX/`.
 
 ### Testing
+The JavaScript tests are located in `./test` folder and are defined with the `.spec.js` suffix.
+Most of these tests were copied over from the Python [main.py tests](../../python/MaterialXTest/main.py).
 
-1. Start a server in the JsMaterialX directory
+#### Setup
+These tests require node.js and npm which can be installed [HERE](https://nodejs.org/en/download/).
 
+1. Install the npm packages.
 ```sh
-python -m http.server 9000
+cd ./test && npm install
 ```
 
-2. In your browser load: http://localhost:9000/JsMaterialXCore/test/index.html
+2. Run the tests
+```sh
+npm run test
+```
 
-There will be some console logs in the browser console. 
 
