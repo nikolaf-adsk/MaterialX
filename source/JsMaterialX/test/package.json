@@ -4,11 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "t": "node ./node_modules/copy/bin/cli.js",
     "pretest": "node ./node_modules/copy/bin/cli.js ../_build/source/JsMaterialX/MaterialXLib.* ./_build/",
     "test": "mocha '*.spec.js' --require @babel/register",
-    "test2": "mocha '*spec.js' --require babel-register",
-    "start": "nodemon --exec babel-node ./index.js"
   },
   "keywords": [],
   "author": "",
