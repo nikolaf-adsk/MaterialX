@@ -33,12 +33,13 @@ set(JS_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/../ -std=c++17 -s WASM=1 -s DISABLE_
 string(APPEND JS_FLAGS "--post-js ${OUTPUT_CORE}JsTypes.js --post-js ${OUTPUT_CORE}JsGeom.js --post-js ${OUTPUT_CORE}JsDefinition.js --post-js ${OUTPUT_CORE}JsDocument.js --post-js ${OUTPUT_CORE}JsElement.js --post-js ${OUTPUT_CORE}JsInterface.js --post-js ${OUTPUT_CORE}JsLook.js --post-js ${OUTPUT_CORE}JsMaterial.js --post-js ${OUTPUT_CORE}JsNode.js --post-js ${OUTPUT_CORE}JsObserver.js --post-js ${OUTPUT_CORE}JsProperty.js --post-js ${OUTPUT_CORE}JsTraversal.js --post-js ${OUTPUT_CORE}JsUtil.js --post-js ${OUTPUT_CORE}JsValue.js --post-js ${OUTPUT_CORE}JsVariant.js --post-js ${OUTPUT_FORMAT}JsXmlIo.js --post-js ${CMAKE_CURRENT_SOURCE_DIR}/initMaterialX.js ")
 string(APPEND JS_FLAGS "-s MEMORY_GROWTH_LINEAR_STEP=32MB -s ALLOW_MEMORY_GROWTH=1 ")
 
-IF(MATERIALX_JS_BUILD_TYPE MATCHES DEBUG)
+if (CMAKE_BUILD_TYPE MATCHES Debug)
     message("JS: Building Debug")
     string(APPEND JS_FLAGS "--bind ")
-ELSE()
+else()
     message("JS: Building Release")
     string(APPEND JS_FLAGS "-Os --bind ")
-ENDIF(MATERIALX_JS_BUILD_TYPE MATCHES DEBUG)
+endif()
+
 
 set_target_properties(MaterialXLib PROPERTIES LINK_FLAGS ${JS_FLAGS})

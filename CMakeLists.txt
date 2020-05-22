@@ -1,3 +1,23 @@
+option(MATERIALX_BUILD_JS "Build the MaterialX Javascript package from C++ bindings. Requires the emscripten environment." OFF)
+set(MATERIALX_EMSDK_PATH "" CACHE PATH "Path to EMSDK (e.g. 'C:/emsdk').")
+
+if (MATERIALX_BUILD_JS)
+    # Set the the emsdk path
+    if (EXISTS "${MATERIALX_EMSDK_PATH}")        
+        set(EMSDK_PATH ${MATERIALX_EMSDK_PATH})
+    elseif (EXISTS $ENV{EMSDK})
+        set(EMSDK_PATH $ENV{EMSDK})
+    endif()
+
+    if (EMSDK_PATH)
+        # NOTE: Setting the CMAKE_TOOLCHAIN_FILE needs to happen before calling project()
+        set(CMAKE_TOOLCHAIN_FILE "${MATERIALX_EMSDK_PATH}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
+    else()
+        message("The EMSDK path was not supplied, disabling MATERIALX_BUILD_JS")
+        set(MATERIALX_BUILD_JS OFF)
+    endif()
+endif()
+
 project(MaterialX)
 set(MATERIALX_MAJOR_VERSION 1)
 set(MATERIALX_MINOR_VERSION 37)
@@ -21,7 +41,6 @@ option(MATERIALX_BUILD_GEN_OGSXML "Build the OGSXML shader generator back-end." 
 option(MATERIALX_BUILD_GEN_OGSFX "Build the OGSFX shader generator back-end." ON)
 option(MATERIALX_BUILD_GEN_ARNOLD "Build the Arnold OSL shader generator back-end." ON)
 
-option(MATERIALX_BUILD_JS "Build the MaterialX WASM package from C++ bindings. Requires the emscripten environment." OFF)
 option(MATERIALX_BUILD_PYTHON "Build the MaterialX Python package from C++ bindings. Requires Python 2.7 or greater." OFF)
 option(MATERIALX_BUILD_RUNTIME "Build the MaterialX Runtime data model library." OFF)
 option(MATERIALX_BUILD_RENDER "Build the MaterialX Render modules." ON)

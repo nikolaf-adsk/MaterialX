@@ -47,7 +47,7 @@ The `MATERIALX_BUILD_JS` option will turn off the `MATERIALX_BUILD_RENDER` and t
 
 Additional options for the generation of MaterialX JavaScript include the following:
 
-- `MATERIALX_JS_BUILD_TYPE`: If this option is omitted, a release build will be generated. Set this option to `DEBUG` to generate a non-optimized build.
+- `MATERIALX_EMSDK_PATH`: Path to the folder that contains emsdk. This option can be omitted if `emsdk_env.sh` or `emsdk_env.bat` was run. 
 
 ### Building The MaterialX Viewer
 

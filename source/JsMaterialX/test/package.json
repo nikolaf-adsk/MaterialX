@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "pretest": "node ./node_modules/copy/bin/cli.js ../_build/source/JsMaterialX/MaterialXLib.* ./_build/",
-    "test": "mocha '*.spec.js' --require @babel/register",
+    "test": "mocha '*.spec.js' --require @babel/register"
   },
   "keywords": [],
   "author": "",

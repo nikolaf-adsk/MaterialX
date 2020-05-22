@@ -32,37 +32,26 @@ In the root of directory of this repository run the following:
 #### CMake
 The JavasScript library can be built using cmake and make.
 
-1. Activate the emscripten environment
-```sh
-source ../../../../emsdk/emsdk_env.sh
-```
-
-2. Create the `_build` folder
+1. Create the `_build` folder
 ```sh
 mkdir -p ./_build
 cd ./_build
 ```
 
-3. Run cmake and make
+2. Run cmake and make
+When building the JavaScript output the user can specify the emsdk path with the `MATERIALX_EMSDK_PATH` option.
+This option can be omitted if the `emsdk/emsdk_env.sh` script was run before hand.
+
 ```sh
 # This will generate the release library
-# To build the non minified debug version replace -DMATERIALX_JS_BUILD_TYPE=RELEASE with -DMATERIALX_JS_BUILD_TYPE=DEBUG
-emcmake cmake ../../.. -DMATERIALX_BUILD_JS=ON -DMATERIALX_JS_BUILD_TYPE=RELEASE
-emmake make
+cmake ../../.. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=/mnt/c/GitHub/PUBLIC/emsdk
+make
 ```
 
-#### build.sh
-There is a helper script called `build.sh` that will do the above steps.
-
-1. Build the release WebAssembly binary and the JavaScript library.
-
+For Windows use [Ninja](https://ninja-build.org/) as the cmake generator.
 ```sh
-./build.sh
-```
-
-To build the debug version call:
-```sh
-./build.sh DEBUG
+cmake ../../.. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=C:\GitHub\PUBLIC\emsdk -G "Ninja"
+cmake --build .
 ```
 
 ### Output
@@ -73,7 +62,7 @@ The JavaScript tests are located in `./test` folder and are defined with the `.s
 Most of these tests were copied over from the Python [main.py tests](../../python/MaterialXTest/main.py).
 
 #### Setup
-These tests require node.js and npm which can be installed [HERE](https://nodejs.org/en/download/).
+These tests require node.js. This is a part of the emscripten environment. So make sure to call `emsdk_env` before running the steps described below.
 
 1. Install the npm packages.
 ```sh
