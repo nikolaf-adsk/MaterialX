@@ -133,6 +133,7 @@ describe('Code Examples', () => {
             primaryShaderParams.forEach((param) => {
                 const value = param.getBoundValue(material);
                 expect(value instanceof mx.TypedValue_float).to.be.true;
+                expect(value.getTypeString()).to.equal('float');
                 expect(param.getName()).to.equal('fresnel_exp');
                 shaderParamCount++;
             });

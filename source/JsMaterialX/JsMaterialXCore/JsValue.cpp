@@ -12,8 +12,8 @@ namespace mx = MaterialX;
         .smart_ptr<std::shared_ptr<mx::TypedValue<T>>>("TypedValue<T>")       \
         .function("getData", &mx::TypedValue<T>::getData)                     \
         .function("getValueString", &mx::TypedValue<T>::getValueString)       \
-        .class_function("createValue", &mx::Value::createValue<T>)            \
-        .class_property("TYPE", &mx::TypedValue<T>::TYPE); // this outputs forward declaration warnings
+        .function("getTypeString", &mx::TypedValue<T>::getTypeString)         \
+        .class_function("createValue", &mx::Value::createValue<T>);
 
 extern "C"
 {
