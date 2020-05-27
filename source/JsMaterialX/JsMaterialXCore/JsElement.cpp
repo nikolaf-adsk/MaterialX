@@ -9,242 +9,239 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
-using namespace emscripten;
-
+namespace ems = emscripten;
 namespace mx = MaterialX;
 
-using namespace mx;
-
 #define BIND_VALUE_ELEMENT_FUNC_INSTANCE(NAME, T)          \
-    .function("setValue" #NAME, &ValueElement::setValue<T>)
+    .function("setValue" #NAME, &mx::ValueElement::setValue<T>)
 
 #define BIND_ELEMENT_FUNC_INSTANCE(T)                                  \
-    .function("_addChild" #T, &Element::addChild<T>)                   \
-    .function("_getChildOfType" #T, &Element::getChildOfType<T>)       \
-    .function("_getChildrenOfType" #T, &Element::getChildrenOfType<T>) \
-    .function("_removeChildOfType" #T, &Element::removeChildOfType<T>)
+    .function("_addChild" #T, &mx::Element::addChild<T>)                   \
+    .function("_getChildOfType" #T, &mx::Element::getChildOfType<T>)       \
+    .function("_getChildrenOfType" #T, &mx::Element::getChildrenOfType<T>) \
+    .function("_removeChildOfType" #T, &mx::Element::removeChildOfType<T>)
 
 extern "C"
 {
     EMSCRIPTEN_BINDINGS(element)
     {
-        class_<CopyOptions>("CopyOptions")
+        ems::class_<mx::CopyOptions>("CopyOptions")
             .constructor<>()
-            .property("skipConflictingElements", &CopyOptions::skipConflictingElements);
+            .property("skipConflictingElements", &mx::CopyOptions::skipConflictingElements);
 
-        class_<Element>("Element")
-            .smart_ptr<std::shared_ptr<Element>>("Element")
-            .smart_ptr<std::shared_ptr<const Element>>("Element") // ConstElementPtr
-            .function("setCategory", &Element::setCategory)
-            .function("getCategory", &Element::getCategory)
-            .function("getName", &Element::getName)
-            .function("setName", &Element::setName)
-            .function("getNamePath", &Element::getNamePath) // might need to do something with the ConstElementPtr relativeTo parameter
-            .function("setInheritsFrom", &Element::setInheritsFrom)
-            .function("hasInheritedBase", &Element::hasInheritedBase)
-            .function("setFilePrefix", &Element::setFilePrefix)
-            .function("setColorSpace", &Element::setColorSpace)
-            .function("setGeomPrefix", &Element::setGeomPrefix)
-            .function("setTarget", &Element::setTarget)
-            .function("setInheritString", &Element::setInheritString)
-            .function("setNamespace", &Element::setNamespace)
-            .function("setVersionString", &Element::setVersionString)
-            .function("setDefaultVersion", &Element::setDefaultVersion)
-            .function("setDocString", &Element::setDocString)
-            .function("addChildOfCategory", &Element::addChildOfCategory)
-            .function("getActiveFilePrefix", &Element::getActiveFilePrefix)
-            .function("getActiveGeomPrefix", &Element::getActiveGeomPrefix)
-            .function("getActiveColorSpace", &Element::getActiveColorSpace)
-            .function("getInheritsFrom", &Element::getInheritsFrom)
-            .function("hasInheritanceCycle", &Element::hasInheritanceCycle)
-            .function("getQualifiedName", &Element::getQualifiedName)
-            .function("hasFilePrefix", &Element::hasFilePrefix)
-            .function("hasGeomPrefix", &Element::hasGeomPrefix)
-            .function("hasColorSpace", &Element::hasColorSpace)
-            .function("hasTarget", &Element::hasTarget)
-            .function("hasInheritString", &Element::hasInheritString)
-            .function("hasNamespace", &Element::hasNamespace)
-            .function("hasVersionString", &Element::hasVersionString)
-            .function("getFilePrefix", &Element::getFilePrefix)
-            .function("getGeomPrefix", &Element::getGeomPrefix)
-            .function("getColorSpace", &Element::getColorSpace)
-            .function("getTarget", &Element::getTarget)
-            .function("getInheritString", &Element::getInheritString)
-            .function("getNamespace", &Element::getNamespace)
-            .function("getVersionString", &Element::getVersionString)
-            .function("getVersionIntegers", optional_override([](Element &self) {
+        ems::class_<mx::Element>("Element")
+            .smart_ptr<std::shared_ptr<mx::Element>>("Element")
+            .smart_ptr<std::shared_ptr<const mx::Element>>("Element") // mx::ConstElementPtr
+            .function("setCategory", &mx::Element::setCategory)
+            .function("getCategory", &mx::Element::getCategory)
+            .function("getName", &mx::Element::getName)
+            .function("setName", &mx::Element::setName)
+            .function("getNamePath", &mx::Element::getNamePath) // might need to do something with the mx::ConstElementPtr relativeTo parameter
+            .function("setInheritsFrom", &mx::Element::setInheritsFrom)
+            .function("hasInheritedBase", &mx::Element::hasInheritedBase)
+            .function("setFilePrefix", &mx::Element::setFilePrefix)
+            .function("setColorSpace", &mx::Element::setColorSpace)
+            .function("setGeomPrefix", &mx::Element::setGeomPrefix)
+            .function("setTarget", &mx::Element::setTarget)
+            .function("setInheritString", &mx::Element::setInheritString)
+            .function("setNamespace", &mx::Element::setNamespace)
+            .function("setVersionString", &mx::Element::setVersionString)
+            .function("setDefaultVersion", &mx::Element::setDefaultVersion)
+            .function("setDocString", &mx::Element::setDocString)
+            .function("addChildOfCategory", &mx::Element::addChildOfCategory)
+            .function("getActiveFilePrefix", &mx::Element::getActiveFilePrefix)
+            .function("getActiveGeomPrefix", &mx::Element::getActiveGeomPrefix)
+            .function("getActiveColorSpace", &mx::Element::getActiveColorSpace)
+            .function("getInheritsFrom", &mx::Element::getInheritsFrom)
+            .function("hasInheritanceCycle", &mx::Element::hasInheritanceCycle)
+            .function("getQualifiedName", &mx::Element::getQualifiedName)
+            .function("hasFilePrefix", &mx::Element::hasFilePrefix)
+            .function("hasGeomPrefix", &mx::Element::hasGeomPrefix)
+            .function("hasColorSpace", &mx::Element::hasColorSpace)
+            .function("hasTarget", &mx::Element::hasTarget)
+            .function("hasInheritString", &mx::Element::hasInheritString)
+            .function("hasNamespace", &mx::Element::hasNamespace)
+            .function("hasVersionString", &mx::Element::hasVersionString)
+            .function("getFilePrefix", &mx::Element::getFilePrefix)
+            .function("getGeomPrefix", &mx::Element::getGeomPrefix)
+            .function("getColorSpace", &mx::Element::getColorSpace)
+            .function("getTarget", &mx::Element::getTarget)
+            .function("getInheritString", &mx::Element::getInheritString)
+            .function("getNamespace", &mx::Element::getNamespace)
+            .function("getVersionString", &mx::Element::getVersionString)
+            .function("getVersionIntegers", ems::optional_override([](mx::Element &self) {
                           // std::pair throws a unbound type error when envoving the function in javascript
                           // As a result, the std:pair will be converted into an array.
-                          std::pair<int, int> versionInts = self.Element::getVersionIntegers();
+                          std::pair<int, int> versionInts = self.mx::Element::getVersionIntegers();
                           return arrayToVec((int *)&versionInts, 2);
                       }))
-            .function("getDefaultVersion", &Element::getDefaultVersion)
-            .function("getDocString", &Element::getDocString)
+            .function("getDefaultVersion", &mx::Element::getDefaultVersion)
+            .function("getDocString", &mx::Element::getDocString)
 
-            .function("getChild", &Element::getChild)
-            .function("getChildren", &Element::getChildren)
-            .function("setChildIndex", &Element::setChildIndex)
-            .function("getChildIndex", &Element::getChildIndex)
-            .function("removeChild", &Element::removeChild)
+            .function("getChild", &mx::Element::getChild)
+            .function("getChildren", &mx::Element::getChildren)
+            .function("setChildIndex", &mx::Element::setChildIndex)
+            .function("getChildIndex", &mx::Element::getChildIndex)
+            .function("removeChild", &mx::Element::removeChild)
 
-            .function("setAttribute", &Element::setAttribute)
-            .function("hasAttribute", &Element::hasAttribute)
-            .function("getAttribute", &Element::getAttribute)
-            .function("getAttributeNames", &Element::getAttributeNames)
-            .function("removeAttribute", &Element::removeAttribute)
-            .function("getSelf", optional_override([](Element &self) {
-                          return self.Element::getSelf();
+            .function("setAttribute", &mx::Element::setAttribute)
+            .function("hasAttribute", &mx::Element::hasAttribute)
+            .function("getAttribute", &mx::Element::getAttribute)
+            .function("getAttributeNames", &mx::Element::getAttributeNames)
+            .function("removeAttribute", &mx::Element::removeAttribute)
+            .function("getSelf", ems::optional_override([](mx::Element &self) {
+                          return self.mx::Element::getSelf();
                       }))
-            .function("getParent", optional_override([](Element &self) {
-                          return self.Element::getParent();
+            .function("getParent", ems::optional_override([](mx::Element &self) {
+                          return self.mx::Element::getParent();
                       }))
-            .function("getRoot", optional_override([](Element &self) {
-                          return self.Element::getRoot();
+            .function("getRoot", ems::optional_override([](mx::Element &self) {
+                          return self.mx::Element::getRoot();
                       }))
-            .function("getDocument", optional_override([](Element &self) {
-                          return self.Element::getDocument();
+            .function("getDocument", ems::optional_override([](mx::Element &self) {
+                          return self.mx::Element::getDocument();
                       }))
-            .function("traverseTree", &Element::traverseTree)
+            .function("traverseTree", &mx::Element::traverseTree)
 
-            .function("traverseGraph", &Element::traverseGraph)
-            .function("getUpstreamEdge", &Element::getUpstreamEdge)
-            .function("getUpstreamEdgeCount", &Element::getUpstreamEdgeCount)
-            .function("getUpstreamElement", &Element::getUpstreamElement)
+            .function("traverseGraph", &mx::Element::traverseGraph)
+            .function("getUpstreamEdge", &mx::Element::getUpstreamEdge)
+            .function("getUpstreamEdgeCount", &mx::Element::getUpstreamEdgeCount)
+            .function("getUpstreamElement", &mx::Element::getUpstreamElement)
 
-            .function("traverseInheritance", &Element::traverseInheritance)
-            .function("setSourceUri", &Element::setSourceUri)
-            .function("hasSourceUri", &Element::hasSourceUri)
-            .function("getSourceUri", &Element::getSourceUri)
-            .function("getActiveSourceUri", &Element::getActiveSourceUri)
-            .function("validate", optional_override([](Element &self, std::string message) {
-                          bool res = self.Element::validate(&message);
+            .function("traverseInheritance", &mx::Element::traverseInheritance)
+            .function("setSourceUri", &mx::Element::setSourceUri)
+            .function("hasSourceUri", &mx::Element::hasSourceUri)
+            .function("getSourceUri", &mx::Element::getSourceUri)
+            .function("getActiveSourceUri", &mx::Element::getActiveSourceUri)
+            .function("validate", ems::optional_override([](mx::Element &self, std::string message) {
+                          bool res = self.mx::Element::validate(&message);
                           return res;
                       }))
-            .function("copyContentFrom", optional_override([](Element &self, ConstElementPtr source, CopyOptions copyOptions) {
-                          const ConstElementPtr &source1 = source;
-                          const CopyOptions *str1 = &copyOptions;
-                          return self.Element::copyContentFrom(source1, str1);
+            .function("copyContentFrom", ems::optional_override([](mx::Element &self, mx::ConstElementPtr source, mx::CopyOptions copyOptions) {
+                          const mx::ConstElementPtr &source1 = source;
+                          const mx::CopyOptions *str1 = &copyOptions;
+                          return self.mx::Element::copyContentFrom(source1, str1);
                       }))
-            .function("clearContent", &Element::clearContent)
-            .function("createValidChildName", &Element::createValidChildName)
-            .function("createStringResolver", &Element::createStringResolver)
-            .function("asString", &Element::asString)
-            .function("__str__", &Element::asString)
-            BIND_ELEMENT_FUNC_INSTANCE(BindParam)
-            BIND_ELEMENT_FUNC_INSTANCE(BindInput)
-            BIND_ELEMENT_FUNC_INSTANCE(BindToken)
-            BIND_ELEMENT_FUNC_INSTANCE(Collection)
-            BIND_ELEMENT_FUNC_INSTANCE(Document)
-            BIND_ELEMENT_FUNC_INSTANCE(GeomInfo)
-            BIND_ELEMENT_FUNC_INSTANCE(GeomProp)
-            BIND_ELEMENT_FUNC_INSTANCE(Implementation)
-            BIND_ELEMENT_FUNC_INSTANCE(Look)
-            BIND_ELEMENT_FUNC_INSTANCE(Material)
-            BIND_ELEMENT_FUNC_INSTANCE(MaterialAssign)
-            BIND_ELEMENT_FUNC_INSTANCE(Node)
-            BIND_ELEMENT_FUNC_INSTANCE(NodeDef)
-            BIND_ELEMENT_FUNC_INSTANCE(NodeGraph)
-            BIND_ELEMENT_FUNC_INSTANCE(Parameter)
-            BIND_ELEMENT_FUNC_INSTANCE(Property)
-            BIND_ELEMENT_FUNC_INSTANCE(PropertySet)
-            BIND_ELEMENT_FUNC_INSTANCE(PropertySetAssign)
-            BIND_ELEMENT_FUNC_INSTANCE(ShaderRef)
-            BIND_ELEMENT_FUNC_INSTANCE(Token)
-            BIND_ELEMENT_FUNC_INSTANCE(TypeDef)
-            BIND_ELEMENT_FUNC_INSTANCE(Visibility)
-            .class_property("NAME_ATTRIBUTE", &Element::NAME_ATTRIBUTE)
-            .class_property("FILE_PREFIX_ATTRIBUTE", &Element::FILE_PREFIX_ATTRIBUTE)
-            .class_property("GEOM_PREFIX_ATTRIBUTE", &Element::GEOM_PREFIX_ATTRIBUTE)
-            .class_property("COLOR_SPACE_ATTRIBUTE", &Element::COLOR_SPACE_ATTRIBUTE)
-            .class_property("TARGET_ATTRIBUTE", &Element::TARGET_ATTRIBUTE)
-            .class_property("VERSION_ATTRIBUTE", &Element::VERSION_ATTRIBUTE)
-            .class_property("DEFAULT_VERSION_ATTRIBUTE", &Element::DEFAULT_VERSION_ATTRIBUTE)
-            .class_property("INHERIT_ATTRIBUTE", &Element::INHERIT_ATTRIBUTE)
-            .class_property("NAMESPACE_ATTRIBUTE", &Element::NAMESPACE_ATTRIBUTE)
-            .class_property("DOC_ATTRIBUTE", &Element::DOC_ATTRIBUTE);
+            .function("clearContent", &mx::Element::clearContent)
+            .function("createValidChildName", &mx::Element::createValidChildName)
+            .function("createStringResolver", &mx::Element::createStringResolver)
+            .function("asString", &mx::Element::asString)
+            .function("__str__", &mx::Element::asString)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::BindParam)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::BindInput)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::BindToken)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::Collection)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::Document)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::GeomInfo)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::GeomProp)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::Implementation)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::Look)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::Material)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::MaterialAssign)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::Node)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::NodeDef)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::NodeGraph)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::Parameter)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::Property)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::PropertySet)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::PropertySetAssign)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::ShaderRef)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::Token)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::TypeDef)
+            BIND_ELEMENT_FUNC_INSTANCE(mx::Visibility)
+            .class_property("NAME_ATTRIBUTE", &mx::Element::NAME_ATTRIBUTE)
+            .class_property("FILE_PREFIX_ATTRIBUTE", &mx::Element::FILE_PREFIX_ATTRIBUTE)
+            .class_property("GEOM_PREFIX_ATTRIBUTE", &mx::Element::GEOM_PREFIX_ATTRIBUTE)
+            .class_property("COLOR_SPACE_ATTRIBUTE", &mx::Element::COLOR_SPACE_ATTRIBUTE)
+            .class_property("TARGET_ATTRIBUTE", &mx::Element::TARGET_ATTRIBUTE)
+            .class_property("VERSION_ATTRIBUTE", &mx::Element::VERSION_ATTRIBUTE)
+            .class_property("DEFAULT_VERSION_ATTRIBUTE", &mx::Element::DEFAULT_VERSION_ATTRIBUTE)
+            .class_property("INHERIT_ATTRIBUTE", &mx::Element::INHERIT_ATTRIBUTE)
+            .class_property("NAMESPACE_ATTRIBUTE", &mx::Element::NAMESPACE_ATTRIBUTE)
+            .class_property("DOC_ATTRIBUTE", &mx::Element::DOC_ATTRIBUTE);
 
-        class_<TypedElement, base<Element>>("TypedElement")
-            .smart_ptr<std::shared_ptr<TypedElement>>("TypedElement")
-            .smart_ptr<std::shared_ptr<const TypedElement>>("TypedElement")
-            .function("setType", &TypedElement::setType)
-            .function("hasType", &TypedElement::hasType)
-            .function("getType", &TypedElement::getType)
-            .function("isMultiOutputType", &TypedElement::isMultiOutputType)
-            .function("getTypeDef", &TypedElement::getTypeDef)
-            .class_property("TYPE_ATTRIBUTE", &TypedElement::TYPE_ATTRIBUTE);
+        ems::class_<mx::TypedElement, ems::base<mx::Element>>("TypedElement")
+            .smart_ptr<std::shared_ptr<mx::TypedElement>>("TypedElement")
+            .smart_ptr<std::shared_ptr<const mx::TypedElement>>("TypedElement")
+            .function("setType", &mx::TypedElement::setType)
+            .function("hasType", &mx::TypedElement::hasType)
+            .function("getType", &mx::TypedElement::getType)
+            .function("isMultiOutputType", &mx::TypedElement::isMultiOutputType)
+            .function("getTypeDef", &mx::TypedElement::getTypeDef)
+            .class_property("TYPE_ATTRIBUTE", &mx::TypedElement::TYPE_ATTRIBUTE);
 
-        class_<ValueElement, base<TypedElement>>("ValueElement")
-            .smart_ptr<std::shared_ptr<ValueElement>>("ValueElement")
-            .smart_ptr<std::shared_ptr<const ValueElement>>("ValueElement")
-            .function("setValueString", &ValueElement::setValueString)
-            .function("hasValueString", &ValueElement::hasValueString)
-            .function("getValueString", &ValueElement::getValueString)
-            .function("getResolvedValueString", &ValueElement::getResolvedValueString)
-            .function("setInterfaceName", &ValueElement::setInterfaceName)
-            .function("hasInterfaceName", &ValueElement::hasInterfaceName)
-            .function("getInterfaceName", &ValueElement::getInterfaceName)
-            .function("setImplementationName", &ValueElement::setImplementationName)
-            .function("hasImplementationName", &ValueElement::hasImplementationName)
-            .function("getImplementationName", &ValueElement::getImplementationName)
-            .function("getValue", &ValueElement::getValue)
-            .function("getBoundValue", &ValueElement::getBoundValue)
-            .function("getDefaultValue", &ValueElement::getDefaultValue)
-            .function("setUnit", &ValueElement::setUnit)
-            .function("hasUnit", &ValueElement::hasUnit)
-            .function("getUnit", &ValueElement::getUnit)
-            .function("getActiveUnit", &ValueElement::getActiveUnit)
-            .function("setUnitType", &ValueElement::setUnitType)
-            .function("hasUnitType", &ValueElement::hasUnitType)
-            .function("getUnitType", &ValueElement::getUnitType)
-            .class_property("VALUE_ATTRIBUTE", &ValueElement::VALUE_ATTRIBUTE)
-            .class_property("INTERFACE_NAME_ATTRIBUTE", &ValueElement::INTERFACE_NAME_ATTRIBUTE)
-            .class_property("IMPLEMENTATION_NAME_ATTRIBUTE", &ValueElement::IMPLEMENTATION_NAME_ATTRIBUTE)
-            .class_property("IMPLEMENTATION_TYPE_ATTRIBUTE", &ValueElement::IMPLEMENTATION_TYPE_ATTRIBUTE)
-            .class_property("ENUM_ATTRIBUTE", &ValueElement::ENUM_ATTRIBUTE)
-            .class_property("ENUM_VALUES_ATTRIBUTE", &ValueElement::ENUM_VALUES_ATTRIBUTE)
-            .class_property("UNIT_ATTRIBUTE", &ValueElement::UNIT_ATTRIBUTE)
-            .class_property("UI_NAME_ATTRIBUTE", &ValueElement::UI_NAME_ATTRIBUTE)
-            .class_property("UI_FOLDER_ATTRIBUTE", &ValueElement::UI_FOLDER_ATTRIBUTE)
-            .class_property("UI_MIN_ATTRIBUTE", &ValueElement::UI_MIN_ATTRIBUTE)
-            .class_property("UI_MAX_ATTRIBUTE", &ValueElement::UI_MAX_ATTRIBUTE)
-            .class_property("UI_SOFT_MIN_ATTRIBUTE", &ValueElement::UI_SOFT_MIN_ATTRIBUTE)
-            .class_property("UI_SOFT_MAX_ATTRIBUTE", &ValueElement::UI_SOFT_MAX_ATTRIBUTE)
-            .class_property("UI_STEP_ATTRIBUTE", &ValueElement::UI_STEP_ATTRIBUTE)
-            .class_property("UI_ADVANCED_ATTRIBUTE", &ValueElement::UI_ADVANCED_ATTRIBUTE)
+        ems::class_<mx::ValueElement, ems::base<mx::TypedElement>>("ValueElement")
+            .smart_ptr<std::shared_ptr<mx::ValueElement>>("ValueElement")
+            .smart_ptr<std::shared_ptr<const mx::ValueElement>>("ValueElement")
+            .function("setValueString", &mx::ValueElement::setValueString)
+            .function("hasValueString", &mx::ValueElement::hasValueString)
+            .function("getValueString", &mx::ValueElement::getValueString)
+            .function("getResolvedValueString", &mx::ValueElement::getResolvedValueString)
+            .function("setInterfaceName", &mx::ValueElement::setInterfaceName)
+            .function("hasInterfaceName", &mx::ValueElement::hasInterfaceName)
+            .function("getInterfaceName", &mx::ValueElement::getInterfaceName)
+            .function("setImplementationName", &mx::ValueElement::setImplementationName)
+            .function("hasImplementationName", &mx::ValueElement::hasImplementationName)
+            .function("getImplementationName", &mx::ValueElement::getImplementationName)
+            .function("getValue", &mx::ValueElement::getValue)
+            .function("getBoundValue", &mx::ValueElement::getBoundValue)
+            .function("getDefaultValue", &mx::ValueElement::getDefaultValue)
+            .function("setUnit", &mx::ValueElement::setUnit)
+            .function("hasUnit", &mx::ValueElement::hasUnit)
+            .function("getUnit", &mx::ValueElement::getUnit)
+            .function("getActiveUnit", &mx::ValueElement::getActiveUnit)
+            .function("setUnitType", &mx::ValueElement::setUnitType)
+            .function("hasUnitType", &mx::ValueElement::hasUnitType)
+            .function("getUnitType", &mx::ValueElement::getUnitType)
+            .class_property("VALUE_ATTRIBUTE", &mx::ValueElement::VALUE_ATTRIBUTE)
+            .class_property("INTERFACE_NAME_ATTRIBUTE", &mx::ValueElement::INTERFACE_NAME_ATTRIBUTE)
+            .class_property("IMPLEMENTATION_NAME_ATTRIBUTE", &mx::ValueElement::IMPLEMENTATION_NAME_ATTRIBUTE)
+            .class_property("IMPLEMENTATION_TYPE_ATTRIBUTE", &mx::ValueElement::IMPLEMENTATION_TYPE_ATTRIBUTE)
+            .class_property("ENUM_ATTRIBUTE", &mx::ValueElement::ENUM_ATTRIBUTE)
+            .class_property("ENUM_VALUES_ATTRIBUTE", &mx::ValueElement::ENUM_VALUES_ATTRIBUTE)
+            .class_property("UNIT_ATTRIBUTE", &mx::ValueElement::UNIT_ATTRIBUTE)
+            .class_property("UI_NAME_ATTRIBUTE", &mx::ValueElement::UI_NAME_ATTRIBUTE)
+            .class_property("UI_FOLDER_ATTRIBUTE", &mx::ValueElement::UI_FOLDER_ATTRIBUTE)
+            .class_property("UI_MIN_ATTRIBUTE", &mx::ValueElement::UI_MIN_ATTRIBUTE)
+            .class_property("UI_MAX_ATTRIBUTE", &mx::ValueElement::UI_MAX_ATTRIBUTE)
+            .class_property("UI_SOFT_MIN_ATTRIBUTE", &mx::ValueElement::UI_SOFT_MIN_ATTRIBUTE)
+            .class_property("UI_SOFT_MAX_ATTRIBUTE", &mx::ValueElement::UI_SOFT_MAX_ATTRIBUTE)
+            .class_property("UI_STEP_ATTRIBUTE", &mx::ValueElement::UI_STEP_ATTRIBUTE)
+            .class_property("UI_ADVANCED_ATTRIBUTE", &mx::ValueElement::UI_ADVANCED_ATTRIBUTE)
             BIND_VALUE_ELEMENT_FUNC_INSTANCE(integer, int)
             BIND_VALUE_ELEMENT_FUNC_INSTANCE(boolean, bool)
             BIND_VALUE_ELEMENT_FUNC_INSTANCE(float, float)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(color2, Color2)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(color3, Color3)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(color4, Color4)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(vector2, Vector2)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(vector3, Vector3)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(vector4, Vector4)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(matrix33, Matrix33)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(matrix44, Matrix44)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(color2, mx::Color2)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(color3, mx::Color3)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(color4, mx::Color4)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(vector2, mx::Vector2)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(vector3, mx::Vector3)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(vector4, mx::Vector4)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(matrix33, mx::Matrix33)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(matrix44, mx::Matrix44)
             BIND_VALUE_ELEMENT_FUNC_INSTANCE(string, std::string)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(integerarray, IntVec)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(booleanarray, BoolVec)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(floatarray, FloatVec)
-            BIND_VALUE_ELEMENT_FUNC_INSTANCE(stringarray, StringVec);
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(integerarray, mx::IntVec)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(booleanarray, mx::BoolVec)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(floatarray, mx::FloatVec)
+            BIND_VALUE_ELEMENT_FUNC_INSTANCE(stringarray, mx::StringVec);
 
-        class_<Token, base<ValueElement>>("Token")
-            .smart_ptr_constructor("Token", &std::make_shared<Token, ElementPtr, const string &>)
-            .class_property("CATEGORY", &Token::CATEGORY);
+        ems::class_<mx::Token, ems::base<mx::ValueElement>>("Token")
+            .smart_ptr_constructor("Token", &std::make_shared<mx::Token, mx::ElementPtr, const std::string &>)
+            .class_property("CATEGORY", &mx::Token::CATEGORY);
 
-        class_<StringResolver>("StringResolver")
-            .smart_ptr<std::shared_ptr<StringResolver>>("StringResolver")
-            .class_function("create", &StringResolver::create) // Static function for creating a StringResolver instance
-            .function("setFilePrefix", &StringResolver::setFilePrefix)
-            .function("getFilePrefix", &StringResolver::getFilePrefix)
-            .function("setGeomPrefix", &StringResolver::setGeomPrefix)
-            .function("getGeomPrefix", &StringResolver::getGeomPrefix)
-            .function("setUdimString", &StringResolver::setUdimString)
-            .function("setUvTileString", &StringResolver::setUvTileString)
-            .function("setFilenameSubstitution", &StringResolver::setFilenameSubstitution)
-            .function("getFilenameSubstitutions", optional_override([](StringResolver &self) {
-                          std::unordered_map<string, string> res = self.StringResolver::getFilenameSubstitutions();
-                          val obj = val::object();
+        ems::class_<mx::StringResolver>("StringResolver")
+            .smart_ptr<std::shared_ptr<mx::StringResolver>>("StringResolver")
+            .class_function("create", &mx::StringResolver::create) // Static function for creating a mx::StringResolver instance
+            .function("setFilePrefix", &mx::StringResolver::setFilePrefix)
+            .function("getFilePrefix", &mx::StringResolver::getFilePrefix)
+            .function("setGeomPrefix", &mx::StringResolver::setGeomPrefix)
+            .function("getGeomPrefix", &mx::StringResolver::getGeomPrefix)
+            .function("setUdimString", &mx::StringResolver::setUdimString)
+            .function("setUvTileString", &mx::StringResolver::setUvTileString)
+            .function("setFilenameSubstitution", &mx::StringResolver::setFilenameSubstitution)
+            .function("getFilenameSubstitutions", ems::optional_override([](mx::StringResolver &self) {
+                          std::unordered_map<std::string, std::string> res = self.mx::StringResolver::getFilenameSubstitutions();
+                          ems::val obj = ems::val::object();
                           for (const auto &[key, value] : res)
                           {
                               obj.set(key, value);
@@ -252,10 +249,10 @@ extern "C"
 
                           return obj;
                       }))
-            .function("setGeomNameSubstitution", &StringResolver::setGeomNameSubstitution)
-            .function("getGeomNameSubstitutions", optional_override([](StringResolver &self) {
-                          std::unordered_map<string, string> res = self.StringResolver::getGeomNameSubstitutions();
-                          val obj = val::object();
+            .function("setGeomNameSubstitution", &mx::StringResolver::setGeomNameSubstitution)
+            .function("getGeomNameSubstitutions", ems::optional_override([](mx::StringResolver &self) {
+                          std::unordered_map<std::string, std::string> res = self.mx::StringResolver::getGeomNameSubstitutions();
+                          ems::val obj = ems::val::object();
                           for (const auto &[key, value] : res)
                           {
                               obj.set(key, value);
@@ -263,8 +260,8 @@ extern "C"
 
                           return obj;
                       }))
-            .function("resolve", &StringResolver::resolve);
+            .function("resolve", &mx::StringResolver::resolve);
 
-        class_<ElementPredicate>("ElementPredicate");
+        ems::class_<mx::ElementPredicate>("ElementPredicate");
     }
 }

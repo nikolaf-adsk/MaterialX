@@ -4,74 +4,71 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
-using namespace emscripten;
-
+namespace ems = emscripten;
 namespace mx = MaterialX;
 
-using namespace mx;
-
 #define BIND_PROPERTYSET_TYPE_INSTANCE(NAME, T) \
-.function("_setPropertyValue" #NAME, &PropertySet::setPropertyValue<T>)
+.function("_setPropertyValue" #NAME, &mx::PropertySet::setPropertyValue<T>)
 
 extern "C"
 {
     EMSCRIPTEN_BINDINGS(property)
     {
 
-        class_<Property, base<ValueElement>>("Property")
-            .smart_ptr_constructor("Property", &std::make_shared<Property, ElementPtr, const string &>)
-            .smart_ptr<std::shared_ptr<const Property>>("Property")
-            .class_property("CATEGORY", &Property::CATEGORY);
+        ems::class_<mx::Property, ems::base<mx::ValueElement>>("Property")
+            .smart_ptr_constructor("Property", &std::make_shared<mx::Property, mx::ElementPtr, const std::string &>)
+            .smart_ptr<std::shared_ptr<const mx::Property>>("Property")
+            .class_property("CATEGORY", &mx::Property::CATEGORY);
 
-        class_<PropertyAssign, base<ValueElement>>("PropertyAssign")
-            .smart_ptr_constructor("PropertyAssign", &std::make_shared<PropertyAssign, ElementPtr, const string &>)
-            .smart_ptr<std::shared_ptr<const PropertyAssign>>("PropertyAssign")
-            .function("setProperty", &PropertyAssign::setProperty)
-            .function("hasProperty", &PropertyAssign::hasProperty)
-            .function("getProperty", &PropertyAssign::getProperty)
-            .function("setGeom", &PropertyAssign::setGeom)
-            .function("hasGeom", &PropertyAssign::hasGeom)
-            .function("getGeom", &PropertyAssign::getGeom)
-            .function("setCollectionString", &PropertyAssign::setCollectionString)
-            .function("hasCollectionString", &PropertyAssign::hasCollectionString)
-            .function("getCollectionString", &PropertyAssign::getCollectionString)
-            .function("setCollection", &PropertyAssign::setCollection)
-            .function("getCollection", &PropertyAssign::getCollection)
-            .class_property("CATEGORY", &PropertyAssign::CATEGORY);
+        ems::class_<mx::PropertyAssign, ems::base<mx::ValueElement>>("PropertyAssign")
+            .smart_ptr_constructor("PropertyAssign", &std::make_shared<mx::PropertyAssign, mx::ElementPtr, const std::string &>)
+            .smart_ptr<std::shared_ptr<const mx::PropertyAssign>>("PropertyAssign")
+            .function("setProperty", &mx::PropertyAssign::setProperty)
+            .function("hasProperty", &mx::PropertyAssign::hasProperty)
+            .function("getProperty", &mx::PropertyAssign::getProperty)
+            .function("setGeom", &mx::PropertyAssign::setGeom)
+            .function("hasGeom", &mx::PropertyAssign::hasGeom)
+            .function("getGeom", &mx::PropertyAssign::getGeom)
+            .function("setCollectionString", &mx::PropertyAssign::setCollectionString)
+            .function("hasCollectionString", &mx::PropertyAssign::hasCollectionString)
+            .function("getCollectionString", &mx::PropertyAssign::getCollectionString)
+            .function("setCollection", &mx::PropertyAssign::setCollection)
+            .function("getCollection", &mx::PropertyAssign::getCollection)
+            .class_property("CATEGORY", &mx::PropertyAssign::CATEGORY);
 
-        class_<PropertySet, base<Element>>("PropertySet")
-            .smart_ptr_constructor("PropertySet", &std::make_shared<PropertySet, ElementPtr, const string &>)
-            .smart_ptr<std::shared_ptr<const PropertySet>>("PropertySet")
-            .function("addProperty", &PropertySet::addProperty)
-            .function("getProperties", &PropertySet::getProperties)
-            .function("removeProperty", &PropertySet::removeProperty)
-            .function("_getPropertyValue", &PropertySet::getPropertyValue)
+        ems::class_<mx::PropertySet, ems::base<mx::Element>>("PropertySet")
+            .smart_ptr_constructor("PropertySet", &std::make_shared<mx::PropertySet, mx::ElementPtr, const std::string &>)
+            .smart_ptr<std::shared_ptr<const mx::PropertySet>>("PropertySet")
+            .function("addProperty", &mx::PropertySet::addProperty)
+            .function("getProperties", &mx::PropertySet::getProperties)
+            .function("removeProperty", &mx::PropertySet::removeProperty)
+            .function("_getPropertyValue", &mx::PropertySet::getPropertyValue)
             BIND_PROPERTYSET_TYPE_INSTANCE(integer, int)
             BIND_PROPERTYSET_TYPE_INSTANCE(boolean, bool)
             BIND_PROPERTYSET_TYPE_INSTANCE(float, float)
-            BIND_PROPERTYSET_TYPE_INSTANCE(color2, Color2)
-            BIND_PROPERTYSET_TYPE_INSTANCE(color3, Color3)
-            BIND_PROPERTYSET_TYPE_INSTANCE(color4, Color4)
-            BIND_PROPERTYSET_TYPE_INSTANCE(vector2, Vector2)
-            BIND_PROPERTYSET_TYPE_INSTANCE(vector3, Vector3)
-            BIND_PROPERTYSET_TYPE_INSTANCE(vector4, Vector4)
-            BIND_PROPERTYSET_TYPE_INSTANCE(matrix33, Matrix33)
-            BIND_PROPERTYSET_TYPE_INSTANCE(matrix44, Matrix44)
+            BIND_PROPERTYSET_TYPE_INSTANCE(color2, mx::Color2)
+            BIND_PROPERTYSET_TYPE_INSTANCE(color3, mx::Color3)
+            BIND_PROPERTYSET_TYPE_INSTANCE(color4, mx::Color4)
+            BIND_PROPERTYSET_TYPE_INSTANCE(vector2, mx::Vector2)
+            BIND_PROPERTYSET_TYPE_INSTANCE(vector3, mx::Vector3)
+            BIND_PROPERTYSET_TYPE_INSTANCE(vector4, mx::Vector4)
+            BIND_PROPERTYSET_TYPE_INSTANCE(matrix33, mx::Matrix33)
+            BIND_PROPERTYSET_TYPE_INSTANCE(matrix44, mx::Matrix44)
             BIND_PROPERTYSET_TYPE_INSTANCE(string, std::string)
-            BIND_PROPERTYSET_TYPE_INSTANCE(integerarray, IntVec)
-            BIND_PROPERTYSET_TYPE_INSTANCE(booleanarray, BoolVec)
-            BIND_PROPERTYSET_TYPE_INSTANCE(floatarray, FloatVec)
-            BIND_PROPERTYSET_TYPE_INSTANCE(stringarray, StringVec)
-            .class_property("CATEGORY", &Property::CATEGORY);
+            BIND_PROPERTYSET_TYPE_INSTANCE(integerarray, mx::IntVec)
+            BIND_PROPERTYSET_TYPE_INSTANCE(booleanarray, mx::BoolVec)
+            BIND_PROPERTYSET_TYPE_INSTANCE(floatarray, mx::FloatVec)
+            BIND_PROPERTYSET_TYPE_INSTANCE(stringarray, mx::StringVec)
+            .class_property("CATEGORY", &mx::Property::CATEGORY);
 
-        class_<PropertySetAssign, base<GeomElement>>("PropertySetAssign")
-            .smart_ptr_constructor("PropertySetAssign", &std::make_shared<PropertySetAssign, ElementPtr, const string &>)
-            .smart_ptr<std::shared_ptr<const PropertySetAssign>>("PropertySetAssign")
-            .function("setPropertySetString", &PropertySetAssign::setPropertySetString)
-            .function("hasPropertySetString", &PropertySetAssign::hasPropertySetString)
-            .function("getPropertySetString", &PropertySetAssign::getPropertySetString)
-            .function("setPropertySet", &PropertySetAssign::setPropertySet)
-            .function("getPropertySet", &PropertySetAssign::getPropertySet)
-            .class_property("CATEGORY", &PropertySetAssign::CATEGORY);
+        ems::class_<mx::PropertySetAssign, ems::base<mx::GeomElement>>("PropertySetAssign")
+            .smart_ptr_constructor("PropertySetAssign", &std::make_shared<mx::PropertySetAssign, mx::ElementPtr, const std::string &>)
+            .smart_ptr<std::shared_ptr<const mx::PropertySetAssign>>("PropertySetAssign")
+            .function("setPropertySetString", &mx::PropertySetAssign::setPropertySetString)
+            .function("hasPropertySetString", &mx::PropertySetAssign::hasPropertySetString)
+            .function("getPropertySetString", &mx::PropertySetAssign::getPropertySetString)
+            .function("setPropertySet", &mx::PropertySetAssign::setPropertySet)
+            .function("getPropertySet", &mx::PropertySetAssign::getPropertySet)
+            .class_property("CATEGORY", &mx::PropertySetAssign::CATEGORY);
     }
 }

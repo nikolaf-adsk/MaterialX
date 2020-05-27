@@ -2,6 +2,8 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
+namespace ems = emscripten;
+
 namespace exceptions
 {
 std::string getExceptionMessage(int exceptionPtr)
@@ -14,6 +16,6 @@ extern "C"
 {
     EMSCRIPTEN_BINDINGS(exceptions)
     {
-        emscripten::function("getExceptionMessage", &exceptions::getExceptionMessage);
+        ems::function("getExceptionMessage", &exceptions::getExceptionMessage);
     }
 }

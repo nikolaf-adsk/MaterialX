@@ -6,69 +6,64 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
-using namespace emscripten;
-
+namespace ems = emscripten;
 namespace mx = MaterialX;
-
-using namespace mx;
 
 extern "C"
 {
     EMSCRIPTEN_BINDINGS(traversal)
     {
-        class_<Edge>("Edge")
-            .smart_ptr_constructor("Edge", &std::make_shared<Edge, ElementPtr, ElementPtr, ElementPtr>)
-            .function("getDownstreamElement", &Edge::getDownstreamElement)
-            .function("getConnectingElement", &Edge::getConnectingElement)
-            .function("getUpstreamElement", &Edge::getUpstreamElement)
-            .function("getName", &Edge::getName);
+        ems::class_<mx::Edge>("Edge")
+            .smart_ptr_constructor("Edge", &std::make_shared<mx::Edge, mx::ElementPtr, mx::ElementPtr, mx::ElementPtr>)
+            .function("getDownstreamElement", &mx::Edge::getDownstreamElement)
+            .function("getConnectingElement", &mx::Edge::getConnectingElement)
+            .function("getUpstreamElement", &mx::Edge::getUpstreamElement)
+            .function("getName", &mx::Edge::getName);
 
-        class_<TreeIterator>("TreeIterator")
-            .smart_ptr_constructor("TreeIterator", &std::make_shared<TreeIterator, ElementPtr>)
-
-            .function("getElement", &TreeIterator::getElement)
-            .function("getElementDepth", &TreeIterator::getElementDepth)
-            .function("setPruneSubtree", &TreeIterator::setPruneSubtree)
-            .function("getPruneSubtree", &TreeIterator::getPruneSubtree)
-            .function("__iter__", optional_override([](TreeIterator &it) -> TreeIterator & {
+        ems::class_<mx::TreeIterator>("TreeIterator")
+            .smart_ptr_constructor("TreeIterator", &std::make_shared<mx::TreeIterator, mx::ElementPtr>)
+            .function("getElement", &mx::TreeIterator::getElement)
+            .function("getElementDepth", &mx::TreeIterator::getElementDepth)
+            .function("setPruneSubtree", &mx::TreeIterator::setPruneSubtree)
+            .function("getPruneSubtree", &mx::TreeIterator::getPruneSubtree)
+            .function("__iter__", ems::optional_override([](mx::TreeIterator &it) -> mx::TreeIterator & {
                 return it.begin(1);
             }))
-            .function("next", optional_override([](TreeIterator &it) {
+            .function("next", ems::optional_override([](mx::TreeIterator &it) {
                 if (++it == it.end())
-                    throw Exception("Could not get the next element.");
+                    throw mx::Exception("Could not get the next element.");
                 return *it;
             }));
 
-        class_<GraphIterator>("GraphIterator")
-            .smart_ptr_constructor("GraphIterator", &std::make_shared<GraphIterator, ElementPtr, ConstMaterialPtr>)
-
-            .function("getDownstreamElement", &GraphIterator::getDownstreamElement)
-            .function("getConnectingElement", &GraphIterator::getConnectingElement)
-            .function("getUpstreamElement", &GraphIterator::getUpstreamElement)
-            .function("getUpstreamIndex", &GraphIterator::getUpstreamIndex)
-            .function("getElementDepth", &GraphIterator::getElementDepth)
-            .function("getNodeDepth", &GraphIterator::getNodeDepth)
-            .function("setPruneSubgraph", &GraphIterator::setPruneSubgraph)
-            .function("getPruneSubgraph", &GraphIterator::getPruneSubgraph)
-            .function("__iter__", optional_override([](GraphIterator &it) -> GraphIterator & {
+        ems::class_<mx::GraphIterator>("GraphIterator")
+            .smart_ptr_constructor("GraphIterator", &std::make_shared<mx::GraphIterator, mx::ElementPtr, mx::ConstMaterialPtr>)
+            .function("getDownstreamElement", &mx::GraphIterator::getDownstreamElement)
+            .function("getConnectingElement", &mx::GraphIterator::getConnectingElement)
+            .function("getUpstreamElement", &mx::GraphIterator::getUpstreamElement)
+            .function("getUpstreamIndex", &mx::GraphIterator::getUpstreamIndex)
+            .function("getElementDepth", &mx::GraphIterator::getElementDepth)
+            .function("getNodeDepth", &mx::GraphIterator::getNodeDepth)
+            .function("setPruneSubgraph", &mx::GraphIterator::setPruneSubgraph)
+            .function("getPruneSubgraph", &mx::GraphIterator::getPruneSubgraph)
+            .function("__iter__", ems::optional_override([](mx::GraphIterator &it) -> mx::GraphIterator & {
                 return it.begin(1);
             }))
-            .function("next", optional_override([](GraphIterator &it) {
+            .function("next", ems::optional_override([](mx::GraphIterator &it) {
                 if (++it == it.end())
-                    throw Exception("Could not get the next element.");
+                    throw mx::Exception("Could not get the next element.");
                     
                 return *it;
             }));
 
-        class_<InheritanceIterator>("InheritanceIterator")
-            .smart_ptr_constructor("InheritanceIterator", &std::make_shared<InheritanceIterator, ConstElementPtr>)
+        ems::class_<mx::InheritanceIterator>("InheritanceIterator")
+            .smart_ptr_constructor("InheritanceIterator", &std::make_shared<mx::InheritanceIterator, mx::ConstElementPtr>)
 
-            .function("__iter__", optional_override([](InheritanceIterator &it) -> InheritanceIterator & {
+            .function("__iter__", ems::optional_override([](mx::InheritanceIterator &it) -> mx::InheritanceIterator & {
                 return it.begin(1);
             }))
-            .function("next", optional_override([](InheritanceIterator &it) {
+            .function("next", ems::optional_override([](mx::InheritanceIterator &it) {
                 if (++it == it.end())
-                    throw Exception("Could not get the next element.");
+                    throw mx::Exception("Could not get the next element.");
                 return *it;
             }));
     }

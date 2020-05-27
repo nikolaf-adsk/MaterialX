@@ -10,53 +10,50 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
-using namespace emscripten;
-
+namespace ems = emscripten;
 namespace mx = MaterialX;
-
-using namespace mx;
 
 extern "C"
 {
     EMSCRIPTEN_BINDINGS(registered_vectors)
     {
-        register_vector<string>("vector<string>");
-        register_vector<int>("vector<int>");
-        register_vector<VariantPtr>("vector<VariantPtr>");
-        register_vector<VariantAssignPtr>("vector<VariantAssignPtr>");
-        register_vector<VariantSetPtr>("vector<VariantSetPtr>");
-        register_vector<ElementPtr>("vector<ElementPtr>");
-        register_vector<PortElementPtr>("vector<PortElementPtr>");
-        register_vector<ValueElementPtr>("vector<ValueElementPtr>");
-        register_vector<InterfaceElementPtr>("vector<InterfaceElementPtr>");
-        register_vector<BackdropPtr>("vector<BackdropPtr>");
-        register_vector<MaterialAssignPtr>("vector<MaterialAssignPtr>");
-        register_vector<MaterialPtr>("vector<MaterialPtr>");
-        register_vector<PropertyAssignPtr>("vector<PropertyAssignPtr>");
-        register_vector<PropertySetAssignPtr>("vector<PropertySetAssignPtr>");
-        register_vector<VisibilityPtr>("vector<VisibilityPtr>");
-        register_vector<ParameterPtr>("vector<ParameterPtr>");
-        register_vector<InputPtr>("vector<InputPtr>");
-        register_vector<OutputPtr>("vector<OutputPtr>");
-        register_vector<TokenPtr>("vector<TokenPtr>");
-        register_vector<NodePtr>("vector<NodePtr>");
-        register_vector<NodeGraphPtr>("vector<NodeGraphPtr>");
-        register_vector<NodeDefPtr>("vector<NodeDefPtr>");
-        register_vector<TypeDefPtr>("vector<TypeDefPtr>");
-        register_vector<ImplementationPtr>("vector<ImplementationPtr>");
-        register_vector<UnitTypeDefPtr>("vector<UnitTypeDefPtr>");
-        register_vector<MemberPtr>("vector<MemberPtr>");
-        register_vector<UnitPtr>("vector<UnitPtr>");
-        register_vector<UnitDefPtr>("vector<UnitDefPtr>");
-        register_vector<ShaderRefPtr>("vector<ShaderRefPtr>");
-        register_vector<BindParamPtr>("vector<BindParamPtr>");
-        register_vector<BindInputPtr>("vector<BindInputPtr>");
-        register_vector<BindTokenPtr>("vector<BindTokenPtr>");
-        register_vector<GeomInfoPtr>("vector<GeomInfoPtr>");
-        register_vector<GeomPropDefPtr>("vector<GeomPropDefPtr>");
-        register_vector<LookPtr>("vector<LookPtr>");
-        register_vector<LookGroupPtr>("vector<LookGroupPtr>");
-        register_vector<CollectionPtr>("vector<CollectionPtr>");
-        register_vector<PropertySetPtr>("vector<PropertySetPtr>");
+        ems::register_vector<std::string>("vector<std::string>");
+        ems::register_vector<int>("vector<int>");
+        ems::register_vector<mx::VariantPtr>("vector<mx::VariantPtr>");
+        ems::register_vector<mx::VariantAssignPtr>("vector<mx::VariantAssignPtr>");
+        ems::register_vector<mx::VariantSetPtr>("vector<mx::VariantSetPtr>");
+        ems::register_vector<mx::ElementPtr>("vector<mx::ElementPtr>");
+        ems::register_vector<mx::PortElementPtr>("vector<mx::PortElementPtr>");
+        ems::register_vector<mx::ValueElementPtr>("vector<mx::ValueElementPtr>");
+        ems::register_vector<mx::InterfaceElementPtr>("vector<mx::InterfaceElementPtr>");
+        ems::register_vector<mx::BackdropPtr>("vector<mx::BackdropPtr>");
+        ems::register_vector<mx::MaterialAssignPtr>("vector<mx::MaterialAssignPtr>");
+        ems::register_vector<mx::MaterialPtr>("vector<mx::MaterialPtr>");
+        ems::register_vector<mx::PropertyAssignPtr>("vector<mx::PropertyAssignPtr>");
+        ems::register_vector<mx::PropertySetAssignPtr>("vector<mx::PropertySetAssignPtr>");
+        ems::register_vector<mx::VisibilityPtr>("vector<mx::VisibilityPtr>");
+        ems::register_vector<mx::ParameterPtr>("vector<mx::ParameterPtr>");
+        ems::register_vector<mx::InputPtr>("vector<mx::InputPtr>");
+        ems::register_vector<mx::OutputPtr>("vector<mx::OutputPtr>");
+        ems::register_vector<mx::TokenPtr>("vector<mx::TokenPtr>");
+        ems::register_vector<mx::NodePtr>("vector<mx::NodePtr>");
+        ems::register_vector<mx::NodeGraphPtr>("vector<mx::NodeGraphPtr>");
+        ems::register_vector<mx::NodeDefPtr>("vector<mx::NodeDefPtr>");
+        ems::register_vector<mx::TypeDefPtr>("vector<mx::TypeDefPtr>");
+        ems::register_vector<mx::ImplementationPtr>("vector<mx::ImplementationPtr>");
+        ems::register_vector<mx::UnitTypeDefPtr>("vector<mx::UnitTypeDefPtr>");
+        ems::register_vector<mx::MemberPtr>("vector<mx::MemberPtr>");
+        ems::register_vector<mx::UnitPtr>("vector<mx::UnitPtr>");
+        ems::register_vector<mx::UnitDefPtr>("vector<mx::UnitDefPtr>");
+        ems::register_vector<mx::ShaderRefPtr>("vector<mx::ShaderRefPtr>");
+        ems::register_vector<mx::BindParamPtr>("vector<mx::BindParamPtr>");
+        ems::register_vector<mx::BindInputPtr>("vector<mx::BindInputPtr>");
+        ems::register_vector<mx::BindTokenPtr>("vector<mx::BindTokenPtr>");
+        ems::register_vector<mx::GeomInfoPtr>("vector<mx::GeomInfoPtr>");
+        ems::register_vector<mx::GeomPropDefPtr>("vector<mx::GeomPropDefPtr>");
+        ems::register_vector<mx::LookPtr>("vector<mx::LookPtr>");
+        ems::register_vector<mx::LookGroupPtr>("vector<mx::LookGroupPtr>");
+        ems::register_vector<mx::CollectionPtr>("vector<mx::CollectionPtr>");
+        ems::register_vector<mx::PropertySetPtr>("vector<mx::PropertySetPtr>");
     }
 }

@@ -4,104 +4,101 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
-using namespace emscripten;
-
+namespace ems = emscripten;
 namespace mx = MaterialX;
-
-using namespace mx;
 
 extern "C"
 {
     EMSCRIPTEN_BINDINGS(document)
     {
-        function("createDocument", &createDocument);
-        class_<Document, base<GraphElement>>("Document")
-            .smart_ptr_constructor("Document", &std::make_shared<Document, ElementPtr, const string &>)
-            .smart_ptr<std::shared_ptr<const Document>>("Document")
-            .function("initialize", &Document::initialize)
-            .function("copy", &Document::copy)
-            .function("importLibrary", optional_override([](Document &self, const ConstDocumentPtr &library, CopyOptions copyOptions = CopyOptions()) {
-                          const CopyOptions *co = &copyOptions;
-                          return self.Document::importLibrary(library, co);
+        ems::function("createDocument", &mx::createDocument);
+        ems::class_<mx::Document, ems::base<mx::GraphElement>>("Document")
+            .smart_ptr_constructor("Document", &std::make_shared<mx::Document, mx::ElementPtr, const std::string &>)
+            .smart_ptr<std::shared_ptr<const mx::Document>>("Document")
+            .function("initialize", &mx::Document::initialize)
+            .function("copy", &mx::Document::copy)
+            .function("importLibrary", ems::optional_override([](mx::Document &self, const mx::ConstDocumentPtr &library, mx::CopyOptions copyOptions = mx::CopyOptions()) {
+                          const mx::CopyOptions *co = &copyOptions;
+                          return self.mx::Document::importLibrary(library, co);
                       }))
-            .function("getReferencedSourceUris", optional_override([](Document &self) {
-                          StringSet referenced = self.Document::getReferencedSourceUris();
+            .function("getReferencedSourceUris", ems::optional_override([](mx::Document &self) {
+                          mx::StringSet referenced = self.mx::Document::getReferencedSourceUris();
                           int size = referenced.size();
-                          return arrayToVec((string *)&referenced, size);
+                          return arrayToVec((std::string *)&referenced, size);
                       }))
-            .function("addNodeGraph", &Document::addNodeGraph)
-            .function("getNodeGraph", &Document::getNodeGraph)
-            .function("getNodeGraphs", &Document::getNodeGraphs)
-            .function("removeNodeGraph", &Document::removeNodeGraph)
-            .function("getMatchingPorts", &Document::getMatchingPorts)
-            .function("addMaterial", &Document::addMaterial)
-            .function("getMaterial", &Document::getMaterial)
-            .function("getMaterials", &Document::getMaterials)
-            .function("removeMaterial", &Document::removeMaterial)
-            .function("addGeomInfo", &Document::addGeomInfo)
-            .function("getGeomInfo", &Document::getGeomInfo)
-            .function("getGeomInfos", &Document::getGeomInfos)
-            .function("removeGeomInfo", &Document::removeGeomInfo)
-            .function("getGeomPropValue", &Document::getGeomPropValue)
-            .function("addGeomPropDef", &Document::addGeomPropDef)
-            .function("getGeomPropDef", &Document::getGeomPropDef)
-            .function("getGeomPropDefs", &Document::getGeomPropDefs)
-            .function("removeGeomPropDef", &Document::removeGeomPropDef)
-            .function("addLook", &Document::addLook)
-            .function("getLook", &Document::getLook)
-            .function("getLooks", &Document::getLooks)
-            .function("removeLook", &Document::removeLook)
-            .function("addLookGroup", &Document::addLookGroup)
-            .function("getLookGroup", &Document::getLookGroup)
-            .function("getLookGroups", &Document::getLookGroups)
-            .function("removeLookGroup", &Document::removeLookGroup)
-            .function("addCollection", &Document::addCollection)
-            .function("getCollection", &Document::getCollection)
-            .function("getCollections", &Document::getCollections)
-            .function("removeCollection", &Document::removeCollection)
-            .function("addTypeDef", &Document::addTypeDef)
-            .function("getTypeDef", &Document::getTypeDef)
-            .function("getTypeDefs", &Document::getTypeDefs)
-            .function("removeTypeDef", &Document::removeTypeDef)
-            .function("addNodeDef", &Document::addNodeDef)
-            .function("addNodeDefFromGraph", optional_override([](Document &self, NodeGraphPtr nodeGraph, string nodeDefName, string node, string newGraphName, string nodeGroup) {
-                          const string &nodeDefName1 = nodeDefName;
-                          const string &node1 = node;
-                          string &newGraphName1 = newGraphName;
-                          const string &nodeGroup1 = nodeGroup;
-                          return self.Document::addNodeDefFromGraph(nodeGraph, nodeDefName1, node1, newGraphName1, nodeGroup1);
+            .function("addNodeGraph", &mx::Document::addNodeGraph)
+            .function("getNodeGraph", &mx::Document::getNodeGraph)
+            .function("getNodeGraphs", &mx::Document::getNodeGraphs)
+            .function("removeNodeGraph", &mx::Document::removeNodeGraph)
+            .function("getMatchingPorts", &mx::Document::getMatchingPorts)
+            .function("addMaterial", &mx::Document::addMaterial)
+            .function("getMaterial", &mx::Document::getMaterial)
+            .function("getMaterials", &mx::Document::getMaterials)
+            .function("removeMaterial", &mx::Document::removeMaterial)
+            .function("addGeomInfo", &mx::Document::addGeomInfo)
+            .function("getGeomInfo", &mx::Document::getGeomInfo)
+            .function("getGeomInfos", &mx::Document::getGeomInfos)
+            .function("removeGeomInfo", &mx::Document::removeGeomInfo)
+            .function("getGeomPropValue", &mx::Document::getGeomPropValue)
+            .function("addGeomPropDef", &mx::Document::addGeomPropDef)
+            .function("getGeomPropDef", &mx::Document::getGeomPropDef)
+            .function("getGeomPropDefs", &mx::Document::getGeomPropDefs)
+            .function("removeGeomPropDef", &mx::Document::removeGeomPropDef)
+            .function("addLook", &mx::Document::addLook)
+            .function("getLook", &mx::Document::getLook)
+            .function("getLooks", &mx::Document::getLooks)
+            .function("removeLook", &mx::Document::removeLook)
+            .function("addLookGroup", &mx::Document::addLookGroup)
+            .function("getLookGroup", &mx::Document::getLookGroup)
+            .function("getLookGroups", &mx::Document::getLookGroups)
+            .function("removeLookGroup", &mx::Document::removeLookGroup)
+            .function("addCollection", &mx::Document::addCollection)
+            .function("getCollection", &mx::Document::getCollection)
+            .function("getCollections", &mx::Document::getCollections)
+            .function("removeCollection", &mx::Document::removeCollection)
+            .function("addTypeDef", &mx::Document::addTypeDef)
+            .function("getTypeDef", &mx::Document::getTypeDef)
+            .function("getTypeDefs", &mx::Document::getTypeDefs)
+            .function("removeTypeDef", &mx::Document::removeTypeDef)
+            .function("addNodeDef", &mx::Document::addNodeDef)
+            .function("addNodeDefFromGraph", ems::optional_override([](mx::Document &self, mx::NodeGraphPtr nodeGraph, std::string nodeDefName, std::string node, std::string newGraphName, std::string nodeGroup) {
+                          const std::string &nodeDefName1 = nodeDefName;
+                          const std::string &node1 = node;
+                          std::string &newGraphName1 = newGraphName;
+                          const std::string &nodeGroup1 = nodeGroup;
+                          return self.mx::Document::addNodeDefFromGraph(nodeGraph, nodeDefName1, node1, newGraphName1, nodeGroup1);
                       }))
-            .function("getNodeDef", &Document::getNodeDef)
-            .function("getNodeDefs", &Document::getNodeDefs)
-            .function("removeNodeDef", &Document::removeNodeDef)
-            .function("getMatchingNodeDefs", &Document::getMatchingNodeDefs)
-            .function("getMatchingImplementations", &Document::getMatchingImplementations)
-            .function("addPropertySet", &Document::addPropertySet)
-            .function("getPropertySet", &Document::getPropertySet)
-            .function("getPropertySets", &Document::getPropertySets)
-            .function("removePropertySet", &Document::removePropertySet)
-            .function("addVariantSet", &Document::addVariantSet)
-            .function("getVariantSet", &Document::getVariantSet)
-            .function("getVariantSets", &Document::getVariantSets)
-            .function("removeVariantSet", &Document::removeVariantSet)
-            .function("addImplementation", &Document::addImplementation)
-            .function("getImplementation", &Document::getImplementation)
-            .function("getImplementations", &Document::getImplementations)
-            .function("removeImplementation", &Document::removeImplementation)
-            .function("addUnitDef", &Document::addUnitDef)
-            .function("getUnitDef", &Document::getUnitDef)
-            .function("getUnitDefs", &Document::getUnitDefs)
-            .function("removeUnitDef", &Document::removeUnitDef)
-            .function("addUnitTypeDef", &Document::addUnitTypeDef)
-            .function("getUnitTypeDef", &Document::getUnitTypeDef)
-            .function("getUnitTypeDefs", &Document::getUnitTypeDefs)
-            .function("removeUnitTypeDef", &Document::removeUnitTypeDef)
-            .function("upgradeVersion", &Document::upgradeVersion)
-            .function("setColorManagementSystem", &Document::setColorManagementSystem)
-            .function("hasColorManagementSystem", &Document::hasColorManagementSystem)
-            .function("getColorManagementSystem", &Document::getColorManagementSystem)
-            .function("setColorManagementConfig", &Document::setColorManagementConfig)
-            .function("hasColorManagementConfig", &Document::hasColorManagementConfig)
-            .function("getColorManagementConfig", &Document::getColorManagementConfig);
+            .function("getNodeDef", &mx::Document::getNodeDef)
+            .function("getNodeDefs", &mx::Document::getNodeDefs)
+            .function("removeNodeDef", &mx::Document::removeNodeDef)
+            .function("getMatchingNodeDefs", &mx::Document::getMatchingNodeDefs)
+            .function("getMatchingImplementations", &mx::Document::getMatchingImplementations)
+            .function("addPropertySet", &mx::Document::addPropertySet)
+            .function("getPropertySet", &mx::Document::getPropertySet)
+            .function("getPropertySets", &mx::Document::getPropertySets)
+            .function("removePropertySet", &mx::Document::removePropertySet)
+            .function("addVariantSet", &mx::Document::addVariantSet)
+            .function("getVariantSet", &mx::Document::getVariantSet)
+            .function("getVariantSets", &mx::Document::getVariantSets)
+            .function("removeVariantSet", &mx::Document::removeVariantSet)
+            .function("addImplementation", &mx::Document::addImplementation)
+            .function("getImplementation", &mx::Document::getImplementation)
+            .function("getImplementations", &mx::Document::getImplementations)
+            .function("removeImplementation", &mx::Document::removeImplementation)
+            .function("addUnitDef", &mx::Document::addUnitDef)
+            .function("getUnitDef", &mx::Document::getUnitDef)
+            .function("getUnitDefs", &mx::Document::getUnitDefs)
+            .function("removeUnitDef", &mx::Document::removeUnitDef)
+            .function("addUnitTypeDef", &mx::Document::addUnitTypeDef)
+            .function("getUnitTypeDef", &mx::Document::getUnitTypeDef)
+            .function("getUnitTypeDefs", &mx::Document::getUnitTypeDefs)
+            .function("removeUnitTypeDef", &mx::Document::removeUnitTypeDef)
+            .function("upgradeVersion", &mx::Document::upgradeVersion)
+            .function("setColorManagementSystem", &mx::Document::setColorManagementSystem)
+            .function("hasColorManagementSystem", &mx::Document::hasColorManagementSystem)
+            .function("getColorManagementSystem", &mx::Document::getColorManagementSystem)
+            .function("setColorManagementConfig", &mx::Document::setColorManagementConfig)
+            .function("hasColorManagementConfig", &mx::Document::hasColorManagementConfig)
+            .function("getColorManagementConfig", &mx::Document::getColorManagementConfig);
     }
 }

@@ -4,39 +4,36 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
-using namespace emscripten;
-
+namespace ems = emscripten;
 namespace mx = MaterialX;
-
-using namespace mx;
 
 extern "C"
 {
     EMSCRIPTEN_BINDINGS(variant)
     {
-        class_<Variant, base<InterfaceElement>>("Variant")
-            .smart_ptr_constructor("Variant", &std::make_shared<Variant, ElementPtr, const string &>)
-            .smart_ptr<std::shared_ptr<const Variant>>("Variant")
-            .class_property("CATEGORY", &Variant::CATEGORY);
+        ems::class_<mx::Variant, ems::base<mx::InterfaceElement>>("Variant")
+            .smart_ptr_constructor("Variant", &std::make_shared<mx::Variant, mx::ElementPtr, const std::string &>)
+            .smart_ptr<std::shared_ptr<const mx::Variant>>("Variant")
+            .class_property("CATEGORY", &mx::Variant::CATEGORY);
 
-        class_<VariantSet, base<Element>>("VariantSet")
-            .smart_ptr_constructor("VariantSet", &std::make_shared<VariantSet, ElementPtr, const string &>)
-            .smart_ptr<std::shared_ptr<const VariantSet>>("VariantSet")
-            .function("addVariant", &VariantSet::addVariant)
-            .function("getVariant", &VariantSet::getVariant)
-            .function("getVariants", &VariantSet::getVariants)
-            .function("removeVariant", &VariantSet::removeVariant)
-            .class_property("CATEGORY", &VariantSet::CATEGORY);
+        ems::class_<mx::VariantSet, ems::base<mx::Element>>("VariantSet")
+            .smart_ptr_constructor("VariantSet", &std::make_shared<mx::VariantSet, mx::ElementPtr, const std::string &>)
+            .smart_ptr<std::shared_ptr<const mx::VariantSet>>("VariantSet")
+            .function("addVariant", &mx::VariantSet::addVariant)
+            .function("getVariant", &mx::VariantSet::getVariant)
+            .function("getVariants", &mx::VariantSet::getVariants)
+            .function("removeVariant", &mx::VariantSet::removeVariant)
+            .class_property("CATEGORY", &mx::VariantSet::CATEGORY);
 
-        class_<VariantAssign, base<Element>>("VariantAssign")
-            .smart_ptr_constructor("VariantAssign", &std::make_shared<VariantAssign, ElementPtr, const string &>)
-            .smart_ptr<std::shared_ptr<const VariantAssign>>("VariantAssign")
-            .function("setVariantSetString", &VariantAssign::setVariantSetString)
-            .function("hasVariantSetString", &VariantAssign::hasVariantSetString)
-            .function("getVariantSetString", &VariantAssign::getVariantSetString)
-            .function("setVariantString", &VariantAssign::setVariantString)
-            .function("hasVariantString", &VariantAssign::hasVariantString)
-            .function("getVariantString", &VariantAssign::getVariantString)
-            .class_property("CATEGORY", &VariantAssign::CATEGORY);
+        ems::class_<mx::VariantAssign, ems::base<mx::Element>>("VariantAssign")
+            .smart_ptr_constructor("VariantAssign", &std::make_shared<mx::VariantAssign, mx::ElementPtr, const std::string &>)
+            .smart_ptr<std::shared_ptr<const mx::VariantAssign>>("VariantAssign")
+            .function("setVariantSetString", &mx::VariantAssign::setVariantSetString)
+            .function("hasVariantSetString", &mx::VariantAssign::hasVariantSetString)
+            .function("getVariantSetString", &mx::VariantAssign::getVariantSetString)
+            .function("setVariantString", &mx::VariantAssign::setVariantString)
+            .function("hasVariantString", &mx::VariantAssign::hasVariantString)
+            .function("getVariantString", &mx::VariantAssign::getVariantString)
+            .class_property("CATEGORY", &mx::VariantAssign::CATEGORY);
     }
 }

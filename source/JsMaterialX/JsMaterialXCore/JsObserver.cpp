@@ -6,41 +6,38 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
-using namespace emscripten;
-
+namespace ems = emscripten;
 namespace mx = MaterialX;
-
-using namespace mx;
 
 extern "C"
 {
     EMSCRIPTEN_BINDINGS(observer)
     {
-        class_<Observer>("Observer")
-            .smart_ptr_constructor("Observer", &std::make_shared<Observer>)
-            .smart_ptr<std::shared_ptr<const Observer>>("Observer")
-            .function("onAddElement", &Observer::onAddElement)
-            .function("onRemoveElement", &Observer::onRemoveElement)
-            .function("onSetAttribute", &Observer::onSetAttribute)
-            .function("onRemoveAttribute", &Observer::onRemoveAttribute)
-            .function("onCopyContent", &Observer::onCopyContent)
-            .function("onClearContent", &Observer::onClearContent)
-            .function("onRead", &Observer::onRead)
-            .function("onWrite", &Observer::onWrite)
-            .function("onBeginUpdate", &Observer::onBeginUpdate)
-            .function("onEndUpdate", &Observer::onEndUpdate);
+        ems::class_<mx::Observer>("Observer")
+            .smart_ptr_constructor("Observer", &std::make_shared<mx::Observer>)
+            .smart_ptr<std::shared_ptr<const mx::Observer>>("Observer")
+            .function("onAddElement", &mx::Observer::onAddElement)
+            .function("onRemoveElement", &mx::Observer::onRemoveElement)
+            .function("onSetAttribute", &mx::Observer::onSetAttribute)
+            .function("onRemoveAttribute", &mx::Observer::onRemoveAttribute)
+            .function("onCopyContent", &mx::Observer::onCopyContent)
+            .function("onClearContent", &mx::Observer::onClearContent)
+            .function("onRead", &mx::Observer::onRead)
+            .function("onWrite", &mx::Observer::onWrite)
+            .function("onBeginUpdate", &mx::Observer::onBeginUpdate)
+            .function("onEndUpdate", &mx::Observer::onEndUpdate);
 
-        function("createObservedDocument", &Document::createDocument<ObservedDocument>);
+        ems::function("createObservedDocument", &mx::Document::createDocument<mx::ObservedDocument>);
 
-        class_<ObservedDocument, base<Document>>("ObservedDocument")
-            .smart_ptr_constructor("ObservedDocument", &std::make_shared<ObservedDocument, ElementPtr, const string &>)
-            .smart_ptr<std::shared_ptr<const ObservedDocument>>("ObservedDocument")
-            .function("copy", &ObservedDocument::copy)
-            .function("addObserver", &ObservedDocument::addObserver)
-            .function("removeObserver", &ObservedDocument::removeObserver)
-            .function("clearObservers", &ObservedDocument::clearObservers)
-            .function("getUpdateScope", &ObservedDocument::getUpdateScope)
-            .function("enableCallbacks", &ObservedDocument::enableCallbacks)
-            .function("disableCallbacks", &ObservedDocument::disableCallbacks);
+        ems::class_<mx::ObservedDocument, ems::base<mx::Document>>("ObservedDocument")
+            .smart_ptr_constructor("ObservedDocument", &std::make_shared<mx::ObservedDocument, mx::ElementPtr, const std::string &>)
+            .smart_ptr<std::shared_ptr<const mx::ObservedDocument>>("ObservedDocument")
+            .function("copy", &mx::ObservedDocument::copy)
+            .function("addObserver", &mx::ObservedDocument::addObserver)
+            .function("removeObserver", &mx::ObservedDocument::removeObserver)
+            .function("clearObservers", &mx::ObservedDocument::clearObservers)
+            .function("getUpdateScope", &mx::ObservedDocument::getUpdateScope)
+            .function("enableCallbacks", &mx::ObservedDocument::enableCallbacks)
+            .function("disableCallbacks", &mx::ObservedDocument::disableCallbacks);
     }
 }
