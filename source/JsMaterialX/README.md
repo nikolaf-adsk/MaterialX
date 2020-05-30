@@ -24,7 +24,8 @@ cd emsdk
 ./emsdk activate latest
 ```
 
-For more information follow the steps described in the [emscripten documentation](https://emscripten.org/docs/getting_started/downloads.html). 
+For more information follow the steps described in the [emscripten documentation](https://emscripten.org/docs/getting_started/downloads.html).
+The Emscripten toolchain is documented [here](https://emscripten.org/docs/building_from_source/toolchain_what_is_needed.html).
 
 ### Build
 In the root of directory of this repository run the following:
@@ -32,10 +33,10 @@ In the root of directory of this repository run the following:
 #### CMake
 The JavasScript library can be built using cmake and make.
 
-1. Create the `_build` folder
+1. Create the `build` folder from in the *root* of the repository.
 ```sh
-mkdir -p ./_build
-cd ./_build
+mkdir -p ./build
+cd ./build
 ```
 
 2. Run cmake and make
@@ -44,18 +45,20 @@ This option can be omitted if the `emsdk/emsdk_env.sh` script was run before han
 
 ```sh
 # This will generate the release library
-cmake ../../.. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=/mnt/c/GitHub/PUBLIC/emsdk
-make
+cmake .. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=/mnt/c/GitHub/PUBLIC/emsdk
+cmake --build .
 ```
 
 For Windows use [Ninja](https://ninja-build.org/) as the cmake generator.
 ```sh
-cmake ../../.. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=C:\GitHub\PUBLIC\emsdk -G "Ninja"
+cmake .. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=C:\GitHub\PUBLIC\emsdk -G "Ninja"
 cmake --build .
 ```
 
+-G "Visual Studio 15 2017" -A "%ARCH%"
+
 ### Output
-After building the project the `MaterialXLib.wasm` and `MaterialXLib.js` files can be found in `./_build/source/JsMaterialX/`.
+After building the project the `JsMaterialX.wasm` and `JsMaterialX.js` files can be found in `./_build/source/JsMaterialX/`.
 
 ### Testing
 The JavaScript tests are located in `./test` folder and are defined with the `.spec.js` suffix.

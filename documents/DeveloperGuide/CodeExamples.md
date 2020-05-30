@@ -75,7 +75,7 @@ print str(roughness.getBoundValue(material))
 #### JavaScript
 
 ~~~{.js}
-import Module from './MaterialXLib.js';
+import Module from './JsMaterialX.js';
 
 Module().then((_module) => {
     // Get the MaterialX namespace.
@@ -165,7 +165,7 @@ for elem in doc.traverseTree():
 #### JavaScript
 
 ~~~{.js}
-import Module from './MaterialXLib.js';
+import Module from './JsMaterialX.js';
 
 Module().then((_module) => {
     // Get the MaterialX namespace.
@@ -264,7 +264,7 @@ for material in doc.getMaterials():
 #### JavaScript
 
 ~~~{.js}
-import Module from './MaterialXLib.js';
+import Module from './JsMaterialX.js';
 
 Module().then((_module) => {
     // Get the MaterialX namespace.
