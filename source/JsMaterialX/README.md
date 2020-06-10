@@ -55,7 +55,18 @@ cmake .. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=C:\GitHub\PUBLIC\emsdk -
 cmake --build .
 ```
 
--G "Visual Studio 15 2017" -A "%ARCH%"
+#### Docker
+It is also possible to build the project with [docker](https://docs.docker.com/) here are the required steps:
+
+1. Get the emscripten docker image
+```sh
+docker run -dit --name emscripten -v {path_to_MaterialX}:/src trzeci/emscripten:sdk-incoming-64bit bash
+```
+
+2. 
+```sh
+docker exec -it emscripten sh -c "cd build && cmake .. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=/emsdk_portable/ && cmake --build . --target install"
+```
 
 ### Output
 After building the project the `JsMaterialX.wasm` and `JsMaterialX.js` files can be found in `./_build/source/JsMaterialX/`.

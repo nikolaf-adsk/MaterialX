@@ -66,6 +66,24 @@ matrix:
       addons:
         apt:
           packages: [*packages_base, clang-9]
+    # WASM build
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      env: CONFIG=Wasm
+      language: node_js
+      node_js:
+        - node
+      sudo: required
+      services:
+        - docker
+      before_install:
+        - docker run -dit --name emscripten -v $(pwd):/src trzeci/emscripten:sdk-incoming-64bit bash
+      script:
+        - mkdir build
+        - docker exec -it emscripten sh -c "cd build && cmake .. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=/emsdk_portable/ && cmake --build . --target install && cd ../source/JsMaterialX/test && npm install && npm run test"
+
+
 
 before_install:
   - export PY=3
