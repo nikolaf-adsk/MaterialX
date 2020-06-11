@@ -43,8 +43,6 @@ Additional options for the generation of MaterialX Python include the following:
 
 Building the JavaScript and WebAssembly library requires the user to install and activate the emsdk environment. For more information follow the instructions in the JsMaterialX [README.md](../../source/JsMaterialX/README.md).
 
-The `MATERIALX_BUILD_JS` option will turn off the `MATERIALX_BUILD_RENDER` and the `MATERIALX_BUILD_TESTS` options.
-
 Additional options for the generation of MaterialX JavaScript include the following:
 
 - `MATERIALX_EMSDK_PATH`: Path to the folder that contains emsdk. This option can be omitted if `emsdk_env.sh` or `emsdk_env.bat` was run. 

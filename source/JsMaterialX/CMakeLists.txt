@@ -30,7 +30,7 @@ set(LIB_DEPS ${OUTPUT_LIBS}MaterialXCore/libMaterialXCore.a ${OUTPUT_LIBS}Materi
 set(JS_FLAGS "-I${SOURCE_FOLDER} ")
 
 # Add all of the required flags for emcc
-string(APPEND JS_FLAGS "-std=c++17 -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -s MODULARIZE=1 -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 -s MEMORY_GROWTH_LINEAR_STEP=32MB -s ALLOW_MEMORY_GROWTH=1 ")
+string(APPEND JS_FLAGS "-s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -s MODULARIZE=1 -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 -s MEMORY_GROWTH_LINEAR_STEP=32MB -s ALLOW_MEMORY_GROWTH=1 ")
 
 # Add the post javascript core files 
 string(APPEND JS_FLAGS "--post-js ${OUTPUT_CORE}JsTypes.js --post-js ${OUTPUT_CORE}JsGeom.js --post-js ${OUTPUT_CORE}JsDefinition.js --post-js ${OUTPUT_CORE}JsDocument.js --post-js ${OUTPUT_CORE}JsElement.js --post-js ${OUTPUT_CORE}JsInterface.js --post-js ${OUTPUT_CORE}JsLook.js --post-js ${OUTPUT_CORE}JsMaterial.js --post-js ${OUTPUT_CORE}JsNode.js --post-js ${OUTPUT_CORE}JsObserver.js --post-js ${OUTPUT_CORE}JsProperty.js --post-js ${OUTPUT_CORE}JsTraversal.js --post-js ${OUTPUT_CORE}JsUtil.js --post-js ${OUTPUT_CORE}JsValue.js --post-js ${OUTPUT_CORE}JsVariant.js ")

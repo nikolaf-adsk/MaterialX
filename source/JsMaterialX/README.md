@@ -45,27 +45,28 @@ This option can be omitted if the `emsdk/emsdk_env.sh` script was run before han
 
 ```sh
 # This will generate the release library
-cmake .. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=/mnt/c/GitHub/PUBLIC/emsdk
+cmake .. -DMATERIALX_BUILD_JS=ON -DMATERIALX_BUILD_RENDER=OFF -DMATERIALX_BUILD_TESTS=OFF -DMATERIALX_EMSDK_PATH=/mnt/c/GitHub/PUBLIC/emsdk
 cmake --build .
 ```
 
 For Windows use [Ninja](https://ninja-build.org/) as the cmake generator.
 ```sh
-cmake .. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=C:\GitHub\PUBLIC\emsdk -G "Ninja"
+cmake .. -DMATERIALX_BUILD_JS=ON -DMATERIALX_BUILD_RENDER=OFF -DMATERIALX_BUILD_TESTS=OFF -DMATERIALX_EMSDK_PATH=C:\GitHub\PUBLIC\emsdk -G "Ninja"
 cmake --build .
 ```
+
 
 #### Docker
 It is also possible to build the project with [docker](https://docs.docker.com/) here are the required steps:
 
 1. Get the emscripten docker image
 ```sh
-docker run -dit --name emscripten -v {path_to_MaterialX}:/src trzeci/emscripten:sdk-incoming-64bit bash
+docker run -dit --name emscripten -v {path_to_MaterialX}:/src trzeci/emscripten:1.39.7-upstream bash
 ```
 
-2. 
+2. Build the JavaScript bindings.
 ```sh
-docker exec -it emscripten sh -c "cd build && cmake .. -DMATERIALX_BUILD_JS=ON -DMATERIALX_EMSDK_PATH=/emsdk_portable/ && cmake --build . --target install"
+docker exec -it emscripten sh -c "cd build && cmake .. -DMATERIALX_BUILD_JS=ON -DMATERIALX_BUILD_RENDER=OFF -DMATERIALX_BUILD_TESTS=OFF -DMATERIALX_EMSDK_PATH=/emsdk_portable/ && cmake --build . --target install"
 ```
 
 ### Output
